@@ -1,0 +1,4 @@
+extern/log/server.log
+server/testOutput
+server/testSrc/testExtern/log
+ui/dist
