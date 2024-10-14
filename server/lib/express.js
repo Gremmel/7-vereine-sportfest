@@ -5,17 +5,23 @@ import logger from './logger.js';
 import path from 'path';
 
 // ESM braucht __dirname-Ersatz
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const filename = fileURLToPath(import.meta.url);
+const dirname = path.dirname(filename);
 
 const expressApp = {
   app: express(),
   server: undefined,
   port: 3000,
 
-  init () {
+  init (config) {
+    logger.fatal(config);
+
+    if (config?.express?.port) {
+      this.port = config.express.port;
+    }
+
     // Static Path für UI
-    this.app.use('/', express.static(path.join(__dirname, '..', '..', 'ui', 'dist')));
+    this.app.use('/', express.static(path.join(dirname, '..', '..', 'ui', 'dist')));
 
     this.server = http.createServer(this.app);
   },

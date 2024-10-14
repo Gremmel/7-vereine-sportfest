@@ -1,2 +1,2 @@
 
-Grundgerüst für interne Apps mit nodejs und vue 3
+Internetpräsenz für das 7 Vereine Sportfest

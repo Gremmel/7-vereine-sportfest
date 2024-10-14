@@ -9,7 +9,7 @@
   "author": "",
   "type": "module",
   "dependencies": {
-    "eslint-config-gre": "^1.0.2",
+    "eslint-config-gre": "^1.0.3",
     "express": "^4.21.1",
     "fs-extra": "^11.2.0",
     "json-stringify-safe": "^5.0.1",

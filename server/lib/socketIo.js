@@ -1,6 +1,6 @@
+import HomeView from './vueController/HomeView.js';
 import logger from './logger.js'; // Logger importieren
 import { Server } from 'socket.io'; // socket.io importieren
-import HomeView from './vueController/HomeView.js';
 
 const socketIo = {
   server: undefined,

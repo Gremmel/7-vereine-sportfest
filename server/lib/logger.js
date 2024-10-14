@@ -7,8 +7,8 @@ import stringify from 'json-stringify-safe';
 const logfilename = 'server.log';
 
 // ESM braucht __dirname-Ersatz
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const filename = fileURLToPath(import.meta.url);
+const dirname = path.dirname(filename);
 
 // JSON-Layout hinzufügen
 log4js.addLayout('json', (config) => function (logEvent) {
@@ -28,7 +28,7 @@ log4js.configure({
   appenders: {
     file: {
       type: 'file',
-      filename: path.join(__dirname, 'log', logfilename), // Pfad zum Logfile
+      filename: path.join(dirname, 'log', logfilename), // Pfad zum Logfile
       maxLogSize: 3 * 1024 * 1024, // 3 MB
       backups: 3,
       layout: {
