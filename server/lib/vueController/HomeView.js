@@ -7,9 +7,11 @@ const HomeView = {
 
   init (ioClient, payload) {
     logger.debug('init', payload);
-    ioClient.emit('initHome', {
-      msg: 'Hallo vom Server'
-    });
+    setTimeout(() => {
+      ioClient.emit('initHome', {
+        msg: 'Hallo vom Server'
+      });
+    }, 5000);
   }
 
 };

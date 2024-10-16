@@ -1,4 +1,4 @@
-import HomeView from './vueController/HomeView.js';
+import homeView from './vueController/HomeView.js';
 import logger from './logger.js'; // Logger importieren
 import { Server } from 'socket.io'; // socket.io importieren
 
@@ -6,7 +6,6 @@ const socketIo = {
   server: undefined,
   io: undefined,
   clients: {},
-  vueControllers: {},
 
   init (server) {
     this.server = server;
@@ -23,8 +22,8 @@ const socketIo = {
 
       client.on('HomeView', (data) => {
         logger.info('homeView data', data);
-        if (data.callFunction && typeof HomeView[data.callFunction] === 'function') {
-          HomeView[data.callFunction](client, data.payload);
+        if (data.callFunction && typeof homeView[data.callFunction] === 'function') {
+          homeView[data.callFunction](client, data.payload);
         }
       });
 
