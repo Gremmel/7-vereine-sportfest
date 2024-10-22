@@ -3,14 +3,14 @@ import './assets/main.css'
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 
-import socketPlugin from './plugins/socketPlugin';
+// import socketPlugin from './plugins/socketPlugin';
 
 import App from './App.vue'
 import router from './router'
 
 const app = createApp(App)
 
-app.use(socketPlugin);
+// app.use(socketPlugin);
 app.use(createPinia())
 app.use(router)
 

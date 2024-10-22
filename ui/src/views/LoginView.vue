@@ -38,6 +38,7 @@ export default {
         });
 
         const result = await response.json();
+        console.log('handleLogin response', response);
 
         if (response.ok) {
           successMessage.value = result.message;
