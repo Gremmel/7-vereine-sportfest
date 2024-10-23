@@ -19,8 +19,8 @@ const expressApp = {
 
   init (config) {
     logger.fatal(config);
-    authMiddleware.token = config.JWT.secret;
     logger.fatal(config.JWT.secret);
+    authMiddleware.setSecret(config.JWT.secret);
 
     // Verwende CORS für alle Routen
     this.app.use(cors({
@@ -45,7 +45,7 @@ const expressApp = {
     ];
 
     // API-Routen
-    this.app.get('/api/protected', authMiddleware.check.bind(authMiddleware), (req, res) => {
+    this.app.get('/api/protected', authMiddleware.check('testRolle').bind(authMiddleware), (req, res) => {
       res.json({ message: 'Hallo von der API protected!' });
     });
 

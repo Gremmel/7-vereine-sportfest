@@ -1,13 +1,19 @@
+/* eslint-disable callback-return */
 import logger from '../logger.js';
 import jwt from 'jsonwebtoken';
 
 const authMiddleware = {
   secret: null,
 
+  setSecret (secret) {
+    this.secret = secret;
+  },
+
   // Dummy-Funktion zur Überprüfung des Tokens (Anpassbar)
   verifyToken (token, secret) {
     try {
       logger.info('verifyToken', secret);
+
       // Überprüfe den Token und dekodiere die Payload
       const decoded = jwt.verify(token, secret);
 
@@ -15,21 +21,36 @@ const authMiddleware = {
 
       return decoded; // Gibt die dekodierte Payload zurück, wenn der Token gültig ist
     } catch (err) {
+      logger.error('Token ungültig oder abgelaufen', err);
+
       // Wenn der Token ungültig oder abgelaufen ist, gebe false zurück oder werfe einen Fehler
       return false; // Hier kannst du auch Fehlerbehandlung einfügen, wenn gewünscht
     }
   },
 
   // Authentifizierungs-Middleware
-  check (req, res, next) {
-    const token = req.cookies.session_token; // Hole das Session-Token aus dem Cookie
+  check (requiredRole) {
+    return (req, res, next) => {
+      const token = req.cookies.session_token;
 
-    if (token && this.verifyToken(token, this.secret)) {
-      // eslint-disable-next-line callback-return
-      next(); // Wenn der Token gültig ist, rufe next() auf
-    } else {
-      res.status(401).json({ message: 'Nicht autorisiert' }); // 401: Nicht autorisiert
-    }
+      if (token) {
+        const decoded = this.verifyToken(token, this.secret);
+
+        if (decoded) {
+          // Hier kannst du die Rolle des Benutzers überprüfen
+          if (requiredRole && decoded.role !== requiredRole) {
+            return res.status(403).json({ message: 'Zugriff verweigert: Unzureichende Berechtigungen' });
+          }
+
+          // Wenn alles passt, rufe next() auf
+          next();
+        } else {
+          res.status(401).json({ message: 'Nicht autorisiert' });
+        }
+      } else {
+        res.status(401).json({ message: 'Kein Token vorhanden' });
+      }
+    };
   }
 };
 
