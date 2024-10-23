@@ -1,0 +1,9 @@
+{
+  "name": "create-db-table",
+  "version": "1.0.0",
+  "main": "create-db-table.js",
+  "type": "module",
+  "dependencies": {
+    "better-sqlite3": "^11.5.0"
+  }
+}

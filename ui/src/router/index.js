@@ -21,9 +21,30 @@ const router = createRouter({
       // route level code-splitting
       // this generates a separate chunk (About.[hash].js) for this route
       // which is lazy-loaded when the route is visited.
-      component: () => import('../views/AboutView.vue')
+      component: () => import('../views/AboutView.vue'),
+      meta: {
+        requiresRole: 'admin'  // Hier wird die erforderliche Rolle definiert
+      }
     }
   ]
 })
+
+// Navigation Guard
+router.beforeEach((to, from, next) => {
+  const requiredRole = to.meta.requiresRole;
+
+  if (requiredRole) {
+    // Prüfe, ob der Benutzer eingeloggt ist und die erforderliche Rolle hat
+    const userRole = 'test';
+
+    if (userRole === requiredRole) {
+      next(); // Benutzer hat die richtige Rolle, Route erlauben
+    } else {
+      next({ name: 'home' }); // Umleiten, falls die Rolle nicht passt
+    }
+  } else {
+    next(); // Wenn keine spezielle Rolle erforderlich ist, Route erlauben
+  }
+});
 
 export default router

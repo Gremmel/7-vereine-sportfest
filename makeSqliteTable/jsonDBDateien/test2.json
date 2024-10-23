@@ -1,0 +1,17 @@
+[
+  {
+    "id": 1,
+    "key1t2": "ob1 key1",
+    "key2t2": "ob1 key2"
+  },
+  {
+    "id": 2,
+    "key1t2": "ob2 key1",
+    "key2t2": "ob2 key2"
+  },
+  {
+    "id": 3,
+    "key1t2": "ob3 key1",
+    "key2t2": "ob3 key2"
+  }
+]
