@@ -1,5 +1,5 @@
 <script setup>
-import TheWelcome from '../components/TheWelcome.vue'
+// socket io verbindung test
 // import { ref, onMounted, getCurrentInstance } from 'vue';
 
 // const message = ref('noch nichts neues');
@@ -24,6 +24,6 @@ import TheWelcome from '../components/TheWelcome.vue'
 
 <template>
   <main>
-    <TheWelcome />
+    Home
   </main>
 </template>

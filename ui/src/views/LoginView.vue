@@ -21,8 +21,8 @@ import { ref } from 'vue';
 
 export default {
   setup() {
-    const username = ref('');  // v-model gebunden
-    const password = ref('');  // v-model gebunden
+    const username = ref('');
+    const password = ref('');
     const errorMessage = ref('');
     const successMessage = ref('');
 
