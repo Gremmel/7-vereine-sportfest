@@ -24,6 +24,10 @@
 
 <template>
   <main>
-    Home
+    <div class="text-center mt-4">
+      <h1>
+        Home
+      </h1>
+    </div>
   </main>
 </template>

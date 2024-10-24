@@ -1,23 +1,33 @@
 <template>
-  <div class="login-container">
-    <h1>Login</h1>
-    <form @submit.prevent="handleLogin">
-      <label for="username">Benutzername:</label>
-      <input type="text" v-model="username" id="username" required>
+  <div class="d-flex justify-content-center align-items-center mt-4">
+    <div class="card loginCard">
+      <div class="card-header">
+        <h3>
+          Login
+        </h3>
+      </div>
+      <div class="card-body">
+        <div class="form-floating mb-3">
+          <input v-model="username" type="text" class="form-control" id="floatingInput" placeholder="Benutzername">
+          <label for="floatingInput">Benutzername</label>
+        </div>
+        <div class="form-floating">
+          <input v-model="password" type="password" class="form-control" id="floatingPassword" placeholder="Password">
+          <label for="floatingPassword">Passwort</label>
+        </div>
+        <button class="btn btn-success mt-2" type="button" @click="handleLogin">Login</button>
+      </div>
 
-      <label for="password">Passwort:</label>
-      <input type="password" v-model="password" id="password" required>
-
-      <button type="submit">Login</button>
-    </form>
-
-    <p v-if="errorMessage" class="error">{{ errorMessage }}</p>
-    <p v-if="successMessage" class="success">{{ successMessage }}</p>
+      <p v-if="errorMessage" class="error m-3">{{ errorMessage }}</p>
+      <p v-if="successMessage" class="success m-3">{{ successMessage }}</p>
+    </div>
   </div>
 </template>
 
 <script>
 import { ref } from 'vue';
+import { useUserStore } from '@/stores/userStore';
+import { useRouter } from 'vue-router';
 
 export default {
   setup() {
@@ -25,6 +35,9 @@ export default {
     const password = ref('');
     const errorMessage = ref('');
     const successMessage = ref('');
+
+    const userStore = useUserStore();
+    const router = useRouter();
 
     const handleLogin = async () => {
       try {
@@ -43,8 +56,14 @@ export default {
         if (response.ok) {
           successMessage.value = result.message;
           errorMessage.value = '';
-          // Optional: Weiterleitung nach erfolgreichem Login
-          // this.$router.push('/dashboard');
+
+          userStore.setUser({
+            name: response.name,
+            roles: response.roles,
+          });
+
+          // Weiterleitung nach erfolgreichem Login
+          router.push('/');
         } else {
           errorMessage.value = result.message || 'Login fehlgeschlagen';
           successMessage.value = '';
@@ -69,42 +88,18 @@ export default {
 </script>
 
 <style scoped>
-.login-container {
-  max-width: 300px;
-  margin: 0 auto;
-  padding: 20px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-}
+  .loginCard {
+    width: 25rem;
+  }
 
-input {
-  display: block;
-  width: 100%;
-  padding: 8px;
-  margin-bottom: 10px;
-}
+  .error {
+    color: red;
+    margin-top: 10px;
+  }
 
-button {
-  width: 100%;
-  padding: 10px;
-  background-color: #4CAF50;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-}
+  .success {
+    color: green;
+    margin-top: 10px;
+  }
 
-button:hover {
-  background-color: #45a049;
-}
-
-.error {
-  color: red;
-  margin-top: 10px;
-}
-
-.success {
-  color: green;
-  margin-top: 10px;
-}
 </style>
