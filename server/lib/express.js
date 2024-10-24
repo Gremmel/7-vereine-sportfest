@@ -19,7 +19,6 @@ const expressApp = {
 
   init (config) {
     logger.fatal(config);
-    logger.fatal(config.JWT.secret);
     authMiddleware.setSecret(config.JWT.secret);
 
     // Verwende CORS für alle Routen
@@ -33,7 +32,7 @@ const expressApp = {
     // Dies teilt Express mit, dass es den X-Forwarded-*-Headern, die vom Proxy gesendet werden
     // (wie X-Forwarded-Proto für das Protokoll), vertrauen soll. Dadurch wird Express bewusst,
     // dass die ursprüngliche Verbindung tatsächlich über HTTPS war, und es erlaubt das Setzen von Cookies mit dem secure-Flag.
-    this.app.set('trust proxy', 1);
+    // this.app.set('trust proxy', 1);
 
     // Middleware zum Parsen von Cookies
     this.app.use(express.json());

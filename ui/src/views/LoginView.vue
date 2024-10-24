@@ -54,13 +54,9 @@ export default {
         console.log('handleLogin response', response);
 
         if (response.ok) {
-          successMessage.value = result.message;
           errorMessage.value = '';
 
-          userStore.setUser({
-            name: response.name,
-            roles: response.roles,
-          });
+          userStore.setUser(result.user);
 
           // Weiterleitung nach erfolgreichem Login
           router.push('/');

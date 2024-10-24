@@ -1,13 +1,12 @@
 import logger from '../logger.js';
 import authMiddleware from '../middleware/authMiddleware.js';
-import jwt from 'jsonwebtoken';
+import loginController from './loginController.js';
+import sessionController from './sessionController.js';
+// import userController from './userController';
 
 const apiRoutes = {
   init (app, config) {
-    //todo Dummy-Datenbank für Benutzer (zum Beispiel)
-    const users = [
-      { id: 1, username: 'admin', password: '1234' } // Beispiel-Benutzer
-    ];
+    sessionController.init(config);
 
     // API-Routen
     app.get('/api/protected', authMiddleware.check('testRolle').bind(authMiddleware), (req, res) => {
@@ -23,14 +22,14 @@ const apiRoutes = {
       const { username, password } = req.body;
 
       // Überprüfe Benutzername und Passwort
-      const user = users.find((us) => us.username === username && us.password === password);
+      const user = loginController.loginUser(username, password);
 
       if (user) {
-        // Wenn der Benutzer existiert, erzeuge einen JWT
-        const token = jwt.sign({ userId: user.id, username: user.username }, config.JWT.secret, { expiresIn: '1h' });
+        // session erzeugen
+        const token = sessionController.addSession(user);
 
         // Setze das Token als HTTP-Only Cookie
-        res.cookie('7vsf-session_token', token, {
+        res.cookie('session_token', token, {
           httpOnly: true, // Cookie nicht durch JavaScript im Browser zugreifbar
           // todo secure in der produktiv umgebung mit nginx auf true setzen
           secure: false, // Setze dies auf true, wenn du HTTPS verwendest
@@ -39,7 +38,7 @@ const apiRoutes = {
         });
 
         // Erfolgsnachricht senden
-        res.json({ message: 'Login erfolgreich!' });
+        res.json({ user });
       } else {
         // Falsche Zugangsdaten
         res.status(401).json({ message: 'Ungültiger Benutzername oder Passwort' });
@@ -49,12 +48,27 @@ const apiRoutes = {
     // Logout-Route (GET)
     app.get('/api/logout', (req, res) => {
       logger.info('/api/logout');
-      res.clearCookie('7vsf-session_token', {
+      res.clearCookie('session_token', {
         httpOnly: true,
         secure: false,
         sameSite: 'strict'
       });
       res.json({ message: 'Erfolgreich abgemeldet' });
+    });
+
+    // Logout-Route (GET)
+    app.get('/api/getSession', (req, res) => {
+      const token = req.cookies.session_token;
+
+      logger.info('/api/getSession', token);
+
+      if (token) {
+        const session = sessionController.getSessionByToken(token);
+
+        res.json({ user: session.user });
+      } else {
+        res.json({ message: 'Keine session vorhanden' });
+      }
     });
   }
 };
