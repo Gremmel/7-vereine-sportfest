@@ -1,5 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
+import UserView from '../views/UserView.vue'
+import NewUserView from '../views/NewUserView.vue'
 import LoginView from '../views/LoginView.vue'
 
 const router = createRouter({
@@ -11,25 +13,19 @@ const router = createRouter({
       component: HomeView
     },
     {
+      path: '/users',
+      name: 'users',
+      component: UserView
+    },
+    {
+      path: '/newuser',
+      name: 'newuser',
+      component: NewUserView
+    },
+    {
       path: '/login',
       name: 'login',
       component: LoginView
-    },
-    {
-      path: '/about',
-      name: 'about',
-      // route level code-splitting
-      // this generates a separate chunk (About.[hash].js) for this route
-      // which is lazy-loaded when the route is visited.
-      component: () => import('../views/AboutView.vue')
-    },
-    {
-      path: '/protected',
-      name: 'protected',
-      component: () => import('../views/AboutView.vue'),
-      meta: {
-        requiresRole: 'admin'  // Hier wird die erforderliche Rolle definiert
-      }
     }
   ]
 })

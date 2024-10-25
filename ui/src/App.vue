@@ -37,5 +37,9 @@ onMounted(() => {
   <RouterView />
 </template>
 
-<style scoped>
+<style>
+body {
+  margin: 0; /* Entfernt den Standard-Margin */
+  padding-top: 4rem; /* Optional: Platz schaffen, damit der Inhalt nicht unter dem Header verborgen ist */
+}
 </style>

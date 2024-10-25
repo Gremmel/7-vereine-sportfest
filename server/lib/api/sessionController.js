@@ -22,7 +22,8 @@ const sessionController = {
 
       return newToken;
     } catch (error) {
-      console.error('Fehler beim Verlängern des Tokens:', error);
+      logger.error('Fehler beim Verlängern des Tokens:', error);
+
       return null;
     }
   },

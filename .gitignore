@@ -2,3 +2,5 @@ extern
 server/testOutput
 server/testSrc/testExtern/log
 server/lib/log/server.log
+makeSqliteTable/jsonDBDateien/*
+makeSqliteTable/datenbank.db

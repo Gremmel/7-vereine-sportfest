@@ -38,7 +38,7 @@ const authMiddleware = {
 
         if (decoded) {
           // Hier kannst du die Rolle des Benutzers überprüfen
-          if (requiredRole && decoded.role !== requiredRole) {
+          if (requiredRole && decoded.user.role !== requiredRole) {
             return res.status(403).json({ message: 'Zugriff verweigert: Unzureichende Berechtigungen' });
           }
 

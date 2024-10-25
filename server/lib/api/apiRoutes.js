@@ -2,7 +2,7 @@ import logger from '../logger.js';
 import authMiddleware from '../middleware/authMiddleware.js';
 import loginController from './loginController.js';
 import sessionController from './sessionController.js';
-// import userController from './userController';
+import userController from './userController.js';
 
 const apiRoutes = {
   init (app, config) {
@@ -17,12 +17,14 @@ const apiRoutes = {
       res.json({ message: 'Hallo von der API! unprotected' });
     });
 
-    app.post('/api/login', (req, res) => {
+    app.post('/api/login', async (req, res) => {
       logger.fatal('/api/login req.body', req.body);
       const { username, password } = req.body;
 
       // Überprüfe Benutzername und Passwort
-      const user = loginController.loginUser(username, password);
+      const user = await loginController.loginUser(username, password);
+
+      logger.fatal('api login user', user);
 
       if (user) {
         // session erzeugen
@@ -68,6 +70,37 @@ const apiRoutes = {
         res.json({ user: session.user });
       } else {
         res.json({ message: 'Keine session vorhanden' });
+      }
+    });
+
+    // gibt die Benutzerliste zurück
+    app.get('/api/getUserList', authMiddleware.check('admin').bind(authMiddleware), (req, res) => {
+      const token = req.cookies.session_token;
+
+      logger.info('/api/getUserList', token);
+
+      const users = userController.getUsers();
+
+      if (token) {
+        res.json({ users });
+      } else {
+        res.json({ message: 'Keine session vorhanden' });
+      }
+    });
+
+    // legt einen neuen User an
+    app.post('/api/adduser', (req, res) => {
+      logger.fatal('/api/adduser req.body', req.body);
+
+      // Neuen Benutzer anlegen
+      const newUser = userController.addUser(req.body);
+
+      if (newUser) {
+        // Erfolgsnachricht senden
+        res.json({ newUser });
+      } else {
+        // Falsche Zugangsdaten
+        res.status(401).json({ message: 'Fehler beim anlegen des neuen Users' });
       }
     });
   }
