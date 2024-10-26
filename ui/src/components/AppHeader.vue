@@ -13,7 +13,7 @@
               <li class="nav-item">
                 <RouterLink class="nav-link" to="/">Home</RouterLink>
               </li>
-              <li class="nav-item">
+              <li v-if="showUserLink" class="nav-item">
                 <RouterLink class="nav-link" to="/users">Benutzer</RouterLink>
               </li>
             </ul>
@@ -41,31 +41,19 @@
   const isLoggedIn = computed(() => userStore.isLoggedIn);
   const router = useRouter();
 
+  // Ermitteln ob der Benutzer die Berechtigung für den Link Benutzer hat
+  const userRoute = router.getRoutes().find(route => route.name === 'users');
+  const userRouteRole = userRoute.meta.requiresRole;
+  const showUserLink = computed(() => {
+    return userStore.hasRole(userRouteRole);
+  });
+
   // Benutzer abmelden
   const doLogout = async () => {
     console.log('doLogout');
 
     // Benutzer aus dem Store entfernen
-    userStore.clearUser();
-
-    // Beim Server abmelden
-    try {
-      const response = await fetch('/api/logout', {
-        method: 'GET',
-        credentials: 'include'  // Cookies mitsenden
-      });
-
-      const result = await response.json();
-      console.log('doLogout response', response);
-
-      if (response.ok) {
-        console.log('logout IO');
-      } else {
-        console.error(result.message || 'Login fehlgeschlagen');
-      }
-    } catch (error) {
-      console.error('Es gab ein Problem mit dem Abmelden beim Server:', error);
-    }
+    await userStore.logout()
 
     // Weiterleitung nach erfolgreichem Logout
     router.push('/');

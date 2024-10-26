@@ -7,7 +7,7 @@ import bcrypt from 'bcrypt';
 class UserController {
   getUsers () {
     try {
-      const stmt = dbController.prepare('SELECT * FROM fos_user ORDER BY username');
+      const stmt = dbController.prepare('SELECT * FROM fos_user ORDER BY username COLLATE NOCASE');
       const users = stmt.all();
 
       return users;
@@ -20,7 +20,7 @@ class UserController {
 
   getUserByName (username) {
     try {
-      const stmt = dbController.prepare(`SELECT * FROM fos_user WHERE username == '${username}'`);
+      const stmt = dbController.prepare(`SELECT * FROM fos_user WHERE username = '${username}' COLLATE NOCASE`);
       const user = stmt.get();
 
       return user;

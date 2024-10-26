@@ -6,6 +6,9 @@
           Login
         </h3>
       </div>
+      <p v-if="message" class="text-danger m-2 text-center">
+        {{ message }}
+      </p>
       <div class="card-body">
         <div class="form-floating mb-3">
           <input v-model="username" type="text" class="form-control" id="floatingInput" placeholder="Benutzername">
@@ -39,6 +42,8 @@ export default {
     const userStore = useUserStore();
     const router = useRouter();
 
+    const message = userStore.message;
+
     const handleLogin = async () => {
       try {
         const response = await fetch('/api/login', {
@@ -57,6 +62,7 @@ export default {
           errorMessage.value = '';
 
           userStore.setUser(result.user);
+          userStore.setMessage(null);
 
           // Weiterleitung nach erfolgreichem Login
           router.push('/');
@@ -77,7 +83,8 @@ export default {
       password,
       errorMessage,
       successMessage,
-      handleLogin
+      handleLogin,
+      message
     };
   }
 };

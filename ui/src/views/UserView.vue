@@ -40,6 +40,7 @@
 <script setup>
   import { onMounted, reactive } from 'vue';
   import { useRouter } from 'vue-router';
+  import { useUserStore } from '@/stores/userStore';
 
   const userList = reactive([]);
 
@@ -51,7 +52,6 @@
       });
 
       const result = await response.json();
-      console.log('getSession result', result);
 
       if (response.ok) {
         for (const user of result.users) {
@@ -70,6 +70,16 @@
           }
         }
 
+      } else if (response.status === 401) {
+        // Benutzer aus dem Store entfernen
+        const userStore = useUserStore();
+
+        await userStore.logout()
+
+        userStore.setMessage('Session ist abgelaufen bitte neu Anmelden');
+
+        // Weiterleitung nach erfolgreichem Logout
+        router.push('/login');
       } else {
         console.log(result.message || 'keine Daten vorhanden');
       }

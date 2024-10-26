@@ -9,16 +9,26 @@ const sessionController = {
     this.config = config;
   },
 
-  extendToken (oldToken, secretKey) {
+  extendToken (oldToken) {
     try {
       // Verifiziere das alte Token
-      const decoded = jwt.verify(oldToken, secretKey);
+      const decoded = jwt.verify(oldToken, this.config.JWT.secret);
 
       // Entferne sensible Felder wie `iat` und `exp` aus dem alten Token
+      // eslint-disable-next-line no-unused-vars
       const { iat, exp, ...rest } = decoded;
 
       // Erstelle ein neues Token mit einer neuen Ablaufzeit
-      const newToken = jwt.sign(rest, secretKey, { expiresIn: '1h' });  // Gültigkeit: 1 Stunde
+      const newToken = jwt.sign(rest, this.config.JWT.secret, { expiresIn: '1h' });
+
+      // token in session austauschen
+      for (const session of this.sessions) {
+        if (session.token === oldToken) {
+          this.token = newToken;
+        }
+      }
+
+      logger.fatal('extendToken', this.sessions);
 
       return newToken;
     } catch (error) {
@@ -41,6 +51,14 @@ const sessionController = {
     logger.warn('add session', this.sessions);
 
     return token;
+  },
+
+  removeSession (token) {
+    const index = this.sessions.findIndex((session) => session.token === token);
+
+    if (index !== -1) {
+      this.sessions.splice(index, 1);
+    }
   },
 
   getSessionByToken (token) {

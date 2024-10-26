@@ -9,14 +9,6 @@ const apiRoutes = {
     sessionController.init(config);
 
     // API-Routen
-    app.get('/api/protected', authMiddleware.check('testRolle').bind(authMiddleware), (req, res) => {
-      res.json({ message: 'Hallo von der API protected!' });
-    });
-
-    app.get('/api/unprotected', (req, res) => {
-      res.json({ message: 'Hallo von der API! unprotected' });
-    });
-
     app.post('/api/login', async (req, res) => {
       logger.fatal('/api/login req.body', req.body);
       const { username, password } = req.body;
@@ -50,6 +42,10 @@ const apiRoutes = {
     // Logout-Route (GET)
     app.get('/api/logout', (req, res) => {
       logger.info('/api/logout');
+      const token = req.cookies.session_token;
+
+      sessionController.removeSession(token);
+
       res.clearCookie('session_token', {
         httpOnly: true,
         secure: false,
@@ -74,7 +70,7 @@ const apiRoutes = {
     });
 
     // gibt die Benutzerliste zurück
-    app.get('/api/getUserList', authMiddleware.check('admin').bind(authMiddleware), (req, res) => {
+    app.get('/api/getUserList', authMiddleware.check('admin'), (req, res) => {
       const token = req.cookies.session_token;
 
       logger.info('/api/getUserList', token);
@@ -89,7 +85,7 @@ const apiRoutes = {
     });
 
     // legt einen neuen User an
-    app.post('/api/adduser', (req, res) => {
+    app.post('/api/adduser', authMiddleware.check('admin'), (req, res) => {
       logger.fatal('/api/adduser req.body', req.body);
 
       // Neuen Benutzer anlegen
