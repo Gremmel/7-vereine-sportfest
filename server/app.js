@@ -3,7 +3,8 @@ import { fileURLToPath } from 'url';
 import logger from './lib/logger.js'; // Logger importieren
 import fs from 'fs-extra';
 import path from 'path';
-import socketIo from './lib/socketIo.js'; // Socket.IO importieren
+
+// import socketIo from './lib/socketIo.js'; // Socket.IO importieren
 
 const filename = fileURLToPath(import.meta.url);
 const dirname = path.dirname(filename);
@@ -17,10 +18,9 @@ logger.debug('init express');
 // Webserver initialisieren
 express.init(config);
 
-logger.debug('init socket IO');
-
+// logger.debug('init socket IO');
 // Socket.IO initialisieren
-socketIo.init(express.server);
+// socketIo.init(express.server);
 
 // Signalbehandlung für SIGINT und SIGTERM
 process.on('SIGINT', async () => {

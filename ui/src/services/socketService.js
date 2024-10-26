@@ -8,7 +8,7 @@ class SocketService {
   // Initialisierung des Sockets
   constructor() {
     // dev
-    this.socket = io('http://192.168.201.42:3000'); // Server-URL anpassen
+    this.socket = io('http://localhost:3000'); // Server-URL anpassen
 
     // production
     // this.socket = io();
