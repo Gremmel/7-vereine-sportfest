@@ -21,7 +21,14 @@
               <td>{{ user.username }}</td>
               <td>{{ user.email }}</td>
               <td>
-                <input type="checkbox" :checked="user.enabled === '1'" disabled />
+                <input
+                  v-if="user.enabled === '1'"
+                  type="checkbox"
+                  :checked="user.enabled === '1'"
+                  style="pointer-events: none"
+                  class="form-check-input form-check-input-black"
+                  readonly
+                />
               </td>
               <td>
                 <ul class="list-group list-group-flush">
@@ -84,6 +91,7 @@
   import { useRouter } from 'vue-router';
   import { useUserStore } from '@/stores/userStore';
 
+  const userStore = useUserStore();
   const userList = reactive([]);
   const delUserName = ref('');
   const delUserId = ref(0);
@@ -118,13 +126,11 @@
 
       } else if (response.status === 401) {
         // Benutzer aus dem Store entfernen
-        const userStore = useUserStore();
-
         await userStore.logout()
 
         userStore.setMessage('Session ist abgelaufen bitte neu Anmelden');
 
-        // Weiterleitung nach erfolgreichem Logout
+        // weiterleiten zum login
         router.push('/login');
       } else {
         console.log(result.message || 'keine Daten vorhanden');
@@ -149,6 +155,20 @@
     delUserName.value = username;
     delUserId.value = id;
     showDeleteConfirmation();
+  }
+
+  function editUser (id) {
+    console.log('editUser', id);
+
+    //ausgewählten User in store Schreiben
+    for (const user of userList) {
+      if (user.id === id) {
+        userStore.setEditUser(user);
+      }
+    }
+
+    // zum Formular wechseln
+    router.push('/edituser');
   }
 
   // Zustandsvariable für das Modal
@@ -194,4 +214,8 @@
 </script>
 
 <style scoped>
+  .form-check-input-black {
+    background-color: black;
+    border-color: black;
+  }
 </style>

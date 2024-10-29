@@ -69,6 +69,5 @@
   width: 100%; /* Header soll die gesamte Breite einnehmen */
   /* background-color: #fff; Hintergrundfarbe (anpassen nach Bedarf) */
   z-index: 1000; /* Stellt sicher, dass der Header über anderen Inhalten liegt */
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Optional: Schatten für Tiefe */
 }
 </style>

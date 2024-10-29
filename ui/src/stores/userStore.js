@@ -4,6 +4,7 @@ import { defineStore } from 'pinia';
 export const useUserStore = defineStore('userStore', {
   state: () => ({
     user: null,
+    editUser: null,
     message: null,
     getSessionDataFinished: false
   }),
@@ -22,8 +23,16 @@ export const useUserStore = defineStore('userStore', {
       this.getSessionDataFinished = true;
     },
 
+    setEditUser (user) {
+      this.editUser = user;
+    },
+
     clearUser () {
       this.user = null;
+    },
+
+    clearEditUser () {
+      this.editUser = null;
     },
 
     hasRole (role) {

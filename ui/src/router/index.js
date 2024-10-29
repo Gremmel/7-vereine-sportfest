@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
 import UserView from '../views/UserView.vue'
 import NewUserView from '../views/NewUserView.vue'
+import EditUserView from '../views/EditUserView.vue'
 import LoginView from '../views/LoginView.vue'
 import { useUserStore } from '@/stores/userStore';
 
@@ -25,6 +26,14 @@ const router = createRouter({
       path: '/newuser',
       name: 'newuser',
       component: NewUserView,
+      meta: {
+        requiresRole: 'admin'
+      }
+    },
+    {
+      path: '/edituser',
+      name: 'edituser',
+      component: EditUserView,
       meta: {
         requiresRole: 'admin'
       }

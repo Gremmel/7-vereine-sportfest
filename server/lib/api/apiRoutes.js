@@ -95,8 +95,22 @@ const apiRoutes = {
         // Erfolgsnachricht senden
         res.json({ newUser });
       } else {
-        // Falsche Zugangsdaten
         res.status(401).json({ message: 'Fehler beim anlegen des neuen Users' });
+      }
+    });
+
+    // Benutzer ändern
+    app.post('/api/updateUser', authMiddleware.check('admin'), async (req, res) => {
+      logger.fatal('/api/updateUser req.body', req.body);
+
+      // Benutzer ändern
+      const result = await userController.updateUser(req.body);
+
+      if (result) {
+        // Erfolgsnachricht senden
+        res.json({ result });
+      } else {
+        res.status(401).json({ message: 'Fehler beim ändern des Users' });
       }
     });
 
