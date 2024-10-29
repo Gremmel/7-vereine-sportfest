@@ -13,6 +13,7 @@
               <th scope="col">E-Mail</th>
               <th scope="col">Aktiv</th>
               <th scope="col">Rollen</th>
+              <th scope="col"></th>
             </tr>
           </thead>
           <tbody>
@@ -29,20 +30,63 @@
                   </li>
                 </ul>
               </td>
+              <td>
+                <button @click="delUser(user.id, user.username)" type="button" class="btn btn-danger">
+                  <i class="bi bi-trash"></i>
+                </button>
+                <button @click="editUser(user.id)" class="btn btn-primary ms-1">
+                  <i class="bi bi-pencil"></i>
+                </button>
+              </td>
             </tr>
           </tbody>
         </table>
       </div>
     </div>
+
+    <!-- Bestätigungs-Modal -->
+    <div
+      v-if="isModalVisible"
+      class="modal fade show"
+      style="display: block;"
+      tabindex="-1"
+      role="dialog"
+    >
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Löschen bestätigen</h5>
+            <button type="button" class="btn-close" @click="closeModal"></button>
+          </div>
+          <div class="modal-body">
+            <p>Möchtest du diesen Benutzer <span class="fw-bold">{{ delUserName }}</span> wirklich löschen?</p>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" @click="closeModal">
+              Abbrechen
+            </button>
+            <button type="button" class="btn btn-danger" @click="deleteUser">
+              Löschen
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Overlay (optional für Hintergrund) -->
+    <div v-if="isModalVisible" class="modal-backdrop fade show"></div>
+
   </main>
 </template>
 
 <script setup>
-  import { onMounted, reactive } from 'vue';
+  import { onMounted, reactive, ref } from 'vue';
   import { useRouter } from 'vue-router';
   import { useUserStore } from '@/stores/userStore';
 
   const userList = reactive([]);
+  const delUserName = ref('');
+  const delUserId = ref(0);
 
   async function getUserList() {
     try {
@@ -54,6 +98,8 @@
       const result = await response.json();
 
       if (response.ok) {
+        userList.splice(0);
+
         for (const user of result.users) {
           userList.push(user);
         }
@@ -89,6 +135,7 @@
   }
 
   onMounted(() => {
+    console.log('onMounted');
     getUserList();
   });
 
@@ -96,6 +143,54 @@
   const goToNewUser = () => {
     router.push('/newuser');
   };
+
+  const delUser = (id, username) => {
+    console.log('delUser', id);
+    delUserName.value = username;
+    delUserId.value = id;
+    showDeleteConfirmation();
+  }
+
+  // Zustandsvariable für das Modal
+  const isModalVisible = ref(false);
+
+  // Modal öffnen
+  function showDeleteConfirmation () {
+    isModalVisible.value = true;
+  }
+
+  // Modal schließen
+  function closeModal() {
+    isModalVisible.value = false;
+  }
+
+  // Benutzer löschen
+  async function deleteUser() {
+    // Hier kannst du die Funktionalität zum Löschen des Benutzers aufrufen
+    try {
+      console.log('deleteUser', delUserId.value);
+      const response = await fetch('/api/deluser', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ id: delUserId.value }),
+        credentials: 'include'  // Cookies mitsenden
+      });
+
+      if (response.ok) {
+        // Benutzerliste wieder abfragen
+        getUserList();
+      } else {
+        console.log('Es gab ein Problem mit dem löschen des Benutzers');
+      }
+    } catch (error) {
+      console.error('Es gab ein Problem mit dem löschen des Benutzers:', error);
+    }
+
+    // Modal schließen nach dem Löschen
+    closeModal();
+  }
 </script>
 
 <style scoped>

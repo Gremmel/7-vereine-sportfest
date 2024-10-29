@@ -24,6 +24,7 @@ async function getSessionData() {
   } catch (error) {
     console.error('Es gab ein Problem mit dem Abrufen der Sessiondaten:', error);
   }
+  userStore.getSessionDataFinished = true;
 }
 
 onMounted(() => {

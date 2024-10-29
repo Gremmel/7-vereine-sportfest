@@ -49,6 +49,7 @@ class AuthMiddleware {
           const newToken = sessionController.extendToken(token);
 
           // cookie neu mit verlängertem token neu setzen
+          logger.info('session verlägern', newToken);
           res.cookie('session_token', newToken, {
             httpOnly: true, // Cookie nicht durch JavaScript im Browser zugreifbar
             // todo secure in der produktiv umgebung mit nginx auf true setzen

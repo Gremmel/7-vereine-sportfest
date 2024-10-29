@@ -24,7 +24,8 @@ const sessionController = {
       // token in session austauschen
       for (const session of this.sessions) {
         if (session.token === oldToken) {
-          this.token = newToken;
+          logger.info('tausche token in session weil verlängert');
+          session.token = newToken;
         }
       }
 
@@ -69,6 +70,8 @@ const sessionController = {
         return session;
       }
     }
+
+    logger.warn('no getSesstionByToken found');
 
     return null;
   }

@@ -67,6 +67,33 @@ class UserController {
       return false;
     }
   }
+
+  async delUser (user) {
+    const { id } = user;
+
+    if (!id) {
+      return false;
+    }
+
+    // Verwende Platzhalter für eine sichere SQL-Abfrage
+    const stmt = dbController.prepare(`DELETE FROM fos_user WHERE id = ?`);
+
+    try {
+      const result = stmt.run(id);
+
+      if (result.changes === 1) {
+        logger.info(`User ${id} erfolgreich gelöscht.`, result);
+
+        return true;
+      }
+
+      return false;
+    } catch (error) {
+      logger.error(`Error adding user: ${error.message}`);
+
+      return false;
+    }
+  }
 }
 
 export default new UserController();
