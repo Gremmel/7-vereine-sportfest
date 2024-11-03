@@ -26,7 +26,7 @@ const apiRoutes = {
         res.cookie('session_token', token, {
           httpOnly: true, // Cookie nicht durch JavaScript im Browser zugreifbar
           // todo secure in der produktiv umgebung mit nginx auf true setzen
-          secure: false, // Setze dies auf true, wenn du HTTPS verwendest
+          secure: true, // Setze dies auf true, wenn du HTTPS verwendest
           maxAge: 3600000, // Cookie-Lebensdauer (z.B. 1 Stunde)
           sameSite: 'strict' // Schützt vor CSRF-Angriffen
         });
