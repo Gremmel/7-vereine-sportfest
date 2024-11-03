@@ -63,7 +63,7 @@ const apiRoutes = {
       if (token) {
         const session = sessionController.getSessionByToken(token);
 
-        res.json({ user: session.user });
+        res.json({ user: session?.user });
       } else {
         res.json({ message: 'Keine session vorhanden' });
       }
@@ -85,15 +85,45 @@ const apiRoutes = {
     });
 
     // legt einen neuen User an
-    app.post('/api/adduser', authMiddleware.check('admin'), (req, res) => {
+    app.post('/api/adduser', authMiddleware.check('admin'), async (req, res) => {
       logger.fatal('/api/adduser req.body', req.body);
 
       // Neuen Benutzer anlegen
-      const newUser = userController.addUser(req.body);
+      const newUser = await userController.addUser(req.body);
 
       if (newUser) {
         // Erfolgsnachricht senden
         res.json({ newUser });
+      } else {
+        res.status(401).json({ message: 'Fehler beim anlegen des neuen Users' });
+      }
+    });
+
+    // Benutzer ändern
+    app.post('/api/updateUser', authMiddleware.check('admin'), async (req, res) => {
+      logger.fatal('/api/updateUser req.body', req.body);
+
+      // Benutzer ändern
+      const result = await userController.updateUser(req.body);
+
+      if (result) {
+        // Erfolgsnachricht senden
+        res.json({ result });
+      } else {
+        res.status(401).json({ message: 'Fehler beim ändern des Users' });
+      }
+    });
+
+    // löscht einen User
+    app.post('/api/deluser', authMiddleware.check('admin'), async (req, res) => {
+      logger.fatal('/api/deluser req.body', req.body);
+
+      // Benutzer löschen
+      const delUser = await userController.delUser(req.body);
+
+      if (delUser) {
+        // Erfolgsnachricht senden
+        res.json({ delUser: true });
       } else {
         // Falsche Zugangsdaten
         res.status(401).json({ message: 'Fehler beim anlegen des neuen Users' });

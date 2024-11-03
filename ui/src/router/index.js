@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
 import UserView from '../views/UserView.vue'
 import NewUserView from '../views/NewUserView.vue'
+import EditUserView from '../views/EditUserView.vue'
 import LoginView from '../views/LoginView.vue'
 import { useUserStore } from '@/stores/userStore';
 
@@ -30,6 +31,14 @@ const router = createRouter({
       }
     },
     {
+      path: '/edituser',
+      name: 'edituser',
+      component: EditUserView,
+      meta: {
+        requiresRole: 'admin'
+      }
+    },
+    {
       path: '/login',
       name: 'login',
       component: LoginView
@@ -37,13 +46,32 @@ const router = createRouter({
   ]
 })
 
+// diese wartefunktion ist notwendig weil die route vorher aufgerufen wird
+// vor die antwort von getSessionData in App.vue fertig ist
+async function waitForSessionData (userStore, timeout = 5000) {
+  const interval = 100; // Intervall in Millisekunden für die Überprüfung
+  let elapsedTime = 0;
+
+  while (elapsedTime < timeout) {
+    if (userStore.getSessionDataFinished) {
+      return true;
+    }
+    console.log('warten');
+    await new Promise(resolve => setTimeout(resolve, interval));
+    elapsedTime += interval;
+  }
+  throw new Error("Timeout abgelaufen!");
+}
+
 // Navigation Guard
-router.beforeEach((to, from, next) => {
+router.beforeEach(async (to, from, next) => {
   const requiredRole = to.meta.requiresRole;
 
   if (requiredRole) {
     // Prüfe, ob der Benutzer eingeloggt ist und die erforderliche Rolle hat
     const userStore = useUserStore();
+
+    await waitForSessionData(userStore);
 
     if (userStore.hasRole(requiredRole)) {
       next(); // Benutzer hat die richtige Rolle, Route erlauben
