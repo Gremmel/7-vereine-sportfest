@@ -1,8 +1,0 @@
-{
-  "express": {
-    "port": 3000
-  },
-  "JWT": {
-    "secret": "5db72c25-c437-40fb-9c9f-e47795d0f7cf"
-  }
-}
