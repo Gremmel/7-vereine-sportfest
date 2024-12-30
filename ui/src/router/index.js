@@ -5,6 +5,7 @@ import NewUserView from '../views/NewUserView.vue'
 import EditUserView from '../views/EditUserView.vue'
 import LoginView from '../views/LoginView.vue'
 import { useUserStore } from '@/stores/userStore';
+import SportlerView from '@/views/SportlerView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -20,6 +21,14 @@ const router = createRouter({
       component: UserView,
       meta: {
         requiresRole: 'admin'
+      }
+    },
+    {
+      path: '/sportler',
+      name: 'sportler',
+      component: SportlerView,
+      meta: {
+        requiresRole: 'benutzer'
       }
     },
     {

@@ -3,6 +3,7 @@ import authMiddleware from '../middleware/authMiddleware.js';
 import loginController from './loginController.js';
 import sessionController from './sessionController.js';
 import userController from './userController.js';
+import sportlerController from './sportlerController.js';
 
 const apiRoutes = {
   init (app, config) {
@@ -125,8 +126,19 @@ const apiRoutes = {
         // Erfolgsnachricht senden
         res.json({ delUser: true });
       } else {
-        // Falsche Zugangsdaten
-        res.status(401).json({ message: 'Fehler beim anlegen des neuen Users' });
+        // Fehler beim löschen
+        res.status(401).json({ message: 'Fehler beim löschen des Users' });
+      }
+    });
+
+    // Sportler des Vereins abrufen
+    app.get('/api/getSportlerList/:vereinsID', authMiddleware.check('benutzer'), async (req, res) => {
+      try {
+        const sportler = await sportlerController.getSportlerByVereinsID(req.params.vereinsID);
+
+        res.json({ sportlerList: sportler });
+      } catch (error) {
+        res.status(401).json({ message: error.message });
       }
     });
   }

@@ -16,6 +16,9 @@
               <li v-if="showUserLink" class="nav-item">
                 <RouterLink class="nav-link" to="/users">Benutzer</RouterLink>
               </li>
+              <li v-if="showSportlerLink" class="nav-item">
+                <RouterLink class="nav-link" to="/sportler">Sportler</RouterLink>
+              </li>
             </ul>
             <div class="d-flex">
               <button @click="doLogout" class="btn btn-outline-success" type="button">Logout</button>
@@ -46,6 +49,13 @@
   const userRouteRole = userRoute.meta.requiresRole;
   const showUserLink = computed(() => {
     return userStore.hasRole(userRouteRole);
+  });
+
+  // Ermitteln ob der Benutzer die Berechtigung für den Link Sportler hat
+  const sportlerRoute = router.getRoutes().find(route => route.name === 'sportler');
+  const sportlerRouteRole = sportlerRoute.meta.requiresRole;
+  const showSportlerLink = computed(() => {
+    return userStore.hasRole(sportlerRouteRole);
   });
 
   // Benutzer abmelden

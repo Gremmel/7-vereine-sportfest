@@ -1,4 +1,4 @@
-import express from './lib/express.js'; // Express importieren
+import expressApp from './lib/express.js'; // Express importieren
 import { fileURLToPath } from 'url';
 import logger from './lib/logger.js'; // Logger importieren
 import fs from 'fs-extra';
@@ -16,7 +16,7 @@ const config = fs.readJSONSync(path.join(extdir, 'config.json'));
 logger.debug('init express');
 
 // Webserver initialisieren
-express.init(config);
+expressApp.init(config);
 
 // logger.debug('init socket IO');
 // Socket.IO initialisieren
@@ -38,4 +38,4 @@ process.on('exit', (code) => {
 });
 
 // Express-Server starten
-express.start();
+expressApp.start();

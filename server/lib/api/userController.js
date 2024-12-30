@@ -25,7 +25,7 @@ class UserController {
 
   getUserByName (username) {
     try {
-      const stmt = dbController.prepare(`SELECT * FROM fos_user WHERE username = '${username}' COLLATE NOCASE`);
+      const stmt = dbController.prepare(`SELECT fos_user.id as id, fos_user.password as password, fos_user.username as username, fos_user.email as email, fos_user.enabled as enabled, fos_user.roles as roles,verein.id as verein_id, verein.name as verein_name, verein.logo as verein_logo FROM fos_user LEFT JOIN user_verein ON user_verein.user_id=fos_user.id LEFT JOIN verein ON verein.id= user_verein.verein_id WHERE username ='${username}' COLLATE NOCASE`);
       const user = stmt.get();
 
       return user;
