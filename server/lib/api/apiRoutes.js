@@ -131,10 +131,21 @@ const apiRoutes = {
       }
     });
 
-    // Sportler des Vereins abrufen
+    // Sportler des Vereins abrufen anhand der ID
     app.get('/api/getSportlerList/:vereinsID', authMiddleware.check('benutzer'), async (req, res) => {
       try {
         const sportler = await sportlerController.getSportlerByVereinsID(req.params.vereinsID);
+
+        res.json({ sportlerList: sportler });
+      } catch (error) {
+        res.status(401).json({ message: error.message });
+      }
+    });
+
+    // alle Sportler abrufen
+    app.get('/api/getSportlerList', authMiddleware.check('admin'), async (req, res) => {
+      try {
+        const sportler = await sportlerController.getAllSportler();
 
         res.json({ sportlerList: sportler });
       } catch (error) {
