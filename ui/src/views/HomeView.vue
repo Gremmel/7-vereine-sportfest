@@ -1,33 +1,23 @@
-<script setup>
-// socket io verbindung test
-// import { ref, onMounted, getCurrentInstance } from 'vue';
-
-// const message = ref('noch nichts neues');
-
-// onMounted(() => {
-//   // Zugriff auf den globalen Socket-Service über proxy.$socket
-//   const { proxy } = getCurrentInstance();
-
-//   const handleMessage = (data) => {
-//     message.value = data.msg;
-//   };
-
-//   proxy.$socket.sendMessage('HomeView', {
-//     callFunction: 'init',
-//     payload: 'Hallo vom Client'
-//   });
-
-//   proxy.$socket.onMessage('initHome', handleMessage);
-// });
-
-</script>
-
 <template>
   <main>
     <div class="text-center mt-4">
-      <h1>
-        Home
-      </h1>
+      <h2>
+        Herzlich willkommen auf der Seite des 7-Vereine Sportfest
+      </h2>
+
+      Die Seite befindet sich gerade im Umbau
+      <br>
+      <br>
+
+      <img src="@/assets/7vereine.png" alt="7 Vereine" class="center-image">
     </div>
   </main>
 </template>
+
+<style scoped>
+.center-image {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+</style>
