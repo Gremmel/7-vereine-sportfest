@@ -246,7 +246,7 @@
 
   onMounted(() => {
     console.log('onMounted');
-    getSportlerList(isAdmin);
+    getSportlerList(isAdmin.value);
   });
 </script>
 
