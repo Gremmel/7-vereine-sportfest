@@ -39,6 +39,16 @@
             </tr>
           </thead>
           <tbody>
+            <tr>
+              <td><input v-model="newSportler.name" type="text" class="form-control" ></td>
+              <td><input v-model="newSportler.vname" type="text" class="form-control" ></td>
+              <td><input v-model="newSportler.jahrgang" type="text" class="form-control" ></td>
+              <td><select v-model="newSportler.geschlecht" class="form-select">
+                <option value="m">männlich</option>
+                <option value="w">weiblich</option>
+              </select></td>
+              <td v-if="isAdmin"></td>
+            </tr>
             <tr v-for="sportler in sportlerListShow" :key="sportler.id">
               <td>{{sportler.name}}</td>
               <td>{{sportler.vname}}</td>
@@ -65,6 +75,13 @@
   let sortOrder = ref('Name_DSC');
   let fuseSearch;
   let searchText = ref('');
+  const newSportler = ref({
+    name: '',
+    vname: '',
+    jahrgang: '',
+    geschlecht: '',
+    vereinsname: ''
+  });
 
   const fuseOptions = {
     // isCaseSensitive: false,
