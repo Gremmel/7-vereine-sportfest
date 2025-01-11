@@ -42,12 +42,21 @@
             <tr>
               <td><input v-model="newSportler.name" type="text" class="form-control" ></td>
               <td><input v-model="newSportler.vname" type="text" class="form-control" ></td>
-              <td><input v-model="newSportler.jahrgang" type="text" class="form-control" ></td>
-              <td><select v-model="newSportler.geschlecht" class="form-select">
-                <option value="m">männlich</option>
-                <option value="w">weiblich</option>
-              </select></td>
-              <td v-if="isAdmin"></td>
+              <td><input v-model.number="newSportler.jahrgang" type="number" class="form-control" min="1900"></td>
+              <td>
+                <select v-model="newSportler.geschlecht" class="form-select">
+                  <option value="m">männlich</option>
+                  <option value="w">weiblich</option>
+                </select>
+              </td>
+              <td v-if="isAdmin">
+                <select v-model="newSportler.vereinsname" class="form-select">
+                  <option v-for="verein in vereineList" :key="verein.id" :value="verein.id">{{verein.name}}</option>
+                </select>
+              </td>
+              <td>
+                <button :disabled="!newSportlerValid" type="button" @click="clickNewSportler" class="btn btn-success">Neuer Sportler</button>
+              </td>
             </tr>
             <tr v-for="sportler in sportlerListShow" :key="sportler.id">
               <td>{{sportler.name}}</td>
@@ -70,6 +79,7 @@
   import Fuse from 'fuse.js';
 
   const sportlerList = reactive([]);
+  const vereineList = reactive([]);
   const userStore = useUserStore();
   const router = useRouter();
   let sortOrder = ref('Name_DSC');
@@ -151,7 +161,40 @@
         console.log(result.message || 'keine Daten vorhanden');
       }
     } catch (error) {
-      console.error('Es gab ein Problem mit dem Abrufen der getUserList:', error);
+      console.error('Es gab ein Problem mit dem Abrufen der getSportlerList:', error);
+    }
+  }
+
+  async function getVereineList() {
+    try {
+      let response;
+      response = await fetch(`/api/getVereineList`, {
+        method: 'GET',
+        credentials: 'include'  // Cookies mitsenden
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        vereineList.splice(0);
+
+        for (const vereine of result.vereineList) {
+          vereineList.push(vereine);
+        }
+
+      } else if (response.status === 401) {
+        // Benutzer aus dem Store entfernen
+        await userStore.logout()
+
+        userStore.setMessage('Session ist abgelaufen bitte neu Anmelden');
+
+        // weiterleiten zum login
+        router.push('/login');
+      } else {
+        console.log(result.message || 'keine Daten vorhanden');
+      }
+    } catch (error) {
+      console.error('Es gab ein Problem mit dem Abrufen der getVereineList:', error);
     }
   }
 
@@ -214,7 +257,22 @@
       sortOrder.value = 'Vereinsname_ASC';
     }
   }
-
+  const newSportlerValid = computed(() => {
+    if (isAdmin.value) {
+      return newSportler.value.name !== '' &&
+        newSportler.value.vname !== '' &&
+        newSportler.value.jahrgang !== ''&&
+        newSportler.value.jahrgang > 1900 &&
+        newSportler.value.geschlecht !== '' &&
+        newSportler.value.vereinsname !== '';
+    } else {
+      return newSportler.value.name !== '' &&
+        newSportler.value.vname !== '' &&
+        newSportler.value.jahrgang !== '' &&
+        newSportler.value.jahrgang > 1900 &&
+        newSportler.value.geschlecht !== '';
+    }
+  });
   const sportlerListShow = computed(() => {
     if (!sportlerList) {
       return [];
@@ -257,6 +315,11 @@
     return sortedList;
   });
 
+
+  const clickNewSportler = () => {
+    console.log('clickNewSportler', newSportler.value);
+  };
+
   const isAdmin = computed(() => {
     return userStore.hasRole('admin');
   });
@@ -264,6 +327,9 @@
   onMounted(() => {
     console.log('onMounted');
     getSportlerList(isAdmin.value);
+    if (isAdmin.value) {
+      getVereineList();
+    }
   });
 </script>
 

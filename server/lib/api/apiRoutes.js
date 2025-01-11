@@ -4,6 +4,7 @@ import loginController from './loginController.js';
 import sessionController from './sessionController.js';
 import userController from './userController.js';
 import sportlerController from './sportlerController.js';
+import vereineController from './vereineController.js';
 
 const apiRoutes = {
   init (app, config) {
@@ -148,6 +149,17 @@ const apiRoutes = {
         const sportler = await sportlerController.getAllSportler();
 
         res.json({ sportlerList: sportler });
+      } catch (error) {
+        res.status(401).json({ message: error.message });
+      }
+    });
+
+    // alle Vereine abrufen
+    app.get('/api/getVereineList', authMiddleware.check('admin'), async (req, res) => {
+      try {
+        const vereineList = await vereineController.getVereine();
+
+        res.json({ vereineList });
       } catch (error) {
         res.status(401).json({ message: error.message });
       }
