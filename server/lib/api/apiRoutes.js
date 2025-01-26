@@ -155,13 +155,43 @@ const apiRoutes = {
     });
 
     // alle Vereine abrufen
-    app.get('/api/getVereineList', authMiddleware.check('admin'), async (req, res) => {
+    app.get('/api/getVereineList', authMiddleware.check('benutzer'), async (req, res) => {
       try {
         const vereineList = await vereineController.getVereine();
 
         res.json({ vereineList });
       } catch (error) {
         res.status(401).json({ message: error.message });
+      }
+    });
+
+    // Sportler anlegen
+    app.post('/api/newsportler', authMiddleware.check('benutzer'), async (req, res) => {
+      logger.fatal('/api/newsprtler req.body', req.body);
+
+      // Neuen Sportler anlegen
+      const sportlerId = await sportlerController.newSportler(req.body);
+
+      if (sportlerId) {
+        // Erfolgsnachricht senden
+        res.json({ sportlerId });
+      } else {
+        res.status(401).json({ message: 'Fehler beim anlegen des neuen Users' });
+      }
+    });
+
+    // Sportler aendern
+    app.post('/api/editsportler', authMiddleware.check('benutzer'), async (req, res) => {
+      logger.fatal('/api/editsportler req.body', req.body);
+
+      // Sportler aendern
+      const sportlerId = await sportlerController.editSportler(req.body);
+
+      if (sportlerId) {
+        // Erfolgsnachricht senden
+        res.json({ sportlerId });
+      } else {
+        res.status(401).json({ message: 'Fehler beim anlegen des neuen Users' });
       }
     });
   }

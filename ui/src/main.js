@@ -3,7 +3,6 @@ import { createPinia } from 'pinia'
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap';
 import 'bootstrap-icons/font/bootstrap-icons.css';
-
 // import socketPlugin from './plugins/socketPlugin';
 
 import App from './App.vue'

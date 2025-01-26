@@ -3,6 +3,7 @@ import { RouterView } from 'vue-router'
 import AppHeader from './components/AppHeader.vue'
 import { useUserStore } from '@/stores/userStore';
 import { onMounted } from 'vue';
+import DialogModal from './components/DialogModal.vue';
 
 const userStore = useUserStore();
 
@@ -36,6 +37,7 @@ onMounted(() => {
 <template>
   <AppHeader />
   <RouterView />
+  <DialogModal />
 </template>
 
 <style>
