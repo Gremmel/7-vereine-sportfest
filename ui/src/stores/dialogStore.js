@@ -23,9 +23,7 @@ export const useDialogStore = defineStore('dialogStore', {
       this.okButtonText = okButtonText;
       this.okButtonClass = okButtonClass;
       this.cancelButtonText = cancelButtonText;
-      if (cancelButtonClass) {
-        this.cancelButtonClass = cancelButtonClass;
-      }
+      this.cancelButtonClass = cancelButtonClass;
       this.okFunction = okFunction;
       this.showDialog = true;
     },

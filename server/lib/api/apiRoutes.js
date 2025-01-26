@@ -185,13 +185,28 @@ const apiRoutes = {
       logger.fatal('/api/editsportler req.body', req.body);
 
       // Sportler aendern
-      const sportlerId = await sportlerController.editSportler(req.body);
+      const io = await sportlerController.editSportler(req.body);
 
-      if (sportlerId) {
+      if (io) {
         // Erfolgsnachricht senden
-        res.json({ sportlerId });
+        res.json({ io });
       } else {
-        res.status(401).json({ message: 'Fehler beim anlegen des neuen Users' });
+        res.status(401).json({ message: 'Fehler beim Sportler ändern' });
+      }
+    });
+
+    // Sportler löschen
+    app.post('/api/delSportler', authMiddleware.check('benutzer'), async (req, res) => {
+      logger.fatal('/api/delSportler req.body', req.body);
+
+      // Sportler aendern
+      const io = await sportlerController.delSportler(req.body.delSportlerId);
+
+      if (io) {
+        // Erfolgsnachricht senden
+        res.json({ io });
+      } else {
+        res.status(401).json({ message: 'Fehler beim löschen des Sportlers' });
       }
     });
   }

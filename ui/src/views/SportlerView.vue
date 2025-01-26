@@ -73,10 +73,10 @@
             </tr>
             <tr v-for="sportler in sportlerListShow" :key="sportler.id">
               <template v-if="!sportler.editMode">
-                <td :class="{ 'editMode': editMode }">{{sportler.name}}</td>
-                <td :class="{ 'editMode': editMode }">{{sportler.vname}}</td>
-                <td :class="{ 'editMode': editMode }">{{sportler.jahrgang}}</td>
-                <td :class="{ 'editMode': editMode }">{{sportler.geschlecht}}</td>
+                <td :class="{ 'editMode': editMode }">{{ sportler.name }}</td>
+                <td :class="{ 'editMode': editMode }">{{ sportler.vname }}</td>
+                <td :class="{ 'editMode': editMode }">{{ sportler.jahrgang }}</td>
+                <td :class="{ 'editMode': editMode }">{{ sportler.geschlecht === 'm' ? 'männlich' : 'weiblich' }}</td>
                 <td :class="{ 'editMode': editMode }" v-if="isAdmin">{{sportler.vereinsname}}</td>
                 <td>
                   <div class="d-flex">
@@ -212,10 +212,16 @@
         // weiterleiten zum login
         router.push('/login');
       } else {
+        setTimeout(() => {
+          dialogStore.setParameter('Fehlercode 102', `${response.status} ${response.statusText}`, 'ok', null, '', null, null);
+        }, 1000);
         console.log(result.message || 'keine Daten vorhanden');
       }
     } catch (error) {
       console.error('Es gab ein Problem mit dem Abrufen der getSportlerList:', error);
+      setTimeout(() => {
+        dialogStore.setParameter('Fehlercode 106', `${error.message}` , 'ok', null, '', null, null);
+      }, 1000);
     }
   }
 
@@ -247,10 +253,16 @@
         // weiterleiten zum login
         router.push('/login');
       } else {
+        setTimeout(() => {
+          dialogStore.setParameter('Fehlercode 103', `${response.status} ${response.statusText}`, 'ok', null, '', null, null);
+        }, 1000);
         console.log(result.message || 'keine Daten vorhanden');
       }
     } catch (error) {
       console.error('Es gab ein Problem mit dem Abrufen der getVereineList:', error);
+      setTimeout(() => {
+        dialogStore.setParameter('Fehlercode 107', `${error.message}` , 'ok', null, '', null, null);
+      }, 1000);
     }
   }
 
@@ -327,7 +339,7 @@
   async function delSportler () {
     console.log('delSportler delSportlerId', delSportlerId);
     try {
-      const response = await fetch('/api/delsportler', {
+      const response = await fetch('/api/delSportler', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -335,8 +347,26 @@
         body: JSON.stringify({ delSportlerId }),
         credentials: 'include'  // Cookies mitsenden
       });
-    } catch {
 
+      if (response.ok) {
+        for (let index = 0; index < sportlerList.length; index++) {
+          if (delSportlerId === sportlerList[index].id) {
+            sportlerList.splice(index, 1);
+            break;
+          }
+        }
+        fuseSearch = new Fuse(sportlerList, fuseOptions);
+      } else {
+        console.log('asdf test response', response);
+        setTimeout(() => {
+          dialogStore.setParameter('Fehlercode 100', `${response.status} ${response.statusText}`, 'ok', null, '', null, null);
+        }, 1000);
+      }
+    } catch(error) {
+      console.error('Es gab ein Problem mit Löschen des Sportlers:', error);
+      setTimeout(() => {
+        dialogStore.setParameter('Fehlercode 101', `${error.message}` , 'ok', null, '', null, null);
+      }, 1000);
     }
   }
 
@@ -345,7 +375,7 @@
 
     dialogStore.setParameter(
       'Löschen',
-      `Den Sportler ${sportler.name} ${sportler.vname} wirklich löschen?`,
+      `Den Sportler <span class="fw-bold">${sportler.name} ${sportler.vname}</span> wirklich löschen?`,
       'Löschen',
       'btn-danger',
       'Abbrechen',
@@ -457,23 +487,20 @@
           geschlecht: kopieNewSportler.geschlecht,
           vereinsid: kopieNewSportler.vereinsid
         });
-      } else if (response.status === 401) {
-        // Benutzer aus dem Store entfernen
-        const userStore = useUserStore();
 
-        userStore.setMessage('Session ist abgelaufen bitte neu Anmelden');
-
-        await userStore.logout()
-
-        // Weiterleitung nach erfolgreichem Logout
-        router.push('/login');
+        fuseSearch = new Fuse(sportlerList, fuseOptions);
       } else {
-
+        setTimeout(() => {
+          dialogStore.setParameter('Fehlercode 104', `${response.status} ${response.statusText}`, 'ok', null, '', null, null);
+        }, 1000);
         console.log('fehler status beim anlegegen des sportlers', response.status);
 
       }
     } catch (error) {
       console.error('Es gab ein Problem beim Anlegen des Sportlers', error);
+      setTimeout(() => {
+        dialogStore.setParameter('Fehlercode 108', `${error.message}` , 'ok', null, '', null, null);
+      }, 1000);
 
     }
   };
@@ -502,10 +529,20 @@
             break;
           }
         }
+        fuseSearch = new Fuse(sportlerList, fuseOptions);
+
         editMode.value = false;
+      } else {
+          setTimeout(() => {
+            dialogStore.setParameter('Fehlercode 105', `${response.status} ${response.statusText}`, 'ok', null, '', null, null);
+        }, 1000);
+
       }
     } catch (error) {
       console.error('Es gab ein Problem beim Aendern des Sportlers', error);
+      setTimeout(() => {
+        dialogStore.setParameter('Fehlercode 109', `${error.message}` , 'ok', null, '', null, null);
+      }, 1000);
     }
   }
   const clickEditSportlerAbbrechen = (sportler) =>{

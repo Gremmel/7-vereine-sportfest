@@ -7,11 +7,10 @@
         <h1 class="modal-title fs-5" id="globalModalLabel">{{ title }}</h1>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
-      <div class="modal-body">
-        {{ message }}
+      <div class="modal-body" v-html="message">
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn" :class="classButtonCancel" data-bs-dismiss="modal">{{ textButtonCancel }}</button>
+        <button v-if="textButtonCancel !== ''" type="button" class="btn" :class="classButtonCancel" data-bs-dismiss="modal">{{ textButtonCancel }}</button>
         <button type="button" class="btn" :class="classButtonOK" @click="clickButtonOk" data-bs-dismiss="modal">{{ textButtonOK }}</button>
       </div>
     </div>
@@ -49,14 +48,21 @@
 
   watch(
     () => dialogStore.showDialog, (newValue) => {
-      console.log('newValue newValue', newValue);
       if (newValue) {
         title.value = dialogStore.dialogTitle;
         message.value = dialogStore.dialogMessage;
         textButtonOK.value = dialogStore.okButtonText;
         textButtonCancel.value = dialogStore.cancelButtonText;
-        classButtonOK.value = dialogStore.okButtonClass;
-        classButtonCancel.value = dialogStore.cancelButtonClass;
+        if (dialogStore.okButtonClass) {
+          classButtonOK.value = dialogStore.okButtonClass;
+        } else {
+          classButtonOK.value = 'btn-primary';
+        }
+        if (dialogStore.cancelButtonClass) {
+          classButtonCancel.value = dialogStore.cancelButtonClass;
+        } else {
+          classButtonCancel.value = 'btn-secondary';
+        }
         okFunction = dialogStore.okFunction;
         myModal.show();
         dialogStore.showDialog = false;

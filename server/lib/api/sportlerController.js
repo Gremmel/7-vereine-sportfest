@@ -39,6 +39,8 @@ class SportlerController {
     try {
       const info = stmt.run(sportler.name, sportler.vname, sportler.jahrgang, sportler.geschlecht);
 
+      logger.info(`${sportler} added successfully.`, info);
+
       const stmtSportlerVerein = dbController.prepare(`
         INSERT INTO sportler_verein (sportler_id, verein_id)
         VALUES (?, ?)
@@ -46,11 +48,11 @@ class SportlerController {
 
       const infoSportlerVerein = stmtSportlerVerein.run(info.lastInsertRowid, sportler.vereinsid);
 
-      logger.info(`${sportler} added successfully.`, info);
+      logger.info(`infoSportlerVerein`, infoSportlerVerein);
 
       return info.lastInsertRowid;
     } catch (error) {
-      logger.error(`Error adding user: ${error.message}`);
+      logger.error(`Error adding new Sportler: ${error.message}`);
 
       return false;
     }
@@ -78,7 +80,34 @@ class SportlerController {
 
       return true;
     } catch (error) {
-      logger.error(`Error adding user: ${error.message}`);
+      logger.error(`Error edit Sportler: ${error.message}`);
+
+      return false;
+    }
+  }
+
+  async delSportler (delSportlerId) {
+    try {
+      const stmt = dbController.prepare(`
+        DELETE FROM sportler
+        WHERE id = ?
+      `);
+      const info = stmt.run(delSportlerId);
+
+      logger.info(`Löschen erfolgreich.`, info);
+
+      const stmtSportlerVerein = dbController.prepare(`
+        DELETE FROM sportler_verein
+        WHERE sportler_id = ?
+      `);
+
+      const infoSportlerVerein = stmtSportlerVerein.run(delSportlerId);
+
+      logger.info('infoSportlerVerein', infoSportlerVerein);
+
+      return true;
+    } catch (error) {
+      logger.error(`Error Sportler DELETE: ${error.message}`);
 
       return false;
     }
