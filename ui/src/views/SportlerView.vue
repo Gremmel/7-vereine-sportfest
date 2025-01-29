@@ -430,7 +430,10 @@
       for (const sportler of sportlerList) {
         console.log('sportler newSportler', newSportler);
         if (sportler.name.toLowerCase().startsWith(newSportler.value.name.toLowerCase())) {
-          sortedList.push({ ...sportler });
+          const obj = { ...sportler };
+
+          obj.vereinsname = vereineList.find(verein => verein.id === obj.vereinsid).name;
+          sortedList.push(obj);
         }
       }
     } else if (searchText.value !== '') {
