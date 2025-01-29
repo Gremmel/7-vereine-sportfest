@@ -384,6 +384,21 @@
     );
   }
 
+  function checkNewSportlerDoppelt (newSportler, isAdmin) {
+    for (const sportler of sportlerList) {
+      if (sportler.name.toLowerCase() === newSportler.name.toLowerCase() &&
+          sportler.vname.toLowerCase() === newSportler.vname.toLowerCase() &&
+          sportler.jahrgang === newSportler.jahrgang &&
+          sportler.geschlecht === newSportler.geschlecht) {
+        if (sportler.vereinsid === newSportler.vereinsid && isAdmin || !isAdmin) {
+          return true;
+        }
+      }
+    }
+
+    return false;
+  }
+
   const newSportlerValid = computed(() => {
     if (isAdmin.value) {
       return newSportler.value.name !== '' &&
@@ -391,15 +406,18 @@
         newSportler.value.jahrgang !== ''&&
         newSportler.value.jahrgang > 1900 &&
         newSportler.value.geschlecht !== '' &&
-        newSportler.value.vereinsid !== '';
+        newSportler.value.vereinsid !== '' &&
+        checkNewSportlerDoppelt(newSportler.value, isAdmin.value) === false;
     } else {
       return newSportler.value.name !== '' &&
         newSportler.value.vname !== '' &&
         newSportler.value.jahrgang !== '' &&
         newSportler.value.jahrgang > 1900 &&
-        newSportler.value.geschlecht !== '';
+        newSportler.value.geschlecht !== '' &&
+        checkNewSportlerDoppelt(newSportler.value, isAdmin.value) === false;
     }
   });
+
   const sportlerListShow = computed(() => {
     if (!sportlerList) {
       return [];
@@ -407,7 +425,16 @@
 
     let sortedList = [];
 
-    if (searchText.value !== '') {
+    // Filter nach Neuem Namen
+    if (newSportler.value.name !== '') {
+      for (const sportler of sportlerList) {
+        console.log('sportler newSportler', newSportler);
+        if (sportler.name.toLowerCase().startsWith(newSportler.value.name.toLowerCase())) {
+          sortedList.push({ ...sportler });
+        }
+      }
+    } else if (searchText.value !== '') {
+      // globale fuse Filter
       const searchResult = fuseSearch.search(searchText.value);
 
       for (const obj of searchResult) {
@@ -415,6 +442,7 @@
         sortedList.push({ ...obj.item });
       }
     } else {
+      // Sortierung
       sortedList = sportlerList.map(sportler => ({ ...sportler })); // Erstelle eine tiefe Kopie des Arrays
       for (const sportler of sortedList) {
         sportler.vereinsname = vereineList.find(verein => verein.id === sportler.vereinsid).name;
