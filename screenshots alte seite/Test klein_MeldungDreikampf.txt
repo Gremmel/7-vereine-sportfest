@@ -1,0 +1,26 @@
+Verein;Name;Vorname;JG ;GS;AH Hochsprung
+TV Oy;Posselt;Franziska;2006;w;
+TV Oy;Dombrowski;Sarah;2005;w;
+TV Oy;Dombrowski;Gabriel;2010;w;
+TV Oy;Emmerich;Elena;2007;w;
+TV Oy;Helchenberg;Alisa;2005;w;
+TV Oy;Mangold;Anna-Maria;2006;w;
+TV Nesselwang;Kareke;Delain;2009;m;
+TV Nesselwang;Görlach;Philipp;2011;m;
+TSV Untermaiselstein;Baldauf;Julia;2004;w;
+TSV Untermaiselstein;Huber;Zoe;2004;w;
+TSV Untermaiselstein;Endras;Carina;2005;w;1,10
+TSV Untermaiselstein;Zöllner;Adrian;2015;m;
+TSV Untermaiselstein;Ächter;Niklas;2015;m;
+TV Mittelberg;Sertel;Michelle;2005;w;
+TV Mittelberg;Hagen;Juliana;2005;w;1,10
+TV Mittelberg;Kettenring;Livia;2005;w;1,15
+TSV Petersthal;Ettensberger;Pia;2012;w;
+TSV Petersthal;Lohbeck;Florian;2013;m;
+TSV Petersthal;Schäfer;Nele;2013;w;
+SSV Wertach;Leimgruber;Fabian;2005;m;
+SSV Wertach;Meyer;Ralf;2004;m;1,40
+SSV Wertach;Votteler;Nick;2004;m;
+TSV Kranzegg;Denz;Roman;2012;m;
+TSV Kranzegg;Lingenhöl;Johannes;2013;m;
+TSV Kranzegg;Burkart;Elias;2013;m;

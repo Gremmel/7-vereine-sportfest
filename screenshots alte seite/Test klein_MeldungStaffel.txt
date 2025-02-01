@@ -1,0 +1,15 @@
+Verein;Klasse Staffel;Vorname1;Name1;G 1;JG 1;Vorname2;Name2;G 2;JG 2;Vorname3;Name3;G 3;JG 3;Vorname4;Name4;G 4;JG 4
+TV Nesselwang;männliche Jugend U18/20;Sebastian;Wagner;m;2001;Lukas;French;m;2001;Tom;French;m;2002;Jacob;Erhart;m;2002
+TV Nesselwang I;männliche Kinder U8;Jason;Zanolla;m;2013;Leander;Herb;m;2014;Benno;Meusburger;m;2013;Johannes;Brandl;m;20104
+TSV Untermaiselstein;männliche Jugend U14;Simeon;Finsterer;w;2007;Geiger;Matthias;m;2008;Niklas;Baiz;m;2008;Paul;Huber;m;2008
+TSV Untermaiselstein;weibliche Jugend U16;Anna;Budig;w;2005;Melina;Fritz;w;2006;Carina;Endras;w;2006;Hannah;Frenz;w;2006
+TV Mittelberg I;weibliche Jugend U16;Anna;Kettenring;w;2005;Josefin;Filleböck;w;2005;Larissa;Lechleiter;w;2005;Juliana;Hagen;w;2006
+TV Mittelberg;weibliche Jugend U14;Sophia;Filleböck;w;2007;Jasmin;Kistler;w;2007;Hannah;Liebald;w;2007;Theresa;Böck;w;2008
+TV Oy;männliche Kinder U12;Gabriel;Dombrowski;m;2005;Luis;Zweng;m;2006;Luca;Schneider;m;2005;Kilian;Friedl;m;2006
+TV Oy;männliche Jugend U14;Carlos;Höss;m;2008;Severin;Haslach;m;2008;Simon;Klaus;m;2008;Lukas;Besler;m;2008
+TSV Petersthal;männliche Kinder U10;Florian;Lohbeck;m;2012;Manuel;Osterried;m;2012;Lukas;Bernhard;m;2011;Tobias;Bernhard;m;2012
+TSV Petersthal;weibliche Kinder U10;Veronika;Christ;w;2011;Lovis;Weißenbach;w;2011;Rosalie;Diemer;w;2011;Pia;Ettensberger;w;2011
+SSV Wertach;weibliche Jugend U16;Miriam;Scheidhammer;w;2005;Sandra;Steinlehner;w;2005;Julia;Neuhauser;w;2005;Anna;Manthey;w;2005
+SSV Wertach;männliche Jugend U18/20;David;Hauber;m;2003;Janis;Knoll;m;2003;Fabian;Leimgruber;m;2004;Ralf;Meyer;m;2003
+TSV Kranzegg;weibliche Kinder U10;Mia;Roth;w;2010;Sophie;Mühlegg;w;2011;Jana;Roller;w;2011;Patrizia;Mayr;w;2011
+TSV Kranzegg;Frauen;Cora;Jürgens;w;1970;Gertrud;Weißenbach;w;1975;Susanne;Müller;w;1971;Jennifer;Renn;w;1991
