@@ -1,63 +1,73 @@
-import { createRouter, createWebHistory } from 'vue-router'
-import HomeView from '../views/HomeView.vue'
-import UserView from '../views/UserView.vue'
-import NewUserView from '../views/NewUserView.vue'
-import EditUserView from '../views/EditUserView.vue'
-import LoginView from '../views/LoginView.vue'
-import { useUserStore } from '@/stores/userStore';
-import SportlerView from '@/views/SportlerView.vue'
+import { createRouter, createWebHistory } from "vue-router";
+import HomeView from "../views/HomeView.vue";
+import UserView from "../views/UserView.vue";
+import NewUserView from "../views/NewUserView.vue";
+import EditUserView from "../views/EditUserView.vue";
+import LoginView from "../views/LoginView.vue";
+import { useUserStore } from "@/stores/userStore";
+import SportlerView from "@/views/SportlerView.vue";
+import AnmeldungDreiVierKampf from "@/views/AnmeldungDreiVierKampf.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
-      path: '/',
-      name: 'home',
-      component: HomeView
+      path: "/",
+      name: "home",
+      component: HomeView,
     },
     {
-      path: '/users',
-      name: 'users',
+      path: "/users",
+      name: "users",
       component: UserView,
       meta: {
-        requiresRole: 'admin'
-      }
+        requiresRole: "admin",
+      },
     },
     {
-      path: '/sportler',
-      name: 'sportler',
+      path: "/sportler",
+      name: "sportler",
       component: SportlerView,
       meta: {
-        requiresRole: 'benutzer'
-      }
+        requiresRole: "benutzer",
+      },
     },
     {
-      path: '/newuser',
-      name: 'newuser',
+      path: "/sportlerAnmeldung/:sportfestId",
+      name: "sportlerAnmeldung",
+      component: AnmeldungDreiVierKampf,
+      meta: {
+        requiresRole: "benutzer",
+      },
+      props: true
+    },
+    {
+      path: "/newuser",
+      name: "newuser",
       component: NewUserView,
       meta: {
-        requiresRole: 'admin'
-      }
+        requiresRole: "admin",
+      },
     },
     {
-      path: '/edituser',
-      name: 'edituser',
+      path: "/edituser",
+      name: "edituser",
       component: EditUserView,
       meta: {
-        requiresRole: 'admin'
-      }
+        requiresRole: "admin",
+      },
     },
     {
-      path: '/login',
-      name: 'login',
-      component: LoginView
-    }
-  ]
-})
+      path: "/login",
+      name: "login",
+      component: LoginView,
+    },
+  ],
+});
 
 // diese wartefunktion ist notwendig weil die route vorher aufgerufen wird
 // vor die antwort von getSessionData in App.vue fertig ist
-async function waitForSessionData (userStore, timeout = 5000) {
+async function waitForSessionData(userStore, timeout = 5000) {
   const interval = 100; // Intervall in Millisekunden für die Überprüfung
   let elapsedTime = 0;
 
@@ -65,8 +75,8 @@ async function waitForSessionData (userStore, timeout = 5000) {
     if (userStore.getSessionDataFinished) {
       return true;
     }
-    console.log('warten');
-    await new Promise(resolve => setTimeout(resolve, interval));
+    console.log("warten");
+    await new Promise((resolve) => setTimeout(resolve, interval));
     elapsedTime += interval;
   }
   throw new Error("Timeout abgelaufen!");
@@ -85,11 +95,11 @@ router.beforeEach(async (to, from, next) => {
     if (userStore.hasRole(requiredRole)) {
       next(); // Benutzer hat die richtige Rolle, Route erlauben
     } else {
-      next({ name: 'home' }); // Umleiten, falls die Rolle nicht passt
+      next({ name: "home" }); // Umleiten, falls die Rolle nicht passt
     }
   } else {
     next(); // Wenn keine Rolle erforderlich ist, Route erlauben
   }
 });
 
-export default router
+export default router;

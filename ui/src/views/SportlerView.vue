@@ -5,7 +5,8 @@
         <h2 class="card-title">Teilnehmer</h2>
         <div class="input-group mb-3">
           <input v-model="searchText" type="text" class="form-control" placeholder="finde...">
-          <button @click="clickClearTextSearch()" class="btn btn-outline-secondary" type="button" id="button-addon2">X</button>
+          <button @click="clickClearTextSearch()" class="btn btn-outline-secondary" type="button"
+            id="button-addon2">X</button>
         </div>
         <table class="table table-striped">
           <thead>
@@ -40,8 +41,8 @@
           </thead>
           <tbody>
             <tr>
-              <td><input v-model="newSportler.name" type="text" class="form-control" ></td>
-              <td><input v-model="newSportler.vname" type="text" class="form-control" ></td>
+              <td><input v-model="newSportler.name" type="text" class="form-control"></td>
+              <td><input v-model="newSportler.vname" type="text" class="form-control"></td>
               <td><input v-model.number="newSportler.jahrgang" type="number" class="form-control" min="1900"></td>
               <td>
                 <select v-model="newSportler.geschlecht" class="form-select">
@@ -52,18 +53,13 @@
               <td v-if="isAdmin">
                 <select v-model="newSportler.vereinsid" class="form-select">
                   <option v-for="verein in vereineList" :key="verein.id" :value="verein.id">
-                    {{verein.name}}
+                    {{ verein.name }}
                   </option>
                 </select>
               </td>
               <td>
-                <button
-                  v-if="!abgesendetOK"
-                  :disabled="!newSportlerValid"
-                  type="button"
-                  @click="clickNewSportler"
-                  class="btn btn-success"
-                >
+                <button v-if="!abgesendetOK" :disabled="!newSportlerValid" type="button" @click="clickNewSportler"
+                  class="btn btn-success">
                   Neuer Sportler
                 </button>
                 <div v-else>
@@ -77,7 +73,7 @@
                 <td :class="{ 'editMode': editMode }">{{ sportler.vname }}</td>
                 <td :class="{ 'editMode': editMode }">{{ sportler.jahrgang }}</td>
                 <td :class="{ 'editMode': editMode }">{{ sportler.geschlecht === 'm' ? 'männlich' : 'weiblich' }}</td>
-                <td :class="{ 'editMode': editMode }" v-if="isAdmin">{{sportler.vereinsname}}</td>
+                <td :class="{ 'editMode': editMode }" v-if="isAdmin">{{ sportler.vereinsname }}</td>
                 <td>
                   <div class="d-flex">
                     <button v-if="!editMode" @click="clickDelSportler(sportler)" type="button" class="btn btn-danger">
@@ -90,17 +86,18 @@
                 </td>
               </template>
               <template v-else>
-                <td><input v-model="sportler.name" type="text" class="form-control" ></td>
-                <td><input v-model="sportler.vname" type="text" class="form-control" ></td>
+                <td><input v-model="sportler.name" type="text" class="form-control"></td>
+                <td><input v-model="sportler.vname" type="text" class="form-control"></td>
                 <td><input v-model.number="sportler.jahrgang" type="number" class="form-control" min="1900"></td>
                 <td>
                   <select v-model="sportler.geschlecht" class="form-select">
                     <option value="m">männlich</option>
                     <option value="w">weiblich</option>
-                  </select></td>
+                  </select>
+                </td>
                 <td v-if="isAdmin">
                   <select v-model="sportler.vereinsid" class="form-select">
-                    <option v-for="verein in vereineList" :key="verein.id" :value="verein.id">{{verein.name}}</option>
+                    <option v-for="verein in vereineList" :key="verein.id" :value="verein.id">{{ verein.name }}</option>
                   </select>
                 </td>
                 <td>
@@ -121,487 +118,487 @@
 </template>
 
 <script setup>
-  import { onMounted, reactive, ref, computed } from 'vue';
-  import { useRouter } from 'vue-router';
-  import { useUserStore } from '@/stores/userStore';
-  import { useDialogStore } from '@/stores/dialogStore';
-  import Fuse from 'fuse.js';
+import { onMounted, reactive, ref, computed } from 'vue';
+import { useRouter } from 'vue-router';
+import { useUserStore } from '@/stores/userStore';
+import { useDialogStore } from '@/stores/dialogStore';
+import Fuse from 'fuse.js';
 
-  const sportlerList = reactive([]);
-  const vereineList = reactive([]);
-  const userStore = useUserStore();
-  const dialogStore = useDialogStore();
-  const router = useRouter();
-  let sortOrder = ref('Name_ASC');
-  let fuseSearch;
-  let searchText = ref('');
-  const newSportler = ref({
-    name: '',
-    vname: '',
-    jahrgang: '',
-    geschlecht: '',
-    vereinsid: ''
-  });
-  const abgesendetOK = ref(false);
-  const editMode = ref(false);
-  let delSportlerId = null;
+const sportlerList = reactive([]);
+const vereineList = reactive([]);
+const userStore = useUserStore();
+const dialogStore = useDialogStore();
+const router = useRouter();
+let sortOrder = ref('Name_ASC');
+let fuseSearch;
+let searchText = ref('');
+const newSportler = ref({
+  name: '',
+  vname: '',
+  jahrgang: '',
+  geschlecht: '',
+  vereinsid: ''
+});
+const abgesendetOK = ref(false);
+const editMode = ref(false);
+let delSportlerId = null;
 
-  const fuseOptions = {
-    // isCaseSensitive: false,
-    // includeScore: false,
-    // shouldSort: true,
-    // includeMatches: false,
-    // findAllMatches: false,
-    // minMatchCharLength: 2,
+const fuseOptions = {
+  // isCaseSensitive: false,
+  // includeScore: false,
+  // shouldSort: true,
+  // includeMatches: false,
+  // findAllMatches: false,
+  // minMatchCharLength: 2,
 
-    // location: 0,
-    threshold: 0.3,
+  // location: 0,
+  threshold: 0.3,
 
-    // distance: 100,
-    // useExtendedSearch: false,
-    // ignoreLocation: false,
-    // ignoreFieldNorm: false,
-    // fieldNormWeight: 1,
-    keys: [
-      'name',
-      'vname',
-      'jahrgang',
-      'vereinsname'
-    ]
-  }
+  // distance: 100,
+  // useExtendedSearch: false,
+  // ignoreLocation: false,
+  // ignoreFieldNorm: false,
+  // fieldNormWeight: 1,
+  keys: [
+    'name',
+    'vname',
+    'jahrgang',
+    'vereinsname'
+  ]
+}
 
-  function clickClearTextSearch () {
-    searchText.value = '';
-  }
+function clickClearTextSearch() {
+  searchText.value = '';
+}
 
-  async function getSportlerList(isAdmin) {
-    try {
-      const vereinsID = userStore.user.verein_id;
-      let response;
+async function getSportlerList(isAdmin) {
+  try {
+    const vereinsID = userStore.user.verein_id;
+    let response;
 
-      if (isAdmin) {
-        response = await fetch(`/api/getSportlerList`, {
-          method: 'GET',
-          credentials: 'include'  // Cookies mitsenden
-        });
-      } else {
-        response = await fetch(`/api/getSportlerList/${vereinsID}`, {
-          method: 'GET',
-          credentials: 'include'  // Cookies mitsenden
-        });
-      }
-
-      const result = await response.json();
-
-      if (response.ok) {
-        sportlerList.splice(0);
-
-        for (const sportler of result.sportlerList) {
-          sportler.editMode = false;
-          sportlerList.push(sportler);
-        }
-
-        fuseSearch = new Fuse(sportlerList, fuseOptions);
-
-      } else if (response.status === 401) {
-        // Benutzer aus dem Store entfernen
-        await userStore.logout()
-
-        userStore.setMessage('Session ist abgelaufen bitte neu Anmelden');
-
-        // weiterleiten zum login
-        router.push('/login');
-      } else {
-        setTimeout(() => {
-          dialogStore.setParameter('Fehlercode 102', `${response.status} ${response.statusText}`, 'ok', null, '', null, null);
-        }, 1000);
-        console.log(result.message || 'keine Daten vorhanden');
-      }
-    } catch (error) {
-      console.error('Es gab ein Problem mit dem Abrufen der getSportlerList:', error);
-      setTimeout(() => {
-        dialogStore.setParameter('Fehlercode 106', `${error.message}` , 'ok', null, '', null, null);
-      }, 1000);
-    }
-  }
-
-  async function getVereineList() {
-    try {
-      let response;
-      response = await fetch(`/api/getVereineList`, {
+    if (isAdmin) {
+      response = await fetch(`/api/getSportlerList`, {
         method: 'GET',
         credentials: 'include'  // Cookies mitsenden
       });
+    } else {
+      response = await fetch(`/api/getSportlerList/${vereinsID}`, {
+        method: 'GET',
+        credentials: 'include'  // Cookies mitsenden
+      });
+    }
 
-      const result = await response.json();
+    const result = await response.json();
 
-      if (response.ok) {
-        vereineList.splice(0);
+    if (response.ok) {
+      sportlerList.splice(0);
 
-        for (const vereine of result.vereineList) {
-          vereineList.push(vereine);
-        }
-
-        getSportlerList(isAdmin.value);
-
-      } else if (response.status === 401) {
-        // Benutzer aus dem Store entfernen
-        await userStore.logout()
-
-        userStore.setMessage('Session ist abgelaufen bitte neu Anmelden');
-
-        // weiterleiten zum login
-        router.push('/login');
-      } else {
-        setTimeout(() => {
-          dialogStore.setParameter('Fehlercode 103', `${response.status} ${response.statusText}`, 'ok', null, '', null, null);
-        }, 1000);
-        console.log(result.message || 'keine Daten vorhanden');
+      for (const sportler of result.sportlerList) {
+        sportler.editMode = false;
+        sportlerList.push(sportler);
       }
-    } catch (error) {
-      console.error('Es gab ein Problem mit dem Abrufen der getVereineList:', error);
+
+      fuseSearch = new Fuse(sportlerList, fuseOptions);
+
+    } else if (response.status === 401) {
+      // Benutzer aus dem Store entfernen
+      await userStore.logout()
+
+      userStore.setMessage('Session ist abgelaufen bitte neu Anmelden');
+
+      // weiterleiten zum login
+      router.push('/login');
+    } else {
       setTimeout(() => {
-        dialogStore.setParameter('Fehlercode 107', `${error.message}` , 'ok', null, '', null, null);
+        dialogStore.setParameter('Fehlercode 102', `${response.status} ${response.statusText}`, 'ok', null, '', null, null);
       }, 1000);
+      console.log(result.message || 'keine Daten vorhanden');
+    }
+  } catch (error) {
+    console.error('Es gab ein Problem mit dem Abrufen der getSportlerList:', error);
+    setTimeout(() => {
+      dialogStore.setParameter('Fehlercode 106', `${error.message}`, 'ok', null, '', null, null);
+    }, 1000);
+  }
+}
+
+async function getVereineList() {
+  try {
+    let response;
+    response = await fetch(`/api/getVereineList`, {
+      method: 'GET',
+      credentials: 'include'  // Cookies mitsenden
+    });
+
+    const result = await response.json();
+
+    if (response.ok) {
+      vereineList.splice(0);
+
+      for (const vereine of result.vereineList) {
+        vereineList.push(vereine);
+      }
+
+      getSportlerList(isAdmin.value);
+
+    } else if (response.status === 401) {
+      // Benutzer aus dem Store entfernen
+      await userStore.logout()
+
+      userStore.setMessage('Session ist abgelaufen bitte neu Anmelden');
+
+      // weiterleiten zum login
+      router.push('/login');
+    } else {
+      setTimeout(() => {
+        dialogStore.setParameter('Fehlercode 103', `${response.status} ${response.statusText}`, 'ok', null, '', null, null);
+      }, 1000);
+      console.log(result.message || 'keine Daten vorhanden');
+    }
+  } catch (error) {
+    console.error('Es gab ein Problem mit dem Abrufen der getVereineList:', error);
+    setTimeout(() => {
+      dialogStore.setParameter('Fehlercode 107', `${error.message}`, 'ok', null, '', null, null);
+    }, 1000);
+  }
+}
+
+function clickSortName() {
+  if (searchText.value !== '') {
+    return;
+  }
+
+  if (sortOrder.value === 'Name_ASC') {
+    sortOrder.value = 'Name_DSC';
+  } else {
+    sortOrder.value = 'Name_ASC';
+  }
+}
+
+function clickSortVorname() {
+  if (searchText.value !== '') {
+    return;
+  }
+
+  if (sortOrder.value === 'Vorname_ASC') {
+    sortOrder.value = 'Vorname_DSC';
+  } else {
+    sortOrder.value = 'Vorname_ASC';
+  }
+}
+
+function clickSortJahrgang() {
+  if (searchText.value !== '') {
+    return;
+  }
+
+  if (sortOrder.value === 'Jahrgang_ASC') {
+    sortOrder.value = 'Jahrgang_DSC';
+  } else {
+    sortOrder.value = 'Jahrgang_ASC';
+  }
+}
+
+function clickSortGeschlecht() {
+  if (searchText.value !== '') {
+    return;
+  }
+
+  if (sortOrder.value === 'Geschlecht_ASC') {
+    sortOrder.value = 'Geschlecht_DSC';
+  } else {
+    sortOrder.value = 'Geschlecht_ASC';
+  }
+}
+
+function clickSortVerein() {
+  if (searchText.value !== '') {
+    return;
+  }
+
+  if (sortOrder.value === 'Vereinsname_ASC') {
+    sortOrder.value = 'Vereinsname_DSC';
+  } else {
+    sortOrder.value = 'Vereinsname_ASC';
+  }
+}
+
+function clickEditSportler(sportler) {
+  for (const sportlerOrg of sportlerList) {
+    if (sportlerOrg.id === sportler.id) {
+      sportlerOrg.editMode = true;
+      break;
+    }
+  }
+  editMode.value = true;
+}
+
+async function delSportler() {
+  console.log('delSportler delSportlerId', delSportlerId);
+  try {
+    const response = await fetch('/api/delSportler', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ delSportlerId }),
+      credentials: 'include'  // Cookies mitsenden
+    });
+
+    if (response.ok) {
+      for (let index = 0; index < sportlerList.length; index++) {
+        if (delSportlerId === sportlerList[index].id) {
+          sportlerList.splice(index, 1);
+          break;
+        }
+      }
+      fuseSearch = new Fuse(sportlerList, fuseOptions);
+    } else {
+      console.log('asdf test response', response);
+      setTimeout(() => {
+        dialogStore.setParameter('Fehlercode 100', `${response.status} ${response.statusText}`, 'ok', null, '', null, null);
+      }, 1000);
+    }
+  } catch (error) {
+    console.error('Es gab ein Problem mit Löschen des Sportlers:', error);
+    setTimeout(() => {
+      dialogStore.setParameter('Fehlercode 101', `${error.message}`, 'ok', null, '', null, null);
+    }, 1000);
+  }
+}
+
+function clickDelSportler(sportler) {
+  delSportlerId = sportler.id;
+
+  dialogStore.setParameter(
+    'Löschen',
+    `Den Sportler <span class="fw-bold">${sportler.name} ${sportler.vname}</span> wirklich löschen?`,
+    'Löschen',
+    'btn-danger',
+    'Abbrechen',
+    null,
+    delSportler
+  );
+}
+
+function checkNewSportlerDoppelt(newSportler, isAdmin) {
+  for (const sportler of sportlerList) {
+    if (sportler.name.toLowerCase() === newSportler.name.toLowerCase() &&
+      sportler.vname.toLowerCase() === newSportler.vname.toLowerCase() &&
+      sportler.jahrgang === newSportler.jahrgang &&
+      sportler.geschlecht === newSportler.geschlecht) {
+      if (sportler.vereinsid === newSportler.vereinsid && isAdmin || !isAdmin) {
+        return true;
+      }
     }
   }
 
-  function clickSortName() {
-    if (searchText.value !== '') {
-      return;
+  return false;
+}
+
+const newSportlerValid = computed(() => {
+  if (isAdmin.value) {
+    return newSportler.value.name !== '' &&
+      newSportler.value.vname !== '' &&
+      newSportler.value.jahrgang !== '' &&
+      newSportler.value.jahrgang > 1900 &&
+      newSportler.value.geschlecht !== '' &&
+      newSportler.value.vereinsid !== '' &&
+      checkNewSportlerDoppelt(newSportler.value, isAdmin.value) === false;
+  } else {
+    return newSportler.value.name !== '' &&
+      newSportler.value.vname !== '' &&
+      newSportler.value.jahrgang !== '' &&
+      newSportler.value.jahrgang > 1900 &&
+      newSportler.value.geschlecht !== '' &&
+      checkNewSportlerDoppelt(newSportler.value, isAdmin.value) === false;
+  }
+});
+
+const sportlerListShow = computed(() => {
+  if (!sportlerList) {
+    return [];
+  }
+
+  let sortedList = [];
+
+  // Filter nach Neuem Namen
+  if (newSportler.value.name !== '') {
+    for (const sportler of sportlerList) {
+      console.log('sportler newSportler', newSportler);
+      if (sportler.name.toLowerCase().startsWith(newSportler.value.name.toLowerCase())) {
+        const obj = { ...sportler };
+
+        obj.vereinsname = vereineList.find(verein => verein.id === obj.vereinsid).name;
+        sortedList.push(obj);
+      }
+    }
+  } else if (searchText.value !== '') {
+    // globale fuse Filter
+    const searchResult = fuseSearch.search(searchText.value);
+
+    for (const obj of searchResult) {
+      obj.item.vereinsname = vereineList.find(verein => verein.id === obj.item.vereinsid).name;
+      sortedList.push({ ...obj.item });
+    }
+  } else {
+    // Sortierung
+    sortedList = sportlerList.map(sportler => ({ ...sportler })); // Erstelle eine tiefe Kopie des Arrays
+    for (const sportler of sortedList) {
+      sportler.vereinsname = vereineList.find(verein => verein.id === sportler.vereinsid).name;
     }
 
     if (sortOrder.value === 'Name_ASC') {
-      sortOrder.value = 'Name_DSC';
-    } else {
-      sortOrder.value = 'Name_ASC';
+      sortedList.sort((a, b) => a.name.localeCompare(b.name, "de", { sensitivity: 'base' }));
+    } else if (sortOrder.value === 'Name_DSC') {
+      sortedList.sort((a, b) => b.name.localeCompare(a.name, "de", { sensitivity: "base" }));
+    } else if (sortOrder.value === 'Vorname_ASC') {
+      sortedList.sort((a, b) => a.vname.localeCompare(b.vname, "de", { sensitivity: 'base' }));
+    } else if (sortOrder.value === 'Vorname_DSC') {
+      sortedList.sort((a, b) => b.vname.localeCompare(a.vname, "de", { sensitivity: "base" }));
+    } else if (sortOrder.value === 'Jahrgang_ASC') {
+      sortedList.sort((a, b) => a.jahrgang - b.jahrgang);
+    } else if (sortOrder.value === 'Jahrgang_DSC') {
+      sortedList.sort((a, b) => b.jahrgang - a.jahrgang);
+    } else if (sortOrder.value === 'Geschlecht_ASC') {
+      sortedList.sort((a, b) => a.geschlecht.localeCompare(b.geschlecht, "de", { sensitivity: 'base' }));
+    } else if (sortOrder.value === 'Geschlecht_DSC') {
+      sortedList.sort((a, b) => b.geschlecht.localeCompare(a.geschlecht, "de", { sensitivity: "base" }));
+    } else if (sortOrder.value === 'Vereinsname_ASC') {
+      sortedList.sort((a, b) => a.vereinsname.localeCompare(b.vereinsname, "de", { sensitivity: 'base' }));
+    } else if (sortOrder.value === 'Vereinsname_DSC') {
+      sortedList.sort((a, b) => b.vereinsname.localeCompare(a.vereinsname, "de", { sensitivity: "base" }));
     }
   }
 
-  function clickSortVorname() {
-    if (searchText.value !== '') {
-      return;
-    }
+  return sortedList;
+});
 
-    if (sortOrder.value === 'Vorname_ASC') {
-      sortOrder.value = 'Vorname_DSC';
-    } else {
-      sortOrder.value = 'Vorname_ASC';
-    }
+
+const clickNewSportler = async () => {
+  console.log('clickNewSportler', newSportler.value);
+  const kopieNewSportler = { ...newSportler.value };
+  newSportler.value.name = '';
+  newSportler.value.vname = '';
+  newSportler.value.jahrgang = '';
+  newSportler.value.geschlecht = '';
+  newSportler.value.vereinsid = '';
+
+  if (!isAdmin.value) {
+    kopieNewSportler.vereinsid = userStore.user.verein_id;
   }
 
-  function clickSortJahrgang() {
-    if (searchText.value !== '') {
-      return;
-    }
+  try {
+    const response = await fetch('/api/newsportler', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(kopieNewSportler),
+      credentials: 'include'  // Cookies mitsenden
+    });
 
-    if (sortOrder.value === 'Jahrgang_ASC') {
-      sortOrder.value = 'Jahrgang_DSC';
-    } else {
-      sortOrder.value = 'Jahrgang_ASC';
-    }
-  }
+    const result = await response.json();
 
-  function clickSortGeschlecht() {
-    if (searchText.value !== '') {
-      return;
-    }
+    if (response.ok && result.sportlerId > 0) {
+      abgesendetOK.value = true;
 
-    if (sortOrder.value === 'Geschlecht_ASC') {
-      sortOrder.value = 'Geschlecht_DSC';
-    } else {
-      sortOrder.value = 'Geschlecht_ASC';
-    }
-  }
+      setTimeout(() => {
+        abgesendetOK.value = false;
+      }, 2000);
 
-  function clickSortVerein() {
-    if (searchText.value !== '') {
-      return;
-    }
-
-    if (sortOrder.value === 'Vereinsname_ASC') {
-      sortOrder.value = 'Vereinsname_DSC';
-    } else {
-      sortOrder.value = 'Vereinsname_ASC';
-    }
-  }
-
-  function clickEditSportler (sportler){
-    for (const sportlerOrg of sportlerList) {
-      if (sportlerOrg.id === sportler.id) {
-        sportlerOrg.editMode = true;
-        break;
-      }
-    }
-    editMode.value = true;
-  }
-
-  async function delSportler () {
-    console.log('delSportler delSportlerId', delSportlerId);
-    try {
-      const response = await fetch('/api/delSportler', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ delSportlerId }),
-        credentials: 'include'  // Cookies mitsenden
+      sportlerList.push({
+        id: result.sportlerId,
+        name: kopieNewSportler.name,
+        vname: kopieNewSportler.vname,
+        jahrgang: kopieNewSportler.jahrgang,
+        geschlecht: kopieNewSportler.geschlecht,
+        vereinsid: kopieNewSportler.vereinsid
       });
 
-      if (response.ok) {
-        for (let index = 0; index < sportlerList.length; index++) {
-          if (delSportlerId === sportlerList[index].id) {
-            sportlerList.splice(index, 1);
-            break;
-          }
-        }
-        fuseSearch = new Fuse(sportlerList, fuseOptions);
-      } else {
-        console.log('asdf test response', response);
-        setTimeout(() => {
-          dialogStore.setParameter('Fehlercode 100', `${response.status} ${response.statusText}`, 'ok', null, '', null, null);
-        }, 1000);
-      }
-    } catch(error) {
-      console.error('Es gab ein Problem mit Löschen des Sportlers:', error);
-      setTimeout(() => {
-        dialogStore.setParameter('Fehlercode 101', `${error.message}` , 'ok', null, '', null, null);
-      }, 1000);
-    }
-  }
-
-  function clickDelSportler (sportler){
-    delSportlerId = sportler.id;
-
-    dialogStore.setParameter(
-      'Löschen',
-      `Den Sportler <span class="fw-bold">${sportler.name} ${sportler.vname}</span> wirklich löschen?`,
-      'Löschen',
-      'btn-danger',
-      'Abbrechen',
-      null,
-      delSportler
-    );
-  }
-
-  function checkNewSportlerDoppelt (newSportler, isAdmin) {
-    for (const sportler of sportlerList) {
-      if (sportler.name.toLowerCase() === newSportler.name.toLowerCase() &&
-          sportler.vname.toLowerCase() === newSportler.vname.toLowerCase() &&
-          sportler.jahrgang === newSportler.jahrgang &&
-          sportler.geschlecht === newSportler.geschlecht) {
-        if (sportler.vereinsid === newSportler.vereinsid && isAdmin || !isAdmin) {
-          return true;
-        }
-      }
-    }
-
-    return false;
-  }
-
-  const newSportlerValid = computed(() => {
-    if (isAdmin.value) {
-      return newSportler.value.name !== '' &&
-        newSportler.value.vname !== '' &&
-        newSportler.value.jahrgang !== ''&&
-        newSportler.value.jahrgang > 1900 &&
-        newSportler.value.geschlecht !== '' &&
-        newSportler.value.vereinsid !== '' &&
-        checkNewSportlerDoppelt(newSportler.value, isAdmin.value) === false;
+      fuseSearch = new Fuse(sportlerList, fuseOptions);
     } else {
-      return newSportler.value.name !== '' &&
-        newSportler.value.vname !== '' &&
-        newSportler.value.jahrgang !== '' &&
-        newSportler.value.jahrgang > 1900 &&
-        newSportler.value.geschlecht !== '' &&
-        checkNewSportlerDoppelt(newSportler.value, isAdmin.value) === false;
+      setTimeout(() => {
+        dialogStore.setParameter('Fehlercode 104', `${response.status} ${response.statusText}`, 'ok', null, '', null, null);
+      }, 1000);
+      console.log('fehler status beim anlegegen des sportlers', response.status);
+
     }
-  });
+  } catch (error) {
+    console.error('Es gab ein Problem beim Anlegen des Sportlers', error);
+    setTimeout(() => {
+      dialogStore.setParameter('Fehlercode 108', `${error.message}`, 'ok', null, '', null, null);
+    }, 1000);
 
-  const sportlerListShow = computed(() => {
-    if (!sportlerList) {
-      return [];
-    }
+  }
+};
+const clickEditSportlerAendern = async (sportler) => {
+  try {
+    const response = await fetch('/api/editsportler', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(sportler),
+      credentials: 'include'  // Cookies mitsenden
+    }); // todo...
 
-    let sortedList = [];
+    const result = await response.json();
 
-    // Filter nach Neuem Namen
-    if (newSportler.value.name !== '') {
-      for (const sportler of sportlerList) {
-        console.log('sportler newSportler', newSportler);
-        if (sportler.name.toLowerCase().startsWith(newSportler.value.name.toLowerCase())) {
-          const obj = { ...sportler };
-
-          obj.vereinsname = vereineList.find(verein => verein.id === obj.vereinsid).name;
-          sortedList.push(obj);
+    if (response.ok) {
+      for (const sportlerOrg of sportlerList) {
+        if (sportlerOrg.id === sportler.id) {
+          sportlerOrg.name = sportler.name;
+          sportlerOrg.vname = sportler.vname;
+          sportlerOrg.jahrgang = sportler.jahrgang;
+          sportlerOrg.geschlecht = sportler.geschlecht;
+          sportlerOrg.vereinsid = sportler.vereinsid;
+          sportlerOrg.editMode = false;
+          break;
         }
       }
-    } else if (searchText.value !== '') {
-      // globale fuse Filter
-      const searchResult = fuseSearch.search(searchText.value);
+      fuseSearch = new Fuse(sportlerList, fuseOptions);
 
-      for (const obj of searchResult) {
-        obj.item.vereinsname = vereineList.find(verein => verein.id === obj.item.vereinsid).name;
-        sortedList.push({ ...obj.item });
-      }
+      editMode.value = false;
     } else {
-      // Sortierung
-      sortedList = sportlerList.map(sportler => ({ ...sportler })); // Erstelle eine tiefe Kopie des Arrays
-      for (const sportler of sortedList) {
-        sportler.vereinsname = vereineList.find(verein => verein.id === sportler.vereinsid).name;
-      }
-
-      if (sortOrder.value === 'Name_ASC') {
-        sortedList.sort((a, b) => a.name.localeCompare(b.name, "de", { sensitivity: 'base' }));
-      } else if (sortOrder.value === 'Name_DSC') {
-        sortedList.sort((a, b) => b.name.localeCompare(a.name, "de", { sensitivity: "base" }));
-      } else if (sortOrder.value === 'Vorname_ASC') {
-        sortedList.sort((a, b) => a.vname.localeCompare(b.vname, "de", { sensitivity: 'base' }));
-      } else if (sortOrder.value === 'Vorname_DSC') {
-        sortedList.sort((a, b) => b.vname.localeCompare(a.vname, "de", { sensitivity: "base" }));
-      } else if (sortOrder.value === 'Jahrgang_ASC') {
-        sortedList.sort((a, b) => a.jahrgang.localeCompare(b.jahrgang, "de", { sensitivity: 'base' }));
-      } else if (sortOrder.value === 'Jahrgang_DSC') {
-        sortedList.sort((a, b) => b.jahrgang.localeCompare(a.jahrgang, "de", { sensitivity: "base" }));
-      } else if (sortOrder.value === 'Geschlecht_ASC') {
-        sortedList.sort((a, b) => a.geschlecht.localeCompare(b.geschlecht, "de", { sensitivity: 'base' }));
-      } else if (sortOrder.value === 'Geschlecht_DSC') {
-        sortedList.sort((a, b) => b.geschlecht.localeCompare(a.geschlecht, "de", { sensitivity: "base" }));
-      } else if (sortOrder.value === 'Vereinsname_ASC') {
-        sortedList.sort((a, b) => a.vereinsname.localeCompare(b.vereinsname, "de", { sensitivity: 'base' }));
-      } else if (sortOrder.value === 'Vereinsname_DSC') {
-        sortedList.sort((a, b) => b.vereinsname.localeCompare(a.vereinsname, "de", { sensitivity: "base" }));
-      }
-    }
-
-    return sortedList;
-  });
-
-
-  const clickNewSportler = async () => {
-    console.log('clickNewSportler', newSportler.value);
-    const kopieNewSportler = { ...newSportler.value };
-    newSportler.value.name = '';
-    newSportler.value.vname = '';
-    newSportler.value.jahrgang = '';
-    newSportler.value.geschlecht = '';
-    newSportler.value.vereinsid = '';
-
-    if (!isAdmin.value) {
-      kopieNewSportler.vereinsid = userStore.user.verein_id;
-    }
-
-    try {
-      const response = await fetch('/api/newsportler', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(kopieNewSportler),
-        credentials: 'include'  // Cookies mitsenden
-      });
-
-      const result = await response.json();
-
-      if (response.ok && result.sportlerId > 0) {
-        abgesendetOK.value = true;
-
-        setTimeout(() => {
-          abgesendetOK.value = false;
-        }, 2000);
-
-        sportlerList.push({
-          id: result.sportlerId,
-          name: kopieNewSportler.name,
-          vname: kopieNewSportler.vname,
-          jahrgang: kopieNewSportler.jahrgang,
-          geschlecht: kopieNewSportler.geschlecht,
-          vereinsid: kopieNewSportler.vereinsid
-        });
-
-        fuseSearch = new Fuse(sportlerList, fuseOptions);
-      } else {
-        setTimeout(() => {
-          dialogStore.setParameter('Fehlercode 104', `${response.status} ${response.statusText}`, 'ok', null, '', null, null);
-        }, 1000);
-        console.log('fehler status beim anlegegen des sportlers', response.status);
-
-      }
-    } catch (error) {
-      console.error('Es gab ein Problem beim Anlegen des Sportlers', error);
       setTimeout(() => {
-        dialogStore.setParameter('Fehlercode 108', `${error.message}` , 'ok', null, '', null, null);
+        dialogStore.setParameter('Fehlercode 105', `${response.status} ${response.statusText}`, 'ok', null, '', null, null);
       }, 1000);
 
     }
-  };
-  const clickEditSportlerAendern = async (sportler) => {
-    try {
-      const response = await fetch('/api/editsportler', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(sportler),
-        credentials: 'include'  // Cookies mitsenden
-      }); // todo...
-
-      const result = await response.json();
-
-      if (response.ok) {
-        for (const sportlerOrg of sportlerList) {
-          if (sportlerOrg.id === sportler.id) {
-            sportlerOrg.name = sportler.name;
-            sportlerOrg.vname = sportler.vname;
-            sportlerOrg.jahrgang = sportler.jahrgang;
-            sportlerOrg.geschlecht = sportler.geschlecht;
-            sportlerOrg.vereinsid = sportler.vereinsid;
-            sportlerOrg.editMode = false;
-            break;
-          }
-        }
-        fuseSearch = new Fuse(sportlerList, fuseOptions);
-
-        editMode.value = false;
-      } else {
-          setTimeout(() => {
-            dialogStore.setParameter('Fehlercode 105', `${response.status} ${response.statusText}`, 'ok', null, '', null, null);
-        }, 1000);
-
-      }
-    } catch (error) {
-      console.error('Es gab ein Problem beim Aendern des Sportlers', error);
-      setTimeout(() => {
-        dialogStore.setParameter('Fehlercode 109', `${error.message}` , 'ok', null, '', null, null);
-      }, 1000);
+  } catch (error) {
+    console.error('Es gab ein Problem beim Aendern des Sportlers', error);
+    setTimeout(() => {
+      dialogStore.setParameter('Fehlercode 109', `${error.message}`, 'ok', null, '', null, null);
+    }, 1000);
+  }
+}
+const clickEditSportlerAbbrechen = (sportler) => {
+  for (const sportlerOrg of sportlerList) {
+    if (sportlerOrg.id === sportler.id) {
+      sportlerOrg.editMode = false;
+      break;
     }
   }
-  const clickEditSportlerAbbrechen = (sportler) =>{
-    for (const sportlerOrg of sportlerList) {
-      if (sportlerOrg.id === sportler.id) {
-        sportlerOrg.editMode = false;
-        break;
-      }
-    }
-    editMode.value = false;
-  }
+  editMode.value = false;
+}
 
-  const isAdmin = computed(() => {
-    return userStore.hasRole('admin');
-  });
+const isAdmin = computed(() => {
+  return userStore.hasRole('admin');
+});
 
-  onMounted(() => {
-    console.log('onMounted');
-    getVereineList();
-  });
+onMounted(() => {
+  console.log('onMounted');
+  getVereineList();
+});
 </script>
 
 <style scoped>
-  .sortCollums {
-    cursor: pointer;
-  }
+.sortCollums {
+  cursor: pointer;
+}
 
-  .editMode {
-    color: rgb(187, 187, 187);
-  }
+.editMode {
+  color: rgb(187, 187, 187);
+}
 </style>

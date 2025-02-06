@@ -6,7 +6,9 @@ export const useUserStore = defineStore('userStore', {
     user: null,
     editUser: null,
     message: null,
-    getSessionDataFinished: false
+    getSessionDataFinished: false,
+    sportfeste: null,
+    selectedSportfest: null,
   }),
 
   getters: {

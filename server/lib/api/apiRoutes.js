@@ -5,6 +5,7 @@ import sessionController from './sessionController.js';
 import userController from './userController.js';
 import sportlerController from './sportlerController.js';
 import vereineController from './vereineController.js';
+import sportfestController from './sportfestController.js';
 
 const apiRoutes = {
   init (app, config) {
@@ -207,6 +208,21 @@ const apiRoutes = {
         res.json({ io });
       } else {
         res.status(401).json({ message: 'Fehler beim löschen des Sportlers' });
+      }
+    });
+
+    // Sportfeste abrufen
+    app.post('/api/getAktiveSportfeste', authMiddleware.check('benutzer'), async (req, res) => {
+      logger.fatal('/api/getAktiveSportfeste req.body', req.body);
+
+      // Sportfeste abrufen
+      const sportfestList = await sportfestController.getAktiveSportfeste(req.body.user);
+
+      if (sportfestList) {
+        // Erfolgsnachricht senden
+        res.json({ sportfestList });
+      } else {
+        res.status(401).json({ message: 'Fehler beim Sportfest abrufen' });
       }
     });
   }
