@@ -3,7 +3,7 @@
     <div class="card">
       <div class="card-body">
         <h2 class="card-title">Anmeldung zum  {{ selectedSportfest.name }}</h2>
-        <h3 class="card-subtitle mb-2 text-muted">Dreikampf / Hochsprung</h3>
+        <h3 class="card-subtitle mb-2 text-muted"><span v-if="selectedSportfest.disziplinActive.dreikampf">Dreikampf</span></h3>
         <div class="input-group mb-3">
           <input v-model="searchText" type="text" class="form-control" placeholder="finde...">
           <button @click="searchText = '';" class="btn btn-outline-secondary" type="button"
@@ -32,7 +32,9 @@
                 <i v-if="searchText === '' && sortOrder === 'Vereinsname_ASC'" class="bi bi-arrow-down"></i>
                 <i v-if="searchText === '' && sortOrder === 'Vereinsname_DSC'" class="bi bi-arrow-up"></i>
               </th>
-              <th scope="col"></th>
+              <th v-if="selectedSportfest.disziplinActive.dreikampf" scope="col">
+                <span class="sortCollums" @click="clickSortDreikampf()">Dreikampf</span>
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -41,6 +43,20 @@
               <td>{{ sportler.jahrgang }} ({{ sportler.alter }})</td>
               <td>{{ sportler.geschlecht === 'm' ? 'männlich' : 'weiblich' }}</td>
               <td v-if="isAdmin">{{ sportler.vereinsname }}</td>
+              <td v-if="selectedSportfest.disziplinActive.dreikampf">
+                <i
+                  v-if="!sportler.dreikampf"
+                  @click="clickNewDreikampf(sportler.id)"
+                  class="bi bi-x-circle"
+                  style="cursor: pointer; font-size: 1.5em;">
+                </i>
+                <i
+                v-if="sportler.dreikampf"
+                  @click="clickDelDreikampf(sportler.meldungId)"
+                  class="bi bi-check-circle text-success"
+                  style="cursor: pointer; font-size: 1.5em;">
+                </i>
+              </td>
             </tr>
           </tbody>
         </table>
@@ -65,14 +81,6 @@ const router = useRouter();
 let sortOrder = ref('Name_ASC');
 let fuseSearch;
 let searchText = ref('');
-
-const newDreikampf = ref({
-  name: '',
-  vname: '',
-  jahrgang: '',
-  geschlecht: '',
-  vereinsid: ''
-});
 
 const route = useRoute();
 
@@ -100,23 +108,96 @@ const fuseOptions = {
   ]
 }
 
-
-async function getSportlerList(isAdmin) {
+async function clickNewDreikampf (sportlerId) {
   try {
-    const vereinsID = userStore.user.verein_id;
-    let response;
+    const response = await fetch('/api/newMeldung', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        sportlerId: sportlerId,
+        sportfestId: selectedSportfest.value.id
+      }),
+      credentials: 'include'  // Cookies mitsenden
+    });
 
-    if (isAdmin) {
-      response = await fetch(`/api/getSportlerList`, {
-        method: 'GET',
-        credentials: 'include'  // Cookies mitsenden
-      });
+    const result = await response.json();
+
+    if (response.ok) {
+      for (const sportler of sportlerList) {
+        if (sportler.id === sportlerId) {
+          sportler.dreikampf = true;
+          sportler.meldungId = result.meldungId;
+          break;
+        }
+      }
     } else {
-      response = await fetch(`/api/getSportlerList/${vereinsID}`, {
-        method: 'GET',
-        credentials: 'include'  // Cookies mitsenden
-      });
+      setTimeout(() => {
+        dialogStore.setParameter('Fehlercode xxx', `${response.status} ${response.statusText}`, 'ok', null, '', null, null);
+      }, 1000);
+      console.log(result.message || 'keine Daten vorhanden');
     }
+  } catch (error) {
+    console.error('Es gab ein Problem mit dem Abrufen der getSportlerList:', error);
+    setTimeout(() => {
+      dialogStore.setParameter('Fehlercode xxx', `${error.message}`, 'ok', null, '', null, null);
+    }, 1000);
+  }
+}
+
+async function clickDelDreikampf (meldungId) {
+  try {
+    const response = await fetch('/api/delMeldung', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        meldungId
+      }),
+      credentials: 'include'  // Cookies mitsenden
+    });
+
+    const result = await response.json();
+
+    if (response.ok) {
+      for (const sportler of sportlerList) {
+        if (sportler.meldungId === meldungId) {
+          sportler.dreikampf = false;
+          break;
+        }
+      }
+    } else {
+      setTimeout(() => {
+        dialogStore.setParameter('Fehlercode xxx', `${response.status} ${response.statusText}`, 'ok', null, '', null, null);
+      }, 1000);
+      console.log(result.message || 'keine Daten vorhanden');
+    }
+  } catch (error) {
+    console.error('Es gab ein Problem mit dem Abrufen der getSportlerList:', error);
+    setTimeout(() => {
+      dialogStore.setParameter('Fehlercode xxx', `${error.message}`, 'ok', null, '', null, null);
+    }, 1000);
+  }
+}
+
+async function getSportlerList (isAdmin) {
+  try {
+    const vereinsId = userStore.user.verein_id;
+
+    const response = await fetch('/api/getFestSportlerList', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        isAdmin,
+        vereinsId,
+        sportfestId: selectedSportfest.value.id
+      }),
+      credentials: 'include'  // Cookies mitsenden
+    });
 
     const result = await response.json();
 
@@ -125,6 +206,8 @@ async function getSportlerList(isAdmin) {
 
       for (const sportler of result.sportlerList) {
         sportler.editMode = false;
+        // Alter berechnen
+        sportler.alter = new Date().getFullYear() - sportler.jahrgang;
         sportlerList.push(sportler);
       }
 
@@ -292,11 +375,13 @@ const isAdmin = computed(() => {
 const selectedSportfest = computed(() => {
   let found = false;
   let sportfestName = '';
+  let disziplinActive = {};
 
   for (const sportfest of userStore.sportfeste) {
     if (sportfest.id == route.params.sportfestId) {
       found = true;
       sportfestName = sportfest.name;
+      disziplinActive = sportfest.disziplinActive;
     }
   }
 
@@ -307,7 +392,8 @@ const selectedSportfest = computed(() => {
 
   return {
     id: route.params.sportfestId,
-    name: sportfestName
+    name: sportfestName,
+    disziplinActive: disziplinActive
   };
 });
 

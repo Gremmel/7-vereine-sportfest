@@ -6,6 +6,7 @@ import userController from './userController.js';
 import sportlerController from './sportlerController.js';
 import vereineController from './vereineController.js';
 import sportfestController from './sportfestController.js';
+import meldungController from './meldungController.js';
 
 const apiRoutes = {
   init (app, config) {
@@ -155,6 +156,17 @@ const apiRoutes = {
       }
     });
 
+    // alle Sportler abrufen die zu diesem Sportfest gehören
+    app.post('/api/getFestSportlerList', authMiddleware.check('benutzer'), async (req, res) => {
+      try {
+        const sportlerList = await sportlerController.getFestSportlerList(req.body);
+
+        res.json({ sportlerList });
+      } catch (error) {
+        res.status(401).json({ message: error.message });
+      }
+    });
+
     // alle Vereine abrufen
     app.get('/api/getVereineList', authMiddleware.check('benutzer'), async (req, res) => {
       try {
@@ -223,6 +235,36 @@ const apiRoutes = {
         res.json({ sportfestList });
       } else {
         res.status(401).json({ message: 'Fehler beim Sportfest abrufen' });
+      }
+    });
+
+
+    // Meldung anlegen
+    app.post('/api/newMeldung', authMiddleware.check('benutzer'), async (req, res) => {
+      logger.fatal('/api/newMeldung req.body', req.body);
+
+      // Neue Meldung anlegen
+      const meldungId = await meldungController.newMeldung(req.body);
+
+      if (meldungId) {
+        // Erfolgsnachricht senden
+        res.json({ meldungId });
+      } else {
+        res.status(401).json({ message: 'Fehler beim anlegen der Meldung' });
+      }
+    });
+
+    // Meldung löschen
+    app.post('/api/delMeldung', authMiddleware.check('benutzer'), async (req, res) => {
+      logger.fatal('/api/delMeldung req.body', req.body);
+
+      const io = await meldungController.delMeldung(req.body.meldungId);
+
+      if (io) {
+        // Erfolgsnachricht senden
+        res.json({ io });
+      } else {
+        res.status(401).json({ message: 'Fehler beim löschen der Meldung' });
       }
     });
   }

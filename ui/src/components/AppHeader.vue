@@ -20,7 +20,7 @@
               <li v-if="showSportlerLink" class="nav-item">
                 <RouterLink class="nav-link" to="/sportler">Sportler</RouterLink>
               </li>
-              <li class="nav-item dropdown">
+              <li v-if="showSportlerAnmeldungLink" class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                   Anmeldung 3/4 Kampf
                 </a>
@@ -111,6 +111,19 @@ const getAktiveSportfeste = async () => {
 
   if (response.ok) {
     console.log('Sportfeste', result);
+
+    for (const sportfest of result.sportfestList) {
+      const disziplinen = sportfest.disziplinen.split(',');
+
+      const disziplinActive = {
+        dreikampf: disziplinen.includes('1'),
+        hochsprung: disziplinen.includes('3'),
+        staffel: disziplinen.includes('2')
+      };
+
+      sportfest.disziplinActive = disziplinActive;
+    }
+
     userStore.sportfeste = result.sportfestList;
   } else {
     console.error('Fehler beim Laden der Sportfeste', result);
