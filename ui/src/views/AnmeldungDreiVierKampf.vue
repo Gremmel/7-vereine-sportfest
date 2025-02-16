@@ -19,21 +19,23 @@
               </th>
               <th scope="col">
                 <span class="sortCollums" @click="clickSortJahrgang()">Jahrgang (Alter)</span>
-                <i v-if="searchText === '' && sortOrder === 'Jahrgang_ASC'" class="bi bi-arrow-down"></i>
-                <i v-if="searchText === '' && sortOrder === 'Jahrgang_DSC'" class="bi bi-arrow-up"></i>
+                <i v-if="searchText === '' && sortOrder === 'Jahrgang_ASC'" @click="clickSortJahrgang()" class="bi bi-arrow-down"></i>
+                <i v-if="searchText === '' && sortOrder === 'Jahrgang_DSC'" @click="clickSortJahrgang()" class="bi bi-arrow-up"></i>
               </th>
               <th scope="col">
                 <span class="sortCollums" @click="clickSortGeschlecht()">Geschlecht</span>
-                <i v-if="searchText === '' && sortOrder === 'Geschlecht_ASC'" class="bi bi-arrow-down"></i>
-                <i v-if="searchText === '' && sortOrder === 'Geschlecht_DSC'" class="bi bi-arrow-up"></i>
+                <i v-if="searchText === '' && sortOrder === 'Geschlecht_ASC'" @click="clickSortGeschlecht()" class="bi bi-arrow-down"></i>
+                <i v-if="searchText === '' && sortOrder === 'Geschlecht_DSC'" @click="clickSortGeschlecht()" class="bi bi-arrow-up"></i>
               </th>
               <th v-if="isAdmin" scope="col">
                 <span class="sortCollums" @click="clickSortVerein()">Verein</span>
-                <i v-if="searchText === '' && sortOrder === 'Vereinsname_ASC'" class="bi bi-arrow-down"></i>
-                <i v-if="searchText === '' && sortOrder === 'Vereinsname_DSC'" class="bi bi-arrow-up"></i>
+                <i v-if="searchText === '' && sortOrder === 'Vereinsname_ASC'" @click="clickSortVerein()" class="bi bi-arrow-down"></i>
+                <i v-if="searchText === '' && sortOrder === 'Vereinsname_DSC'" @click="clickSortVerein()" class="bi bi-arrow-up"></i>
               </th>
               <th v-if="selectedSportfest.disziplinActive.dreikampf" scope="col">
                 <span class="sortCollums" @click="clickSortDreikampf()">Dreikampf</span>
+                <i v-if="searchText === '' && sortOrder === 'Dreikampf_DSC'" @click="clickSortDreikampf()" class="bi bi-arrow-down"></i>
+                <i v-if="searchText === '' && sortOrder === 'Dreikampf_ASC'" @click="clickSortDreikampf()" class="bi bi-arrow-up"></i>
               </th>
             </tr>
           </thead>
@@ -53,7 +55,7 @@
                 <i
                 v-if="sportler.dreikampf"
                   @click="clickDelDreikampf(sportler.meldungId)"
-                  class="bi bi-check-circle text-success"
+                    class="bi bi-check-circle-fill text-success"
                   style="cursor: pointer; font-size: 1.5em;">
                 </i>
               </td>
@@ -148,6 +150,7 @@ async function clickNewDreikampf (sportlerId) {
 
 async function clickDelDreikampf (meldungId) {
   try {
+    console.log('clickDelDreikamp meldungId', meldungId);
     const response = await fetch('/api/delMeldung', {
       method: 'POST',
       headers: {
@@ -324,6 +327,17 @@ function clickSortVerein() {
   }
 }
 
+function clickSortDreikampf() {
+  if (searchText.value !== '') {
+    return;
+  }
+
+  if (sortOrder.value === 'Dreikampf_ASC') {
+    sortOrder.value = 'Dreikampf_DSC';
+  } else {
+    sortOrder.value = 'Dreikampf_ASC';
+  }
+}
 const sportlerListShow = computed(() => {
   if (!sportlerList) {
     return [];
@@ -362,6 +376,10 @@ const sportlerListShow = computed(() => {
       sortedList.sort((a, b) => a.vereinsname.localeCompare(b.vereinsname, "de", { sensitivity: 'base' }));
     } else if (sortOrder.value === 'Vereinsname_DSC') {
       sortedList.sort((a, b) => b.vereinsname.localeCompare(a.vereinsname, "de", { sensitivity: "base" }));
+    } else if (sortOrder.value === 'Dreikampf_ASC') {
+      sortedList.sort((a, b) => a.dreikampf - b.dreikampf);
+    } else if (sortOrder.value === 'Dreikampf_DSC') {
+      sortedList.sort((a, b) => b.dreikampf - a.dreikampf);
     }
   }
 

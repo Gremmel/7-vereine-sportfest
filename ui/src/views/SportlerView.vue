@@ -13,28 +13,28 @@
             <tr>
               <th scope="col">
                 <span class="sortCollums" @click="clickSortName()">Name</span>
-                <i v-if="searchText === '' && sortOrder === 'Name_ASC'" class="bi bi-arrow-down"></i>
-                <i v-if="searchText === '' && sortOrder === 'Name_DSC'" class="bi bi-arrow-up"></i>
+                <i v-if="searchText === '' && sortOrder === 'Name_ASC'" @click="clickSortName()" class="bi bi-arrow-down"></i>
+                <i v-if="searchText === '' && sortOrder === 'Name_DSC'" @click="clickSortName()" class="bi bi-arrow-up"></i>
               </th>
               <th scope="col">
                 <span class="sortCollums" @click="clickSortVorname()">Vorname</span>
-                <i v-if="searchText === '' && sortOrder === 'Vorname_ASC'" class="bi bi-arrow-down"></i>
-                <i v-if="searchText === '' && sortOrder === 'Vorname_DSC'" class="bi bi-arrow-up"></i>
+                <i v-if="searchText === '' && sortOrder === 'Vorname_ASC'" @click="clickSortVorname()" class="bi bi-arrow-down"></i>
+                <i v-if="searchText === '' && sortOrder === 'Vorname_DSC'" @click="clickSortVorname()" class="bi bi-arrow-up"></i>
               </th>
               <th scope="col">
                 <span class="sortCollums" @click="clickSortJahrgang()">Jahrgang</span>
-                <i v-if="searchText === '' && sortOrder === 'Jahrgang_ASC'" class="bi bi-arrow-down"></i>
-                <i v-if="searchText === '' && sortOrder === 'Jahrgang_DSC'" class="bi bi-arrow-up"></i>
+                <i v-if="searchText === '' && sortOrder === 'Jahrgang_ASC'" @click="clickSortJahrgang()" class="bi bi-arrow-down"></i>
+                <i v-if="searchText === '' && sortOrder === 'Jahrgang_DSC'" @click="clickSortJahrgang()" class="bi bi-arrow-up"></i>
               </th>
               <th scope="col">
                 <span class="sortCollums" @click="clickSortGeschlecht()">Geschlecht</span>
-                <i v-if="searchText === '' && sortOrder === 'Geschlecht_ASC'" class="bi bi-arrow-down"></i>
-                <i v-if="searchText === '' && sortOrder === 'Geschlecht_DSC'" class="bi bi-arrow-up"></i>
+                <i v-if="searchText === '' && sortOrder === 'Geschlecht_ASC'" @click="clickSortGeschlecht()" class="bi bi-arrow-down"></i>
+                <i v-if="searchText === '' && sortOrder === 'Geschlecht_DSC'" @click="clickSortGeschlecht()" class="bi bi-arrow-up"></i>
               </th>
               <th v-if="isAdmin" scope="col">
                 <span class="sortCollums" @click="clickSortVerein()">Verein</span>
-                <i v-if="searchText === '' && sortOrder === 'Vereinsname_ASC'" class="bi bi-arrow-down"></i>
-                <i v-if="searchText === '' && sortOrder === 'Vereinsname_DSC'" class="bi bi-arrow-up"></i>
+                <i v-if="searchText === '' && sortOrder === 'Vereinsname_ASC'" @click="clickSortVerein()" class="bi bi-arrow-down"></i>
+                <i v-if="searchText === '' && sortOrder === 'Vereinsname_DSC'" @click="clickSortVerein()" class="bi bi-arrow-up"></i>
               </th>
               <th scope="col"></th>
             </tr>

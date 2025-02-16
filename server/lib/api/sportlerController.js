@@ -31,16 +31,18 @@ class SportlerController {
   }
 
   getFestSportlerList (data) {
+    let sportlerList;
+
     if (data.isAdmin) {
       try {
-        const stmt = dbController.prepare(`SELECT sportler.*, sportler_verein.verein_id as vereinsid
-                                          FROM sportler
-                                          LEFT JOIN sportler_verein on sportler.id=sportler_verein.sportler_id
-                                          LEFT JOIN sportfest_verein ON sportler_verein.verein_id=sportfest_verein.verein_id
-                                          WHERE sportfest_verein.sportfest_id= ${data.sportfestId} ORDER BY sportler.name`);
-        const sportler = stmt.all();
+        const stmt = dbController.prepare(`
+          SELECT sportler.*, sportler_verein.verein_id as vereinsid
+          FROM sportler
+          LEFT JOIN sportler_verein on sportler.id=sportler_verein.sportler_id
+          LEFT JOIN sportfest_verein ON sportler_verein.verein_id=sportfest_verein.verein_id
+          WHERE sportfest_verein.sportfest_id= ${data.sportfestId} ORDER BY sportler.name`);
 
-        return sportler;
+        sportlerList = stmt.all();
       } catch (error) {
         logger.error('Fehler beim Abrufen der getFestSportlerList:', error);
 
@@ -48,21 +50,51 @@ class SportlerController {
       }
     } else {
       try {
-        const stmt = dbController.prepare(`SELECT sportler.*, sportler_verein.verein_id as vereinsid
-                                          FROM sportler
-                                          LEFT JOIN sportler_verein ON sportler.id=sportler_verein.sportler_id
-                                          LEFT JOIN sportfest_verein ON sportler_verein.verein_id=sportfest_verein.verein_id AND sportfest_verein.sportfest_id=${data.sportfestId}
-                                          WHERE  sportler_verein.verein_id = ${data.vereinsId}
-                                          ORDER BY sportler.name`);
-        const sportler = stmt.all();
+        const stmt = dbController.prepare(`
+          SELECT sportler.*, sportler_verein.verein_id as vereinsid
+          FROM sportler
+          LEFT JOIN sportler_verein ON sportler.id=sportler_verein.sportler_id
+          LEFT JOIN sportfest_verein ON sportler_verein.verein_id=sportfest_verein.verein_id AND sportfest_verein.sportfest_id=${data.sportfestId}
+          WHERE  sportler_verein.verein_id = ${data.vereinsId}
+          ORDER BY sportler.name`);
 
-        return sportler;
+        sportlerList = stmt.all();
       } catch (error) {
         logger.error('Fehler beim Abrufen der getFestSportlerList:', error);
 
         throw new Error('Konnte keine getFestSportlerList abrufen.');
       }
     }
+
+    logger.warn(' sportlerList', sportlerList);
+
+    for (const sportler of sportlerList) {
+      try {
+        const stmt = dbController.prepare(`
+          SELECT *
+          FROM meldungen
+          Left JOIN meldungen_sportler ON meldungen.id=meldungen_sportler.meldungen_id
+          LEFT JOIN meldungen_sportfest ON meldungen.id=meldungen_sportfest.meldungen_id
+          WHERE sportler_id=${sportler.id} AND sportfest_id=${data.sportfestId}`);
+        const meldungen = stmt.all();
+
+        if (meldungen.length === 1) {
+          sportler.dreikampf = meldungen[0].dreikampf;
+          sportler.hoehe = meldungen[0].hoehe;
+          sportler.meldungId = meldungen[0].id;
+        } else {
+          sportler.dreikampf = 0;
+          sportler.hoehe = null;
+          sportler.meldungId = null;
+        }
+      } catch (error) {
+        logger.error('Fehler beim Abrufen der getFestSportlerList:', error);
+
+        throw new Error('Konnte keine getFestSportlerList abrufen.');
+      }
+    }
+
+    return sportlerList;
   }
 
   async newSportler (sportler) {
