@@ -66,7 +66,7 @@
 </template>
 
 <script setup>
-import { onMounted, reactive, ref, computed } from 'vue';
+import { onMounted, reactive, ref, computed, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import { useRoute } from 'vue-router';
 import { useUserStore } from '@/stores/userStore';
@@ -395,6 +395,12 @@ const selectedSportfest = computed(() => {
     name: sportfestName,
     disziplinActive: disziplinActive
   };
+});
+
+watch (selectedSportfest, (newVal, oldVal) => {
+  if (newVal.id !== oldVal.id) {
+    getSportlerList(isAdmin.value);
+  }
 });
 
 onMounted(() => {

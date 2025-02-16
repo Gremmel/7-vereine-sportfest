@@ -33,14 +33,11 @@ class SportlerController {
   getFestSportlerList (data) {
     if (data.isAdmin) {
       try {
-        const stmt = dbController.prepare(`SELECT sportler.*, sportler_verein.verein_id as vereinsid, meldungen.dreikampf,meldungen.hoehe, meldungen.id AS meldungId
+        const stmt = dbController.prepare(`SELECT sportler.*, sportler_verein.verein_id as vereinsid
                                           FROM sportler
-                                          LEFT JOIN sportler_verein ON sportler.id=sportler_verein.sportler_id
-                                          LEFT JOIN sportfest_verein ON sportfest_verein.verein_id = sportler_verein.verein_id
-                                          LEFT JOIN meldungen_sportler ON sportler.id = meldungen_sportler.sportler_id
-                                          LEFT JOIN meldungen ON meldungen_sportler.meldungen_id = meldungen.id
-                                          LEFT JOIN meldungen_sportfest ON meldungen.id=meldungen_sportfest.meldungen_id
-                                          WHERE sportfest_verein.sportfest_id  = ${data.sportfestId} ORDER BY sportler.name`);
+                                          LEFT JOIN sportler_verein on sportler.id=sportler_verein.sportler_id
+                                          LEFT JOIN sportfest_verein ON sportler_verein.verein_id=sportfest_verein.verein_id
+                                          WHERE sportfest_verein.sportfest_id= ${data.sportfestId} ORDER BY sportler.name`);
         const sportler = stmt.all();
 
         return sportler;
@@ -51,16 +48,12 @@ class SportlerController {
       }
     } else {
       try {
-        const stmt = dbController.prepare(`SELECT sportler.*, sportler_verein.id as vereinsid, meldungen.dreikampf, meldungen.hoehe, meldungen.id AS meldungId
+        const stmt = dbController.prepare(`SELECT sportler.*, sportler_verein.verein_id as vereinsid
                                           FROM sportler
                                           LEFT JOIN sportler_verein ON sportler.id=sportler_verein.sportler_id
-                                          LEFT JOIN sportfest_verein ON sportfest_verein.verein_id = sportler_verein.verein_id
-                                          LEFT JOIN meldungen_sportler ON sportler.id = meldungen_sportler.sportler_id
-                                          LEFT JOIN meldungen ON meldungen_sportler.meldungen_id = meldungen.id
-                                          LEFT JOIN meldungen_sportfest ON meldungen.id=meldungen_sportfest.meldungen_id
-                                          WHERE verein.id = ${data.vereinsId}
-                                          AND sportfest_verein.sportfest_id = ${data.sportfestId}
-                                          ORDER BY sportler.name `);
+                                          LEFT JOIN sportfest_verein ON sportler_verein.verein_id=sportfest_verein.verein_id AND sportfest_verein.sportfest_id=${data.sportfestId}
+                                          WHERE  sportler_verein.verein_id = ${data.vereinsId}
+                                          ORDER BY sportler.name`);
         const sportler = stmt.all();
 
         return sportler;
