@@ -42,6 +42,15 @@ const router = createRouter({
       props: true
     },
     {
+      path: "/staffelAnmeldung/:sportfestId",
+      name: "staffelAnmeldung",
+      component: AnmeldungDreiVierKampf,
+      meta: {
+        requiresRole: "benutzer",
+      },
+      props: true
+    },
+    {
       path: "/newuser",
       name: "newuser",
       component: NewUserView,

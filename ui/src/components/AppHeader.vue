@@ -20,7 +20,7 @@
               <li v-if="showSportlerLink" class="nav-item">
                 <RouterLink class="nav-link" to="/sportler">Sportler</RouterLink>
               </li>
-              <li v-if="showSportlerAnmeldungLink" class="nav-item dropdown">
+              <li v-if="showSportlerAnmeldungLink" class="nav-item dropdown ms-3">
                 <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                   Anmeldung 3/4 Kampf
                 </a>
@@ -28,6 +28,18 @@
                   <li v-for="sportfest of userStore.sportfeste" :key="sportfest.id">
                     <RouterLink class="dropdown-item" :to="`/sportlerAnmeldung/${sportfest.id}`">{{sportfest.name}}</RouterLink>
                   </li>
+                </ul>
+              </li>
+              <li v-if="showStaffelAnmeldungLink" class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                  Staffel
+                </a>
+                <ul class="dropdown-menu">
+                  <template v-for="sportfest of userStore.sportfeste" :key="sportfest.id">
+                    <li v-if="sportfest.disziplinActive.staffel">
+                      <RouterLink class="dropdown-item" :to="`/staffelAnmeldung/${sportfest.id}`">{{sportfest.name}}</RouterLink>
+                    </li>
+                  </template>
                 </ul>
               </li>
             </ul>
@@ -83,6 +95,14 @@ const sportlerAnmeldungRouteRole = sportlerAnmeldungRoute.meta.requiresRole;
 const showSportlerAnmeldungLink = computed(() => {
   return userStore.hasRole(sportlerAnmeldungRouteRole);
 });
+
+// Ermitteln ob der Benutzer die Berechtigung für den Link Staffel hat
+const staffelAnmeldungRoute = router.getRoutes().find(route => route.name === 'staffelAnmeldung');
+const staffelAnmeldungRouteRole = staffelAnmeldungRoute.meta.requiresRole;
+const showStaffelAnmeldungLink = computed(() => {
+  return userStore.hasRole(staffelAnmeldungRouteRole);
+});
+
 
 // Benutzer abmelden
 const doLogout = async () => {
