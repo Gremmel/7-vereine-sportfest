@@ -32,10 +32,31 @@ class MeldungController {
 
       logger.info(`infoMeldungSportfest`, infoMeldungenSportfest);
 
-
       return info.lastInsertRowid;
     } catch (error) {
       logger.error(`Error adding new Meldung: ${error.message}`);
+
+      return false;
+    }
+  }
+
+  async hoeheMeldung (hoeheMeldung) {
+    try {
+      const stmt = dbController.prepare(`
+        UPDATE meldungen
+        SET hoehe = ?
+        WHERE id = ?
+      `);
+
+      stmt.bind(hoeheMeldung.hoehe, hoeheMeldung.meldungId);
+
+      const info = stmt.run();
+
+      logger.info(`change successfully.`, info);
+
+      return true;
+    } catch (error) {
+      logger.error(`Error change Hoehmeldung: ${error.message}`);
 
       return false;
     }

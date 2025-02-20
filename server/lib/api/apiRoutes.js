@@ -238,7 +238,6 @@ const apiRoutes = {
       }
     });
 
-
     // Meldung anlegen
     app.post('/api/newMeldung', authMiddleware.check('benutzer'), async (req, res) => {
       logger.fatal('/api/newMeldung req.body', req.body);
@@ -251,6 +250,21 @@ const apiRoutes = {
         res.json({ meldungId });
       } else {
         res.status(401).json({ message: 'Fehler beim anlegen der Meldung' });
+      }
+    });
+
+    // Höhemeldung anlegen
+    app.post('/api/hoeheMeldung', authMiddleware.check('benutzer'), async (req, res) => {
+      logger.fatal('/api/hoeheMeldung req.body', req.body);
+
+      // Höhemeldung anlegen
+      const io = await meldungController.hoeheMeldung(req.body);
+
+      if (io) {
+        // Erfolgsnachricht senden
+        res.json({ io });
+      } else {
+        res.status(401).json({ message: 'Fehler beim ändern der Höhe' });
       }
     });
 

@@ -67,9 +67,28 @@ class SportlerController {
     }
 
     logger.warn(' sportlerList', sportlerList);
+    const hochsprungMinHoehe = {};
+
+    try {
+      const stmt = dbController.prepare(`
+        SELECT *
+        FROM hochsprungMinHoehe`);
+
+      const hochsprungMinHoeheArray = stmt.all();
+
+      for (const item of hochsprungMinHoeheArray) {
+        hochsprungMinHoehe[item.alter] = item;
+      }
+    } catch (error) {
+      logger.error('Fehler beim Abrufen der hochsprungMinHoehe:', error);
+
+      throw new Error('Fehler beim Abrufen der hochsprungMinHoehe:', error);
+    }
 
     for (const sportler of sportlerList) {
       try {
+        logger.warn(' hochsprungMinHoehe', hochsprungMinHoehe);
+
         const stmt = dbController.prepare(`
           SELECT *
           FROM meldungen
@@ -86,6 +105,22 @@ class SportlerController {
           sportler.dreikampf = 0;
           sportler.hoehe = null;
           sportler.meldungId = null;
+        }
+
+        // Alter berechnen
+        sportler.alter = new Date().getFullYear() - sportler.jahrgang;
+
+        // Mindesthöhe für Hochsprung berechnen
+        if (sportler.geschlecht === 'w' && sportler.alter > 9 && sportler.alter < 21) {
+          sportler.minHoehe = hochsprungMinHoehe[sportler.alter].wHoehe;
+        } else if (sportler.geschlecht === 'm' && sportler.alter > 9 && sportler.alter < 21) {
+          sportler.minHoehe = hochsprungMinHoehe[sportler.alter].mHoehe;
+        } else if (sportler.alter > 20 && sportler.geschlecht === 'w') {
+          sportler.minHoehe = hochsprungMinHoehe[20].wHoehe;
+        } else if (sportler.alter > 20 && sportler.geschlecht === 'm') {
+          sportler.minHoehe = hochsprungMinHoehe[20].mHoehe;
+        } else {
+          sportler.minHoehe = null;
         }
       } catch (error) {
         logger.error('Fehler beim Abrufen der getFestSportlerList:', error);

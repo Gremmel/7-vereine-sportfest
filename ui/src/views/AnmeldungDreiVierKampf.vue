@@ -37,6 +37,12 @@
                 <i v-if="searchText === '' && sortOrder === 'Dreikampf_DSC'" @click="clickSortDreikampf()" class="bi bi-arrow-down"></i>
                 <i v-if="searchText === '' && sortOrder === 'Dreikampf_ASC'" @click="clickSortDreikampf()" class="bi bi-arrow-up"></i>
               </th>
+              <th v-if="selectedSportfest.disziplinActive.hochsprung" scope="col">
+                <span class="sortCollums" @click="clickSortHochsprung()">Hochsprung</span>
+                <i v-if="searchText === '' && sortOrder === 'Hochsprung_DSC'" @click="clickSortHochsprung()" class="bi bi-arrow-down"></i>
+                <i v-if="searchText === '' && sortOrder === 'Hochsprung_ASC'" @click="clickSortHochsprung()" class="bi bi-arrow-up"></i>
+              </th>
+
             </tr>
           </thead>
           <tbody>
@@ -58,6 +64,21 @@
                     class="bi bi-check-circle-fill text-success"
                   style="cursor: pointer; font-size: 1.5em;">
                 </i>
+              </td>
+              <td v-if="selectedSportfest.disziplinActive.hochsprung">
+                <template v-if ="sportler.dreikampf">
+                  <span v-if="sportler.minHoehe === null">min. Alter 10</span>
+                  <select v-else v-model="sportler.hoehe" @change="changeStartHoehe(sportler)" class="form-select">
+                    <option key="0" value="null">keine Hochsprung Anmeldung</option>
+                    <option
+                      v-for="item in createHoeheList(sportler.minHoehe)"
+                      :key="item.value"
+                      :value="item.value"
+                    >
+                      {{ item.text }}
+                    </option>
+                  </select>
+                </template>
               </td>
             </tr>
           </tbody>
@@ -108,6 +129,19 @@ const fuseOptions = {
     'jahrgang',
     'vereinsname'
   ]
+}
+
+function createHoeheList (minHoehe) {
+  let hoeheList = [];
+
+  for (let i = minHoehe; i <= 160; i += 5) {
+    hoeheList.push({
+      value: i,
+      text: `${i} cm`
+    });
+  }
+
+  return hoeheList;
 }
 
 async function clickNewDreikampf (sportlerId) {
@@ -168,6 +202,45 @@ async function clickDelDreikampf (meldungId) {
       for (const sportler of sportlerList) {
         if (sportler.meldungId === meldungId) {
           sportler.dreikampf = false;
+          sportler.meldungId = null;
+          sportler.hoehe = null;
+          break;
+        }
+      }
+    } else {
+      setTimeout(() => {
+        dialogStore.setParameter('Fehlercode xxx', `${response.status} ${response.statusText}`, 'ok', null, '', null, null);
+      }, 1000);
+      console.log(result.message || 'keine Daten vorhanden');
+    }
+  } catch (error) {
+    console.error('Es gab ein Problem mit dem Abrufen der getSportlerList:', error);
+    setTimeout(() => {
+      dialogStore.setParameter('Fehlercode xxx', `${error.message}`, 'ok', null, '', null, null);
+    }, 1000);
+  }
+}
+
+async function changeStartHoehe (sportler) {
+  try {
+    const response = await fetch('/api/hoeheMeldung', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        meldungId: sportler.meldungId,
+        hoehe: sportler.hoehe
+      }),
+      credentials: 'include'  // Cookies mitsenden
+    });
+
+    const result = await response.json();
+
+    if (response.ok) {
+      for (const sp of sportlerList) {
+        if (sp.id === sportler.id) {
+          sp.hoehe= sportler.hoehe;
           break;
         }
       }
@@ -209,9 +282,10 @@ async function getSportlerList (isAdmin) {
 
       for (const sportler of result.sportlerList) {
         sportler.editMode = false;
-        // Alter berechnen
-        sportler.alter = new Date().getFullYear() - sportler.jahrgang;
-        sportlerList.push(sportler);
+
+        if (sportler.alter >= 5) {
+          sportlerList.push(sportler);
+        }
       }
 
       fuseSearch = new Fuse(sportlerList, fuseOptions);
@@ -338,6 +412,19 @@ function clickSortDreikampf() {
     sortOrder.value = 'Dreikampf_ASC';
   }
 }
+
+function clickSortHochsprung() {
+  if (searchText.value !== '') {
+    return;
+  }
+
+  if (sortOrder.value === 'Hochsprung_ASC') {
+    sortOrder.value = 'Hochsprung_DSC';
+  } else {
+    sortOrder.value = 'Hochsprung_ASC';
+  }
+}
+
 const sportlerListShow = computed(() => {
   if (!sportlerList) {
     return [];
@@ -380,7 +467,20 @@ const sportlerListShow = computed(() => {
       sortedList.sort((a, b) => a.dreikampf - b.dreikampf);
     } else if (sortOrder.value === 'Dreikampf_DSC') {
       sortedList.sort((a, b) => b.dreikampf - a.dreikampf);
+    } else if (sortOrder.value === 'Hochsprung_ASC') {
+      sortedList.sort((a, b) => {
+        if (a.dreikampf === 1 && a.hoehe === null && a.alter > 9) return -1;
+        if (b.dreikampf === 1 && b.hoehe === null && b.alter > 9) return 1;
+        return 0;
+      });
+    } else if (sortOrder.value === 'Hochsprung_DSC') {
+      sortedList.sort((a, b) => {
+        if (a.dreikampf === 1 && a.hoehe != null) return -1;
+        if (b.dreikampf === 1 && b.hoehe != null) return 1;
+        return 0;
+      });
     }
+
   }
 
   return sortedList;
