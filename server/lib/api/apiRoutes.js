@@ -7,6 +7,7 @@ import sportlerController from './sportlerController.js';
 import vereineController from './vereineController.js';
 import sportfestController from './sportfestController.js';
 import meldungController from './meldungController.js';
+import staffelController from './staffelController.js';
 
 const apiRoutes = {
   init (app, config) {
@@ -279,6 +280,43 @@ const apiRoutes = {
         res.json({ io });
       } else {
         res.status(401).json({ message: 'Fehler beim löschen der Meldung' });
+      }
+    });
+
+    // Staffel Übersicht abrufen
+    app.get('/api/getStaffelUebersicht', authMiddleware.check('admin'), async (req, res) => {
+      try {
+        const klassen = await staffelController.getKlassen();
+
+        res.json({
+          klassen
+        });
+      } catch (error) {
+        res.status(401).json({ message: error.message });
+      }
+    });
+
+    // alle Sportler abrufen
+    app.post('/api/getKlasseSportler', authMiddleware.check('benutzer'), async (req, res) => {
+      try {
+        const klasseSportler = await staffelController.getKlasseSportler(req.body);
+
+        res.json({ klasseSportlerList: klasseSportler });
+      } catch (error) {
+        res.status(401).json({ message: error.message });
+      }
+    });
+
+    // Staffel Übersicht abrufen
+    app.get('/api/getStaffelUebersicht/:vereinsID', authMiddleware.check('admin'), async (req, res) => {
+      try {
+        const klassen = await staffelController.getKlassen();
+
+        res.json({
+          klassen
+        });
+      } catch (error) {
+        res.status(401).json({ message: error.message });
       }
     });
   }

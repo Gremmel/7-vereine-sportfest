@@ -30,14 +30,14 @@
                   </li>
                 </ul>
               </li>
-              <li v-if="showStaffelAnmeldungLink" class="nav-item dropdown">
+              <li v-if="showStaffelUebersichtLink" class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                   Staffel
                 </a>
                 <ul class="dropdown-menu">
                   <template v-for="sportfest of userStore.sportfeste" :key="sportfest.id">
                     <li v-if="sportfest.disziplinActive.staffel">
-                      <RouterLink class="dropdown-item" :to="`/staffelAnmeldung/${sportfest.id}`">{{sportfest.name}}</RouterLink>
+                      <RouterLink class="dropdown-item" :to="`/staffelUebersicht/${sportfest.id}`">{{sportfest.name}}</RouterLink>
                     </li>
                   </template>
                 </ul>
@@ -97,10 +97,10 @@ const showSportlerAnmeldungLink = computed(() => {
 });
 
 // Ermitteln ob der Benutzer die Berechtigung für den Link Staffel hat
-const staffelAnmeldungRoute = router.getRoutes().find(route => route.name === 'staffelAnmeldung');
-const staffelAnmeldungRouteRole = staffelAnmeldungRoute.meta.requiresRole;
-const showStaffelAnmeldungLink = computed(() => {
-  return userStore.hasRole(staffelAnmeldungRouteRole);
+const staffelUebersichtRoute = router.getRoutes().find(route => route.name === 'staffelUebersicht');
+const staffelUebersichtRouteRole = staffelUebersichtRoute.meta.requiresRole;
+const showStaffelUebersichtLink = computed(() => {
+  return userStore.hasRole(staffelUebersichtRouteRole);
 });
 
 

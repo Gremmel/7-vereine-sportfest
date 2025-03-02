@@ -7,6 +7,8 @@ import LoginView from "../views/LoginView.vue";
 import { useUserStore } from "@/stores/userStore";
 import SportlerView from "@/views/SportlerView.vue";
 import AnmeldungDreiVierKampf from "@/views/AnmeldungDreiVierKampf.vue";
+import StaffelUebersicht from "@/views/StaffelUebersicht.vue";
+import EditStaffelView from "@/views/EditStaffelView.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -42,13 +44,21 @@ const router = createRouter({
       props: true
     },
     {
-      path: "/staffelAnmeldung/:sportfestId",
-      name: "staffelAnmeldung",
-      component: AnmeldungDreiVierKampf,
+      path: "/staffelUebersicht/:sportfestId",
+      name: "staffelUebersicht",
+      component: StaffelUebersicht,
       meta: {
         requiresRole: "benutzer",
       },
       props: true
+    },
+    {
+      path: "/editStaffel",
+      name: "editStaffel",
+      component: EditStaffelView,
+      meta: {
+        requiresRole: "benutzer",
+      },
     },
     {
       path: "/newuser",
