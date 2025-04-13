@@ -24,7 +24,10 @@
             <td>{{ sportler.jahrgang }} ({{ sportler.sportleralter }})</td>
             <td>{{ sportler.geschlecht === 'm' ? 'männlich' : 'weiblich' }}</td>
             <td class="text-center" style="width: 10px;">
-              <template v-if="!staffelVoll || sportler.laeuferNr">
+              <template v-if="sportler.laeuferNr ||
+                  (!staffelVoll && sportler.geschlecht === 'm') ||
+                  (!staffelVoll && sportler.geschlecht === 'w' && !maxWeiblich)"
+                >
                 <i
                   v-if="!sportler.laeuferNr"
                   @click="clickNewStaffelLaeufer(sportler.id)"
@@ -185,6 +188,26 @@ const clickDelStaffelLaeufer = function (sportlerId) {
     staffel.meldungen.lNr4 = null;
   }
 };
+
+const maxWeiblich = computed(() => {
+  if (klasseSportlerListShow.value.length > 0 && dataStore.klasseStaffel.gemixt === '1' && mixedStaffel.value) {
+    let countWeiblich = 0;
+
+    for (const sportler of klasseSportlerListShow.value) {
+      if (sportler.geschlecht === 'w' && sportler.laeuferNr) {
+        countWeiblich += 1;
+      }
+    }
+
+    if (countWeiblich > 2) {
+      return true;
+    } else {
+      return false;
+    }
+  } else {
+    return false;
+  }
+});
 
 const klasseSportlerListShow = computed(() => {
   const list = [];

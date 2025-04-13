@@ -53,7 +53,7 @@ class StaffelController {
         AND sportleralter <= ${klasseStaffel.maxalter}
         AND sportleralter >= ${klasseStaffel.minalter}
         ${klasseStaffel.gemixt === '1' ? `AND sportler.geschlecht IN ('m', 'w')` : `AND sportler.geschlecht = '${klasseStaffel.geschlecht}'`}
-        ORDER BY sportler.jahrgang DESC, sportler.name ASC, sportler.vname ASC`);
+        ORDER BY sportler.jahrgang ASC, sportler.name ASC, sportler.vname ASC`);
       const klasseSportler = stmt.all();
 
       const filterdSportler = [];
