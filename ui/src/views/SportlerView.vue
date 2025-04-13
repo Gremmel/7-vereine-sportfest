@@ -210,14 +210,14 @@ async function getSportlerList(isAdmin) {
       router.push('/login');
     } else {
       setTimeout(() => {
-        dialogStore.setParameter('Fehlercode 102', `${response.status} ${response.statusText}`, 'ok', null, '', null, null);
+        dialogStore.setParameter('Fehlercode xxx', `${response.status} ${response.statusText}`, 'ok', null, '', null, null);
       }, 1000);
       console.log(result.message || 'keine Daten vorhanden');
     }
   } catch (error) {
     console.error('Es gab ein Problem mit dem Abrufen der getSportlerList:', error);
     setTimeout(() => {
-      dialogStore.setParameter('Fehlercode 106', `${error.message}`, 'ok', null, '', null, null);
+      dialogStore.setParameter('Fehlercode xxx', `${error.message}`, 'ok', null, '', null, null);
     }, 1000);
   }
 }
@@ -251,14 +251,14 @@ async function getVereineList() {
       router.push('/login');
     } else {
       setTimeout(() => {
-        dialogStore.setParameter('Fehlercode 103', `${response.status} ${response.statusText}`, 'ok', null, '', null, null);
+        dialogStore.setParameter('Fehlercode xxx', `${response.status} ${response.statusText}`, 'ok', null, '', null, null);
       }, 1000);
       console.log(result.message || 'keine Daten vorhanden');
     }
   } catch (error) {
     console.error('Es gab ein Problem mit dem Abrufen der getVereineList:', error);
     setTimeout(() => {
-      dialogStore.setParameter('Fehlercode 107', `${error.message}`, 'ok', null, '', null, null);
+      dialogStore.setParameter('Fehlercode xxx', `${error.message}`, 'ok', null, '', null, null);
     }, 1000);
   }
 }
@@ -356,13 +356,13 @@ async function delSportler() {
     } else {
       console.log('asdf test response', response);
       setTimeout(() => {
-        dialogStore.setParameter('Fehlercode 100', `${response.status} ${response.statusText}`, 'ok', null, '', null, null);
+        dialogStore.setParameter('Fehlercode xxx', `${response.status} ${response.statusText}`, 'ok', null, '', null, null);
       }, 1000);
     }
   } catch (error) {
     console.error('Es gab ein Problem mit Löschen des Sportlers:', error);
     setTimeout(() => {
-      dialogStore.setParameter('Fehlercode 101', `${error.message}`, 'ok', null, '', null, null);
+      dialogStore.setParameter('Fehlercode xxx', `${error.message}`, 'ok', null, '', null, null);
     }, 1000);
   }
 }
@@ -519,7 +519,7 @@ const clickNewSportler = async () => {
       fuseSearch = new Fuse(sportlerList, fuseOptions);
     } else {
       setTimeout(() => {
-        dialogStore.setParameter('Fehlercode 104', `${response.status} ${response.statusText}`, 'ok', null, '', null, null);
+        dialogStore.setParameter('Fehlercode xxx', `${response.status} ${response.statusText}`, 'ok', null, '', null, null);
       }, 1000);
       console.log('fehler status beim anlegegen des sportlers', response.status);
 
@@ -527,7 +527,7 @@ const clickNewSportler = async () => {
   } catch (error) {
     console.error('Es gab ein Problem beim Anlegen des Sportlers', error);
     setTimeout(() => {
-      dialogStore.setParameter('Fehlercode 108', `${error.message}`, 'ok', null, '', null, null);
+      dialogStore.setParameter('Fehlercode xxx', `${error.message}`, 'ok', null, '', null, null);
     }, 1000);
 
   }
@@ -541,7 +541,7 @@ const clickEditSportlerAendern = async (sportler) => {
       },
       body: JSON.stringify(sportler),
       credentials: 'include'  // Cookies mitsenden
-    }); // todo...
+    });
 
     const result = await response.json();
 
@@ -562,17 +562,18 @@ const clickEditSportlerAendern = async (sportler) => {
       editMode.value = false;
     } else {
       setTimeout(() => {
-        dialogStore.setParameter('Fehlercode 105', `${response.status} ${response.statusText}`, 'ok', null, '', null, null);
+        dialogStore.setParameter('Fehlercode xxx', `${response.status} ${response.statusText}`, 'ok', null, '', null, null);
       }, 1000);
 
     }
   } catch (error) {
     console.error('Es gab ein Problem beim Aendern des Sportlers', error);
     setTimeout(() => {
-      dialogStore.setParameter('Fehlercode 109', `${error.message}`, 'ok', null, '', null, null);
+      dialogStore.setParameter('Fehlercode xxx', `${error.message}`, 'ok', null, '', null, null);
     }, 1000);
   }
 }
+
 const clickEditSportlerAbbrechen = (sportler) => {
   for (const sportlerOrg of sportlerList) {
     if (sportlerOrg.id === sportler.id) {

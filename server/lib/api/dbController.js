@@ -23,6 +23,12 @@ class DatabaseController {
   close () {
     this.db.close();
   }
+
+  transaction (operations) {
+    const transaction = this.db.transaction(operations);
+
+    return (...args) => transaction(...args);
+  }
 }
 
 const dbPath = path.join(__dirname, '..', '..', '..', 'extern', 'datenbank.db');

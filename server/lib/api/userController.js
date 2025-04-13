@@ -15,6 +15,18 @@ class UserController {
         delete user.password;
       }
 
+      // Vereins ID und Name hinzufügen
+      for (const user of users) {
+        const stmt2 = dbController.prepare('SELECT verein.id as vereinsId, verein.name as vereinName, verein.logo as vereinLogo FROM user_verein LEFT JOIN verein ON user_verein.verein_id=verein.id WHERE user_verein.user_id=?');
+        const vereine = stmt2.all(user.id);
+
+        if (vereine.length > 0) {
+          user.verein = vereine[0];
+        } else {
+          user.verein = [];
+        }
+      }
+
       return users;
     } catch (error) {
       logger.error('Fehler beim Abrufen der Benutzer:', error);
@@ -50,20 +62,33 @@ class UserController {
   }
 
   async addUser (user) {
-    const { username, email, password, roles, enabled } = user;
+    const { username, email, telefon, password, roles, enabled, vereinsId } = user;
 
     const passHash = await this.hashPassword(password);
 
-    logger.info('new hash', passHash);
-
     const stmt = dbController.prepare(`
-      INSERT INTO fos_user (username, email, password, roles, enabled)
-      VALUES (?, ?, ?, ?, ?)
+      INSERT INTO fos_user (username, email, telefon, password, roles, enabled)
+      VALUES (?, ?, ?, ?, ?, ?)
     `);
 
     try {
-      stmt.run(username, email, passHash, roles, enabled);
+      const info = stmt.run(username, email, telefon, passHash, roles, enabled);
+
       logger.info(`User ${username} added successfully.`);
+
+      // Hole die ID des neu hinzugefügten Benutzers
+      const userId = info.lastInsertRowid;
+
+      logger.info(`New user ID: ${userId}`);
+
+      // Füge den Benutzer in die user_verein-Tabelle ein
+      const stmt2 = dbController.prepare(`
+        INSERT INTO user_verein (user_id, verein_id)
+        VALUES (?, ?)
+      `);
+
+      stmt2.run(userId, vereinsId);
+      logger.info(`User ${username} added to user_verein successfully.`);
 
       return true;
     } catch (error) {
@@ -74,7 +99,7 @@ class UserController {
   }
 
   async updateUser (user) {
-    const { id, username, email, password, roles, enabled } = user;
+    const { id, username, email, telefon, password, roles, enabled, vereinsId } = user;
 
     let passHash = null;
 
@@ -85,16 +110,26 @@ class UserController {
 
     const stmt = dbController.prepare(`
       UPDATE fos_user
-      SET username = ?, email = ?, password = COALESCE(?, password), roles = ?, enabled = ?
+      SET username = ?, email = ?, telefon = ?, password = COALESCE(?, password), roles = ?, enabled = ?
       WHERE id = ?
     `);
 
     try {
-      const result = stmt.run(username, email, passHash, roles, enabled, id);
+      const result = stmt.run(username, email, telefon, passHash, roles, enabled, id);
 
       logger.info(`User ${username} updated successfully.`, result);
 
       if (result.changes === 1) {
+        // führe die Aktualisierung der user_verein-Tabelle aus
+        const stmt2 = dbController.prepare(`
+          UPDATE user_verein
+          SET verein_id = ?
+          WHERE user_id = ?
+        `);
+
+        stmt2.run(vereinsId, id);
+        logger.info(`User ${username} updated in user_verein successfully.`);
+
         return true;
       }
 

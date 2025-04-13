@@ -17,6 +17,9 @@
               <li v-if="showUserLink" class="nav-item">
                 <RouterLink class="nav-link" to="/users">Benutzer</RouterLink>
               </li>
+              <li v-if="showSportfesteLink" class="nav-item">
+                <RouterLink class="nav-link" to="/sportfeste">Sportfeste</RouterLink>
+              </li>
               <li v-if="showSportlerLink" class="nav-item">
                 <RouterLink class="nav-link" to="/sportler">Sportler</RouterLink>
               </li>
@@ -61,11 +64,13 @@
 import { RouterLink } from 'vue-router'
 import { computed } from 'vue'
 import { useUserStore } from '@/stores/userStore';
+import { useDataStore } from '@/stores/dataStore';
 import { useRouter } from 'vue-router';
 import { onMounted } from 'vue';
 import { watch } from 'vue';
 
 const userStore = useUserStore();
+const dataStore = useDataStore();
 const isLoggedIn = computed(() => userStore.isLoggedIn);
 const router = useRouter();
 
@@ -75,11 +80,25 @@ watch(() => userStore.isLoggedIn, (newValue) => {
   }
 });
 
+watch(() => dataStore.sportfesteChanged, (newValue) => {
+  if (newValue) {
+    getAktiveSportfeste();
+    dataStore.sportfesteChanged = false;
+  }
+});
+
 // Ermitteln ob der Benutzer die Berechtigung für den Link Benutzer hat
 const userRoute = router.getRoutes().find(route => route.name === 'users');
 const userRouteRole = userRoute.meta.requiresRole;
 const showUserLink = computed(() => {
   return userStore.hasRole(userRouteRole);
+});
+
+// Ermitteln ob der Benutzer die Berechtigung für den Link Sportfeste hat
+const sportfesteRoute = router.getRoutes().find(route => route.name === 'sportfeste');
+const sportfesteRouteRole = sportfesteRoute.meta.requiresRole;
+const showSportfesteLink = computed(() => {
+  return userStore.hasRole(sportfesteRouteRole);
 });
 
 // Ermitteln ob der Benutzer die Berechtigung für den Link Sportler hat

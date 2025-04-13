@@ -7,6 +7,8 @@ export const useDataStore = defineStore('dataStore', {
     neueStaffel: null,
     staffelVereinsId: null,
     staffelSportfestId: null,
+    staffelId: null,
+    sportfesteChanged: false,
   }),
 
   getters: {
@@ -14,7 +16,8 @@ export const useDataStore = defineStore('dataStore', {
   },
 
   actions: {
-    setNeueStaffel (klasse, vereinsId, sportfestId) {
+    setNeueStaffel (klasse, vereinsId, sportfestId, staffelId) {
+      this.staffelId = staffelId;
       this.klasseStaffel = klasse;
       this.staffelVereinsId = vereinsId;
       this.neueStaffel = true;

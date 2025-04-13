@@ -15,12 +15,12 @@ class AuthMiddleware {
   // Dummy-Funktion zur Überprüfung des Tokens (Anpassbar)
   verifyToken (token) {
     try {
-      logger.info('verifyToken', this.secret);
+      // logger.info('verifyToken', this.secret);
 
       // Überprüfe den Token und dekodiere die Payload
       const decoded = jwt.verify(token, this.secret);
 
-      logger.warn('tocken  decoded', decoded);
+      // logger.warn('tocken  decoded', decoded);
 
       return decoded; // Gibt die dekodierte Payload zurück, wenn der Token gültig ist
     } catch (err) {
@@ -49,7 +49,7 @@ class AuthMiddleware {
           const newToken = sessionController.extendToken(token);
 
           // cookie neu mit verlängertem token neu setzen
-          logger.info('session verlägern', newToken);
+          // logger.info('session verlägern', newToken);
           res.cookie('session_token', newToken, {
             httpOnly: true, // Cookie nicht durch JavaScript im Browser zugreifbar
             secure: true, // true = wenn HTTPS

@@ -25,6 +25,29 @@
       </div>
 
       <div class="mb-3">
+        <label for="telefon" class="form-label">Telefonnr.</label>
+        <input
+          type="text"
+          id="telefon"
+          v-model="form.telefon"
+          class="form-control"
+        />
+      </div>
+
+      <div class="mb-3">
+        <label for="roles" class="form-label">Verein</label>
+        <select
+          id="roles"
+          v-model="form.vereinsId"
+          class="form-select"
+          required
+          size="7"
+        >
+          <option v-for="verein of vereineList" :key="verein.id" :value="verein.id">{{ verein.name }}</option>
+        </select>
+      </div>
+
+      <div class="mb-3">
         <label for="password" class="form-label">Passwort</label>
         <input
           type="password"
@@ -69,29 +92,71 @@
 </template>
 
 <script setup>
-  import { ref, computed } from 'vue';
+  import { onMounted, ref, reactive, computed } from 'vue';
   import { useRouter } from 'vue-router';
   import { useUserStore } from '@/stores/userStore';
+  import { useDialogStore } from '@/stores/dialogStore';
 
   const form = ref({
     username: '',
     email: '',
+    telefon: '',
     password: '',
     password2: '',
+    vereinsId: ''
   });
 
   const router = useRouter();
   const selectedRoles = ref(['benutzer']);
   const errorMessage = ref('');
   const submitted = ref(false);
+  const dialogStore = useDialogStore();
   const passwordCheck = computed(() => form.value.password === form.value.password2);
   const disabledSubmit = computed(() => {
-    if (form.value.username === '' || form.value.email === '' || form.value.password === '' || !passwordCheck.value) {
+    if (!form.value.vereinsId || form.value.username === '' || form.value.email === '' || form.value.password === '' || !passwordCheck.value) {
       return true;
     } else {
       return false;
     }
   });
+
+  const vereineList = reactive([]);
+
+  async function getVereineList() {
+    try {
+      let response;
+      response = await fetch(`/api/getVereineList`, {
+        method: 'GET',
+        credentials: 'include'  // Cookies mitsenden
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        vereineList.splice(0);
+
+        for (const vereine of result.vereineList) {
+          vereineList.push(vereine);
+        }
+
+        vereineList.sort((a, b) => a.name.localeCompare(b.name));
+
+      } else if (response.status === 401) {
+        // weiterleiten zum login
+        dialogStore.setParameter('Fehlercode xxx', `${response.status} ${response.statusText}`, 'ok', null, '', null, null);
+      } else {
+        setTimeout(() => {
+          dialogStore.setParameter('Fehlercode xxx', `${response.status} ${response.statusText}`, 'ok', null, '', null, null);
+        }, 1000);
+        console.log(result.message || 'keine Daten vorhanden');
+      }
+    } catch (error) {
+      console.error('Es gab ein Problem mit dem Abrufen der getVereineList:', error);
+      setTimeout(() => {
+        dialogStore.setParameter('Fehlercode xxx', `${error.message}`, 'ok', null, '', null, null);
+      }, 1000);
+    }
+  }
 
   const submitForm = async () => {
     submitted.value = true;
@@ -105,8 +170,10 @@
         body: JSON.stringify({
           username: form.value.username,
           email: form.value.email,
+          telefon: form.value.telefon,
           password: form.value.password,
           roles: JSON.stringify(selectedRoles.value),
+          vereinsId: form.value.vereinsId,
           enabled: '1'
         }),
         credentials: 'include'  // Cookies mitsenden
@@ -138,6 +205,12 @@
       errorMessage.value = 'Es gab ein Problem mit der anlegen des Benutzers. Bitte versuche es erneut.';
     }
   };
+
+  onMounted(() => {
+    console.log('onMounted');
+    getVereineList();
+  });
+
 </script>
 
 <style>

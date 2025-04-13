@@ -30,7 +30,6 @@ const apiRoutes = {
         // Setze das Token als HTTP-Only Cookie
         res.cookie('session_token', token, {
           httpOnly: true, // Cookie nicht durch JavaScript im Browser zugreifbar
-          // todo secure in der produktiv umgebung mit nginx auf true setzen
           secure: true, // Setze dies auf true, wenn du HTTPS verwendest
           maxAge: 3600000, // Cookie-Lebensdauer (z.B. 1 Stunde)
           sameSite: 'strict' // Schützt vor CSRF-Angriffen
@@ -224,7 +223,7 @@ const apiRoutes = {
       }
     });
 
-    // Sportfeste abrufen
+    // Aktive Sportfeste abrufen
     app.post('/api/getAktiveSportfeste', authMiddleware.check('benutzer'), async (req, res) => {
       logger.fatal('/api/getAktiveSportfeste req.body', req.body);
 
@@ -236,6 +235,63 @@ const apiRoutes = {
         res.json({ sportfestList });
       } else {
         res.status(401).json({ message: 'Fehler beim Sportfest abrufen' });
+      }
+    });
+
+    // alle Sportfeste abrufen
+    app.get('/api/getSportfestList', authMiddleware.check('admin'), async (req, res) => {
+      logger.fatal('/api/getSportfestList req.body', req.body);
+
+      // Sportfeste abrufen
+      const data = await sportfestController.getSportfestList();
+
+      if (data) {
+        // Erfolgsnachricht senden
+        res.json(data);
+      } else {
+        res.status(401).json({ message: 'Fehler beim Sportfest abrufen' });
+      }
+    });
+
+    // new Sportfest
+    app.post('/api/newSportfest', authMiddleware.check('admin'), async (req, res) => {
+      logger.fatal('/api/newSportfest req.body', req.body);
+
+      const io = sportfestController.newSportfest(req.body.sportfest);
+
+      if (io.success) {
+        // Erfolgsnachricht senden
+        res.json({ sportfestId: io.sportfestId });
+      } else {
+        res.status(401).json({ message: 'Fehler bei newSportfest' });
+      }
+    });
+
+    // edit Sportfest
+    app.post('/api/editSportfest', authMiddleware.check('benutzer'), async (req, res) => {
+      logger.fatal('/api/editSportfest req.body', req.body);
+
+      const io = await sportfestController.editSportfest(req.body.sportfest);
+
+      if (io) {
+        // Erfolgsnachricht senden
+        res.json({ io });
+      } else {
+        res.status(401).json({ message: 'Fehler bei editSportfest' });
+      }
+    });
+
+    // del Sportfest
+    app.post('/api/delSportfest', authMiddleware.check('admin'), async (req, res) => {
+      logger.fatal('/api/delSportfest req.body', req.body);
+
+      const io = sportfestController.delSportfest(req.body.delSportfestId);
+
+      if (io) {
+        // Erfolgsnachricht senden
+        res.json({ io });
+      } else {
+        res.status(401).json({ message: 'Fehler bei delSportfest' });
       }
     });
 
@@ -284,13 +340,35 @@ const apiRoutes = {
     });
 
     // Staffel Übersicht abrufen
-    app.get('/api/getStaffelUebersicht', authMiddleware.check('admin'), async (req, res) => {
+    app.post('/api/getStaffelUebersicht', authMiddleware.check('benutzer'), async (req, res) => {
       try {
-        const klassen = await staffelController.getKlassen();
+        const klassen = staffelController.getKlassen(req.body);
 
         res.json({
           klassen
         });
+      } catch (error) {
+        res.status(401).json({ message: error.message });
+      }
+    });
+
+    // Staffel anlegen
+    app.post('/api/newStaffel', authMiddleware.check('benutzer'), async (req, res) => {
+      try {
+        const staffelId = staffelController.newStaffel(req.body);
+
+        res.json({ staffelId });
+      } catch (error) {
+        res.status(401).json({ message: error.message });
+      }
+    });
+
+    // Staffel anlegen
+    app.post('/api/saveStaffelMeldungen', authMiddleware.check('benutzer'), async (req, res) => {
+      try {
+        const staffelMeldung = staffelController.saveStaffelMeldungen(req.body);
+
+        res.json({ staffelMeldung });
       } catch (error) {
         res.status(401).json({ message: error.message });
       }
@@ -308,9 +386,9 @@ const apiRoutes = {
     });
 
     // Staffel Übersicht abrufen
-    app.get('/api/getStaffelUebersicht/:vereinsID', authMiddleware.check('admin'), async (req, res) => {
+    app.get('/api/getStaffelUebersicht/:sportfestId', authMiddleware.check('admin'), async (req, res) => {
       try {
-        const klassen = await staffelController.getKlassen();
+        const klassen = await staffelController.getKlassen(req.params.sportfestId);
 
         res.json({
           klassen

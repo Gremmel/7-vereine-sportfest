@@ -1,29 +1,31 @@
 <template>
   <div class="d-flex justify-content-center align-items-center mt-4">
-    <div class="card loginCard">
-      <div class="card-header">
-        <h3>
-          Login
-        </h3>
-      </div>
-      <p v-if="message" class="text-danger m-2 text-center">
-        {{ message }}
-      </p>
-      <div class="card-body">
-        <div class="form-floating mb-3">
-          <input v-model="username" type="text" class="form-control" id="floatingInput" placeholder="Benutzername">
-          <label for="floatingInput">Benutzername</label>
+    <form onsubmit="return false;">
+      <div class="card loginCard">
+        <div class="card-header">
+          <h3>
+            Login
+          </h3>
         </div>
-        <div class="form-floating">
-          <input v-model="password" type="password" class="form-control" id="floatingPassword" placeholder="Password">
-          <label for="floatingPassword">Passwort</label>
+        <p v-if="message" class="text-danger m-2 text-center">
+          {{ message }}
+        </p>
+        <div class="card-body">
+          <div class="form-floating mb-3">
+            <input v-model="username" type="text" class="form-control" id="floatingInput" placeholder="Benutzername" autocomplete="username">
+            <label for="floatingInput">Benutzername</label>
+          </div>
+          <div class="form-floating">
+            <input v-model="password" type="password" class="form-control" id="floatingPassword" placeholder="Password" autocomplete="current-password">
+            <label for="floatingPassword">Passwort</label>
+          </div>
+          <button class="btn btn-success mt-2" type="button" @click="handleLogin">Login</button>
         </div>
-        <button class="btn btn-success mt-2" type="button" @click="handleLogin">Login</button>
-      </div>
 
-      <p v-if="errorMessage" class="error m-3">{{ errorMessage }}</p>
-      <p v-if="successMessage" class="success m-3">{{ successMessage }}</p>
-    </div>
+        <p v-if="errorMessage" class="error m-3">{{ errorMessage }}</p>
+        <p v-if="successMessage" class="success m-3">{{ successMessage }}</p>
+      </div>
+    </form>
   </div>
 </template>
 

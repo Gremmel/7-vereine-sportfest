@@ -6,6 +6,7 @@ import EditUserView from "../views/EditUserView.vue";
 import LoginView from "../views/LoginView.vue";
 import { useUserStore } from "@/stores/userStore";
 import SportlerView from "@/views/SportlerView.vue";
+import SportfesteView from "@/views/SportfesteView.vue";
 import AnmeldungDreiVierKampf from "@/views/AnmeldungDreiVierKampf.vue";
 import StaffelUebersicht from "@/views/StaffelUebersicht.vue";
 import EditStaffelView from "@/views/EditStaffelView.vue";
@@ -32,6 +33,14 @@ const router = createRouter({
       component: SportlerView,
       meta: {
         requiresRole: "benutzer",
+      },
+    },
+    {
+      path: "/sportfeste",
+      name: "sportfeste",
+      component: SportfesteView,
+      meta: {
+        requiresRole: "admin",
       },
     },
     {

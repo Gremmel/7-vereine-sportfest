@@ -4,6 +4,7 @@
   "description": "",
   "main": "app.js",
   "scripts": {
+    "start": "clear; node --watch app.js",
     "testSrc": "clear; jest testSrc --coverage=true --verbose --detectOpenHandles --forceExit"
   },
   "author": "",
