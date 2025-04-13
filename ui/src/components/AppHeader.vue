@@ -20,6 +20,9 @@
               <li v-if="showSportfesteLink" class="nav-item">
                 <RouterLink class="nav-link" to="/sportfeste">Sportfeste</RouterLink>
               </li>
+              <li v-if="showFilesLink" class="nav-item">
+                <RouterLink class="nav-link" to="/files">Dateien</RouterLink>
+              </li>
               <li v-if="showSportlerLink" class="nav-item">
                 <RouterLink class="nav-link" to="/sportler">Sportler</RouterLink>
               </li>
@@ -99,6 +102,13 @@ const sportfesteRoute = router.getRoutes().find(route => route.name === 'sportfe
 const sportfesteRouteRole = sportfesteRoute.meta.requiresRole;
 const showSportfesteLink = computed(() => {
   return userStore.hasRole(sportfesteRouteRole);
+});
+
+// Ermitteln ob der Benutzer die Berechtigung für den Link Dateien hat
+const filesRoute = router.getRoutes().find(route => route.name === 'files');
+const filesRouteRole = filesRoute.meta.requiresRole;
+const showFilesLink = computed(() => {
+  return userStore.hasRole(filesRouteRole);
 });
 
 // Ermitteln ob der Benutzer die Berechtigung für den Link Sportler hat

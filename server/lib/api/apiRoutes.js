@@ -8,10 +8,45 @@ import vereineController from './vereineController.js';
 import sportfestController from './sportfestController.js';
 import meldungController from './meldungController.js';
 import staffelController from './staffelController.js';
+import fileController from './fileController.js';
+import multer from 'multer';
+
+// Speicherort und Dateinamen für hochgeladene Dateien konfigurieren
+const upload = multer({
+  dest: `${process.cwd()}/../extern/uploads/`, // Ordner, in dem die Dateien gespeichert werden
+  limits: { fileSize: 10 * 1024 * 1024 } // Maximalgröße der Datei (z. B. 10 MB)
+});
 
 const apiRoutes = {
   init (app, config) {
     sessionController.init(config);
+
+    app.post('/api/upload', authMiddleware.check('admin'), upload.array('files', 10), async (req, res) => {
+      const result = await fileController.handleMultipleFileUpload(req.files);
+
+      if (result.success) {
+        res.json({
+          message: 'Dateien erfolgreich hochgeladen',
+          files: result.files
+        });
+      } else {
+        res.status(401).json({ message: result.message });
+      }
+    });
+
+    app.get('/api/getFileList', authMiddleware.check('admin'), (req, res) => {
+      const token = req.cookies.session_token;
+
+      logger.info('/api/getFileList', token);
+
+      const files = fileController.getFileList();
+
+      if (token) {
+        res.json({ files });
+      } else {
+        res.json({ message: 'Keine session vorhanden' });
+      }
+    });
 
     // API-Routen
     app.post('/api/login', async (req, res) => {

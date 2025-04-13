@@ -10,6 +10,7 @@ import SportfesteView from "@/views/SportfesteView.vue";
 import AnmeldungDreiVierKampf from "@/views/AnmeldungDreiVierKampf.vue";
 import StaffelUebersicht from "@/views/StaffelUebersicht.vue";
 import EditStaffelView from "@/views/EditStaffelView.vue";
+import FilesView from "@/views/FilesView.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -90,6 +91,14 @@ const router = createRouter({
       name: "login",
       component: LoginView,
     },
+    {
+      path: "/files",
+      name: "files",
+      component: FilesView,
+      meta: {
+        requiresRole: "admin",
+      },
+    }
   ],
 });
 

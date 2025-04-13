@@ -543,7 +543,7 @@ const clickEditSportlerAendern = async (sportler) => {
       credentials: 'include'  // Cookies mitsenden
     });
 
-    const result = await response.json();
+    await response.json();
 
     if (response.ok) {
       for (const sportlerOrg of sportlerList) {
