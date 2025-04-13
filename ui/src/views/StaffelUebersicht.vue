@@ -16,10 +16,17 @@
         <table class="table table-hover table-sm">
           <tbody>
             <tr v-for="(staffel, index) of klasse.staffeln" :key="staffel.id">
-              <td>Staffel {{ index + 1 }}</td>
-              <td class="text-center">
-                <span style="color: red;" v-if="staffel.meldungenCount < 4">anzahl Läufer: {{ staffel.meldungenCount }}</span>
+              <td class="min-width fw-bold">Staffel&nbsp;{{ toRoman(index + 1) }}&nbsp;&nbsp;</td>
+              <td class="text-left">
+                <span style="color: red; margin-right: 5px;" v-if="staffel.meldungenCount < 4">anzahl Läufer: {{ staffel.meldungenCount }}</span>
                 <span v-if="staffel.meldungenCount == 4">anzahl Läufer: {{ staffel.meldungenCount }}</span>
+                <span
+                  :class="sportler.geschlecht === 'm' ? 'staffelSportlerMaenlich' : 'staffelSportlerWeiblich'"
+                  v-for="sportler of staffel.staffelSportler"
+                  :key="sportler.id"
+                >
+                  {{ sportler.vname }} {{ sportler.name }}
+                </span>
               </td>
               <td class="text-end">
                 <button v-if="!editMode" @click="clickDelStaffel(staffel)" type="button" class="btn btn-danger">
@@ -53,6 +60,7 @@ const dialogStore = useDialogStore();
 const dataStore = useDataStore();
 const router = useRouter();
 const staffelVereinsId = ref(null);
+let delStaffelId;
 
 const route = useRoute();
 
@@ -68,6 +76,75 @@ watch(staffelVereinsId, async (newVal, oldVal) => {
     await getStaffelUebersichtList();
   }
 });
+
+function clickDelStaffel(staffel) {
+  console.log('clickDelStaffel', staffel);
+  let delStaffelDialogText = ''
+  for (const sportler of staffel.staffelSportler) {
+    delStaffelDialogText += `<span class="fw-bold">${sportler.name} ${sportler.vname}</span><br>`;
+  }
+  delStaffelId = staffel.id;
+  dialogStore.setParameter(
+    'Löschen',
+    `Die Staffel mit folgenden Teilnehmer:<br> ${delStaffelDialogText} wirklich löschen?`,
+    'Löschen',
+    'btn-danger',
+    'Abbrechen',
+    null,
+    delStaffel,
+  );
+}
+
+async function delStaffel() {
+  console.log('delStaffel delStaffelId', delStaffelId);
+  try {
+    const response = await fetch('/api/delStaffel', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ delStaffelId }),
+      credentials: 'include'  // Cookies mitsenden
+    });
+
+    if (response.ok) {
+      await getStaffelUebersichtList();
+    } else {
+      console.log('asdf test response', response);
+      setTimeout(() => {
+        dialogStore.setParameter('Fehlercode xxx', `${response.status} ${response.statusText}`, 'ok', null, '', null, null);
+      }, 1000);
+    }
+  } catch (error) {
+    console.error('Es gab ein Problem mit Löschen des Sportlers:', error);
+    setTimeout(() => {
+      dialogStore.setParameter('Fehlercode xxx', `${error.message}`, 'ok', null, '', null, null);
+    }, 1000);
+  }
+}
+
+function toRoman(num) {
+  const romanNumerals = [
+    { value: 100, numeral: 'C' },
+    { value: 90, numeral: 'XC' },
+    { value: 50, numeral: 'L' },
+    { value: 40, numeral: 'XL' },
+    { value: 10, numeral: 'X' },
+    { value: 9, numeral: 'IX' },
+    { value: 5, numeral: 'V' },
+    { value: 4, numeral: 'IV' },
+    { value: 1, numeral: 'I' }
+  ];
+
+  let result = '';
+  for (const { value, numeral } of romanNumerals) {
+    while (num >= value) {
+      result += numeral;
+      num -= value;
+    }
+  }
+  return result;
+}
 
 async function getStaffelUebersichtList() {
   try {
@@ -212,4 +289,28 @@ onMounted(() => {
 </script>
 
 <style scoped>
+
+.staffelSportlerMaenlich {
+  display: inline-block;
+  margin-left: 5px;
+  margin-right: 5px;
+  padding-left: 7px;
+  padding-right: 7px;
+  background-color: #f0f0f0;
+  border-radius: 8px;
+}
+
+.staffelSportlerWeiblich {
+  display: inline-block;
+  margin-left: 5px;
+  margin-right: 5px;
+  padding-left: 7px;
+  padding-right: 7px;
+  background-color: #e2dff0;
+  border-radius: 8px;
+}
+.min-width {
+  white-space: nowrap;
+  width: 1%;
+}
 </style>

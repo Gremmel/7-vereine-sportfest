@@ -409,6 +409,19 @@ const apiRoutes = {
       }
     });
 
+    // Staffel Übersicht abrufen
+    app.post('/api/delStaffel', authMiddleware.check('benutzer'), async (req, res) => {
+      try {
+        const io = staffelController.delStaffel(req.body.delStaffelId);
+
+        res.json({
+          io
+        });
+      } catch (error) {
+        res.status(401).json({ message: error.message });
+      }
+    });
+
     // alle Sportler abrufen
     app.post('/api/getKlasseSportler', authMiddleware.check('benutzer'), async (req, res) => {
       try {

@@ -22,6 +22,17 @@ class StaffelController {
           GROUP BY staffeln.id`);
         const staffeln = stmt2.all();
 
+        for (const staffel of staffeln) {
+          const stmt3 = dbController.prepare(`
+            SELECT sportler.name, sportler.vname, sportler.geschlecht FROM sportler
+            JOIN staffeln_meldungen ON sportler.id = staffeln_meldungen.sportlerId
+            WHERE staffeln_meldungen.staffelId = ${staffel.id}
+            ORDER BY staffeln_meldungen.laeuferNr ASC`);
+          const staffelSportler = stmt3.all();
+
+          staffel.staffelSportler = staffelSportler;
+        }
+
         // Delete all staffeln where meldungen_count === 0
         for (let i = staffeln.length - 1; i >= 0; i--) {
           if (staffeln[i].meldungenCount === 0) {
@@ -33,6 +44,7 @@ class StaffelController {
         }
 
         klasse.staffeln = staffeln;
+
       }
 
       return klassen;
@@ -40,6 +52,24 @@ class StaffelController {
       logger.error('Fehler beim Abrufen der Klassen:', error);
 
       throw new Error('Konnte keine Klassen abrufen.');
+    }
+  }
+
+  async delStaffel (delStaffelId) {
+    try {
+      const stmt = dbController.prepare(`
+        DELETE FROM staffeln
+        WHERE id = ?
+      `);
+      const info = stmt.run(delStaffelId);
+
+      logger.info(`Löschen erfolgreich.`, info);
+
+      return true;
+    } catch (error) {
+      logger.error(`Error Staffel DELETE: ${error.message}`);
+
+      return false;
     }
   }
 
