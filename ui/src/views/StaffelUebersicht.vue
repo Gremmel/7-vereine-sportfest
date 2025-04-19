@@ -29,10 +29,10 @@
                 </span>
               </td>
               <td class="text-end">
-                <button v-if="!editMode" @click="clickDelStaffel(staffel)" type="button" class="btn btn-danger">
+                <button @click="clickDelStaffel(staffel)" type="button" class="btn btn-danger">
                   <i class="bi bi-trash"></i>
                 </button>
-                <button v-if="!editMode" @click="clickEditStaffel(staffel)" class="btn btn-primary ms-1">
+                <button @click="clickEditStaffel(staffel, klasse)" class="btn btn-primary ms-1">
                   <i class="bi bi-pencil"></i>
                 </button>
               </td>
@@ -93,6 +93,12 @@ function clickDelStaffel(staffel) {
     null,
     delStaffel,
   );
+}
+
+function clickEditStaffel (staffel, klasse) {
+  console.log('clickEditStaffel', staffel, klasse);
+  dataStore.setEditStaffel(staffel, klasse);
+  router.push({ name: 'editStaffel' });
 }
 
 async function delStaffel() {

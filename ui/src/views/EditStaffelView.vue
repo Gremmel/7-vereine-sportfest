@@ -1,9 +1,10 @@
 <template>
   <div class="container">
     <h2 class="mb-4">Staffel {{ dataStore.klasseStaffel.name }}</h2>
+    <button class="btn btn-success mb-3" @click="clickWeitereStaffel()">Weitere Staffel hinzufügen</button>
     <div>
       <div v-if="dataStore.klasseStaffel.gemixt == 1" class="form-check form-switch mb-2 custom-switch">
-        <input v-model="mixedStaffel" class="form-check-input me-2" type="checkbox" role="switch" id="flexSwitchCheckMixed">
+        <input v-model="mixedStaffel" :disabled="countWeiblich > 0" class="form-check-input me-2" type="checkbox" role="switch" id="flexSwitchCheckMixed">
         <label class="form-check-label" for="flexSwitchCheckMixed">gemixte Staffel</label>
       </div>
     </div>
@@ -26,11 +27,11 @@
             <td class="text-center" style="width: 10px;">
               <template v-if="sportler.laeuferNr ||
                   (!staffelVoll && sportler.geschlecht === 'm') ||
-                  (!staffelVoll && sportler.geschlecht === 'w' && !maxWeiblich)"
+                  (!staffelVoll && sportler.geschlecht === 'w' && countWeiblich < 3)"
                 >
                 <i
                   v-if="!sportler.laeuferNr"
-                  @click="clickNewStaffelLaeufer(sportler.id)"
+                  @click="clickNewStaffelLaeufer(sportler)"
                   class="bi bi-check-circle"
                   style="cursor: pointer; font-size: 1.5rem;">
                 </i>
@@ -73,18 +74,16 @@
 </template>
 
 <script setup>
-import { onMounted, reactive, ref, computed, watch } from 'vue';
-import { useRouter } from 'vue-router';
-import { useUserStore } from '@/stores/userStore';
+import { onMounted, onBeforeMount, reactive, ref, computed, watch } from 'vue';
+import { nextTick } from 'vue';
 import { useDialogStore } from '@/stores/dialogStore';
 import { useDataStore } from '@/stores/dataStore';
 
-const userStore = useUserStore();
 const dialogStore = useDialogStore();
 const dataStore = useDataStore();
-const router = useRouter();
 const klasseSportlerList = reactive([]);
 const mixedStaffel = ref(false);
+let merkerWeitereStaffel = false
 const staffel = reactive({
   id: dataStore.staffelId,
   vereinsId: dataStore.staffelVereinsId,
@@ -100,8 +99,10 @@ const staffel = reactive({
 
 watch(() => staffel.meldungen, (newVal) => {
     console.log('Staffel meldungen changed:', newVal);
-    // todo hier müssen wier die änderungen an den server schicken
-    saveStaffelMeldungen();
+    if (!merkerWeitereStaffel) {
+      console.log('saveStaffelMeldungen');
+      saveStaffelMeldungen();
+    }
   }, { deep: true }
 );
 
@@ -165,16 +166,73 @@ const staffelVoll = computed(() => {
   }
 });
 
-const  clickNewStaffelLaeufer = function (sportlerId) {
-  if (!staffel.meldungen.lNr1) {
-    staffel.meldungen.lNr1 = sportlerId;
-  } else if (!staffel.meldungen.lNr2) {
-    staffel.meldungen.lNr2 = sportlerId;
-  } else if (!staffel.meldungen.lNr3) {
-    staffel.meldungen.lNr3 = sportlerId;
-  } else if (!staffel.meldungen.lNr4) {
-    staffel.meldungen.lNr4 = sportlerId;
+const newStaffel = async (staffelObj) => {
+  console.log('newStaffel');
+  const response = await fetch(`/api/newStaffel`, {
+    method: 'POST',
+
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(staffelObj),
+    credentials: 'include'  // Cookies mitsenden
+  });
+
+  const result = await response.json();
+
+  if (response.ok) {
+    console.log('Staffel angelegt', result);
+    return result.staffelId;
+  } else {
+    console.error('Fehler beim anlegen der Staffel', result);
   }
+}
+
+const clickWeitereStaffel = async () => {
+  merkerWeitereStaffel = true;
+  staffel.meldungen.lNr1 = null;
+  staffel.meldungen.lNr2 = null;
+  staffel.meldungen.lNr3 = null;
+  staffel.meldungen.lNr4 = null;
+  const staffelId = await newStaffel({
+    staffelVereinsId: staffel.vereinsId,
+    sportfestId: staffel.sportfestId,
+    klasseId: staffel.klassenId
+  });
+
+  staffel.id = staffelId;
+  dataStore.setWeitereStaffel(staffelId);
+  getKlasseSportler();
+  merkerWeitereStaffel = false;
+}
+
+const setSportlerMeldungenToStore = () => {
+  dataStore.editStaffel.staffelSportler = [];
+
+  for (const sportler of klasseSportlerList) {
+    if (sportler.laeuferNr) {
+      dataStore.editStaffel.staffelSportler.push(sportler);
+    }
+  }
+};
+
+const clickNewStaffelLaeufer = function (sportler) {
+  if (!staffel.meldungen.lNr1) {
+    staffel.meldungen.lNr1 = sportler.id;
+  } else if (!staffel.meldungen.lNr2) {
+    staffel.meldungen.lNr2 = sportler.id;
+  } else if (!staffel.meldungen.lNr3) {
+    staffel.meldungen.lNr3 = sportler.id;
+  } else if (!staffel.meldungen.lNr4) {
+    staffel.meldungen.lNr4 = sportler.id;
+  }
+
+  dataStore.neueStaffel = false;
+  dataStore.editStaffel.id = staffel.id;
+
+  nextTick(() => {
+    setSportlerMeldungenToStore();
+  });
 };
 
 const clickDelStaffelLaeufer = function (sportlerId) {
@@ -187,25 +245,27 @@ const clickDelStaffelLaeufer = function (sportlerId) {
   } else if (staffel.meldungen.lNr4 === sportlerId) {
     staffel.meldungen.lNr4 = null;
   }
+  dataStore.neueStaffel = false;
+  dataStore.editStaffel.id = staffel.id;
+
+  nextTick(() => {
+    setSportlerMeldungenToStore();
+  });
 };
 
-const maxWeiblich = computed(() => {
+const countWeiblich = computed(() => {
   if (klasseSportlerListShow.value.length > 0 && dataStore.klasseStaffel.gemixt === '1' && mixedStaffel.value) {
-    let countWeiblich = 0;
+    let cWeiblich = 0;
 
     for (const sportler of klasseSportlerListShow.value) {
       if (sportler.geschlecht === 'w' && sportler.laeuferNr) {
-        countWeiblich += 1;
+        cWeiblich += 1;
       }
     }
 
-    if (countWeiblich > 2) {
-      return true;
-    } else {
-      return false;
-    }
+    return cWeiblich;
   } else {
-    return false;
+    return 0;
   }
 });
 
@@ -227,10 +287,17 @@ const klasseSportlerListShow = computed(() => {
 
     if (dataStore.klasseStaffel.gemixt ==='1' && !mixedStaffel.value && sportler.geschlecht === 'm'
       || mixedStaffel.value
-      || dataStore.klasseStaffel.gemixt === '0' && sportler.geschlecht === 'w') {
+      || dataStore.klasseStaffel.gemixt === '0') {
       list.push(sportler);
     }
   }
+
+  list.sort((a, b) => {
+    if (a.jahrgang === b.jahrgang) {
+      return a.name.localeCompare(b.name);
+    }
+    return a.jahrgang - b.jahrgang;
+  });
 
   return list;
 });
@@ -263,7 +330,33 @@ async function getKlasseSportler() {
         klasseSportlerList.push(staffelSportler);
       }
 
-    }else {
+      // wenn edit Staffel die bereits gewählten Sportler in die Liste übernehmen
+      if (!dataStore.neueStaffel && dataStore?.editStaffel?.staffelSportler) {
+        let isMixed = false;
+
+        for (const sportler of dataStore.editStaffel.staffelSportler) {
+          if (sportler.geschlecht === 'w' && sportler.laeuferNr) {
+            isMixed = true;
+          }
+          if (sportler.laeuferNr === 1) {
+            staffel.meldungen.lNr1 = sportler.id;
+          } else if (sportler.laeuferNr === 2) {
+            staffel.meldungen.lNr2 = sportler.id;
+          } else if (sportler.laeuferNr === 3) {
+            staffel.meldungen.lNr3 = sportler.id;
+          } else if (sportler.laeuferNr === 4) {
+            staffel.meldungen.lNr4 = sportler.id;
+          }
+
+          klasseSportlerList.push(sportler)
+        }
+
+        if (isMixed) {
+          mixedStaffel.value = true;
+        }
+      }
+
+    } else {
       setTimeout(() => {
         dialogStore.setParameter('Fehlercode xxx', `${response.status} ${response.statusText}`, 'ok', null, '', null, null);
       }, 1000);
@@ -277,8 +370,12 @@ async function getKlasseSportler() {
   }
 }
 
+onBeforeMount(() => {
+  console.log('onCreated EditStaffelView');
+});
+
 onMounted(() => {
-  console.log('onMounted');
+  console.log('onMounted EditStaffelView');
   getKlasseSportler();
 });
 </script>

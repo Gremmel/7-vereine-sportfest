@@ -3,6 +3,7 @@ import dbController from './dbController.js';
 import logger from '../logger.js';
 
 class StaffelController {
+  // alleSportlrer die noch nicht für die Staffel gemeldet sind
   getKlassen (staffelData) {
     try {
       const stmt = dbController.prepare(`SELECT * FROM klasse ORDER BY id `);
@@ -24,10 +25,12 @@ class StaffelController {
 
         for (const staffel of staffeln) {
           const stmt3 = dbController.prepare(`
-            SELECT sportler.name, sportler.vname, sportler.geschlecht FROM sportler
+            SELECT sportler.*, (strftime('%Y', 'now') - sportler.jahrgang) AS sportleralter,
+             staffeln_meldungen.laeuferNr AS laeuferNr
+            FROM sportler
             JOIN staffeln_meldungen ON sportler.id = staffeln_meldungen.sportlerId
             WHERE staffeln_meldungen.staffelId = ${staffel.id}
-            ORDER BY staffeln_meldungen.laeuferNr ASC`);
+            ORDER BY laeuferNr ASC`);
           const staffelSportler = stmt3.all();
 
           staffel.staffelSportler = staffelSportler;
@@ -44,7 +47,6 @@ class StaffelController {
         }
 
         klasse.staffeln = staffeln;
-
       }
 
       return klassen;
@@ -84,6 +86,7 @@ class StaffelController {
         AND sportleralter >= ${klasseStaffel.minalter}
         ${klasseStaffel.gemixt === '1' ? `AND sportler.geschlecht IN ('m', 'w')` : `AND sportler.geschlecht = '${klasseStaffel.geschlecht}'`}
         ORDER BY sportler.jahrgang ASC, sportler.name ASC, sportler.vname ASC`);
+
       const klasseSportler = stmt.all();
 
       const filterdSportler = [];
