@@ -30,6 +30,32 @@ class SportfestController {
     }
   }
 
+  getSportfestListHome () {
+    try {
+      const stmt = dbController.prepare(
+        `SELECT sportfest.*,
+            sportfest_adminverein.verein_id AS admin_verein_id,
+            verein.name AS admin_verein_name,
+            (SELECT GROUP_CONCAT(verein.name)
+             FROM sportfest_verein
+             LEFT JOIN verein ON verein.id = sportfest_verein.verein_id
+             WHERE sportfest_verein.sportfest_id = sportfest.id ) AS vereine
+         FROM sportfest
+         LEFT JOIN sportfest_adminverein ON sportfest_adminverein.sportfest_id = sportfest.id
+         LEFT JOIN verein ON sportfest_adminverein.verein_id = verein.id
+         ORDER BY meldeende ASC`
+      );
+
+      const sportfeste = stmt.all();
+
+      return sportfeste;
+    } catch (error) {
+      logger.error('Fehler beim Abrufen der Sportfeste:', error);
+
+      throw new Error('Fehler beim Abrufen der Sportfeste:', error);
+    }
+  }
+
   getSportfestList () {
     try {
       const stmt = dbController.prepare(
@@ -166,12 +192,13 @@ class SportfestController {
   editSportfest (sportfest) {
     try {
       const stmt = dbController.prepare(
-        `UPDATE sportfest SET name=?, ort=?, startdate=?, meldeende=? WHERE id=?`
+        `UPDATE sportfest SET name=?, ort=?, description=?, startdate=?, meldeende=? WHERE id=?`
       );
 
       stmt.run(
         sportfest.name,
         sportfest.ort,
+        sportfest.description || '',
         sportfest.startdate,
         sportfest.meldeende,
         sportfest.id

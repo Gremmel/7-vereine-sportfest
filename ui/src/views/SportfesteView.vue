@@ -152,12 +152,14 @@
                   <td><input v-model="sportfest.startdate" type="date" class="form-control"></td>
                   <td><input v-model="sportfest.meldeende" type="date" class="form-control"></td>
                   <td>
-                    <button @click="clickEditSportfestAbbrechen(sportfest)" type="button" class="btn btn-secondary">
-                      <i class="bi bi-x"></i>
-                    </button>
-                    <button @click="clickEditSportfestAendern(sportfest)" class="btn btn-success ms-1">
-                      <i class="bi bi-check"></i>
-                    </button>
+                    <div class="button-group">
+                      <button @click="clickEditSportfestAbbrechen(sportfest)" type="button" class="btn btn-secondary">
+                        <i class="bi bi-x"></i>
+                      </button>
+                      <button @click="clickEditSportfestAendern(sportfest)" class="btn btn-success ms-1">
+                        <i class="bi bi-check"></i>
+                      </button>
+                    </div>
                   </td>
                 </tr>
                 <tr>
@@ -227,10 +229,18 @@
 
 <script setup>
 import { onMounted, reactive, ref, computed } from 'vue';
+
 import { useRouter } from 'vue-router';
+const router = useRouter();
+
 import { useUserStore } from '@/stores/userStore';
+const userStore = useUserStore();
+
 import { useDataStore } from '@/stores/dataStore';
+const dataStore = useDataStore();
+
 import { useDialogStore } from '@/stores/dialogStore';
+const dialogStore = useDialogStore();
 
 const sportfestList = reactive([]);
 const disziplinenList = reactive([]);
@@ -238,10 +248,6 @@ const selectedDisziplinen = ref([]);
 const selectedVereine = ref([]);
 const selectedAdminVerein = ref(null);
 const vereineList = reactive([]);
-const userStore = useUserStore();
-const dataStore = useDataStore();
-const dialogStore = useDialogStore();
-const router = useRouter();
 const showNewSportfestForm = ref(false);
 const newSportfest = ref({
   name: '',
@@ -574,5 +580,11 @@ onMounted(() => {
 
 .editMode {
   color: rgb(187, 187, 187);
+}
+
+.button-group {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 2px; /* Abstand zwischen den Buttons */
 }
 </style>

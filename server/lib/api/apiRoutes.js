@@ -10,6 +10,7 @@ import meldungController from './meldungController.js';
 import staffelController from './staffelController.js';
 import fileController from './fileController.js';
 import multer from 'multer';
+import mime from 'mime-types';
 
 // Speicherort und Dateinamen für hochgeladene Dateien konfigurieren
 const upload = multer({
@@ -20,6 +21,21 @@ const upload = multer({
 const apiRoutes = {
   init (app, config) {
     sessionController.init(config);
+
+    app.get('/api/getDataHome', (req, res) => {
+      logger.info('/api/getDataHome');
+
+      const data = {
+        sportfestList: sportfestController.getSportfestListHome(),
+        fileList: fileController.getFileListHome()
+      };
+
+      if (data) {
+        res.json(data);
+      } else {
+        res.json({ message: 'Keine session vorhanden' });
+      }
+    });
 
     app.post('/api/upload', authMiddleware.check('admin'), upload.array('files', 10), async (req, res) => {
       const result = await fileController.handleMultipleFileUpload(req.files);
@@ -35,20 +51,70 @@ const apiRoutes = {
     });
 
     app.get('/api/getFileList', authMiddleware.check('admin'), (req, res) => {
-      const token = req.cookies.session_token;
+      logger.info('/api/getFileList');
 
-      logger.info('/api/getFileList', token);
+      const fileList = fileController.getFileList();
 
-      const files = fileController.getFileList();
-
-      if (token) {
-        res.json({ files });
+      if (fileList) {
+        res.json({ fileList });
       } else {
         res.json({ message: 'Keine session vorhanden' });
       }
     });
 
-    // API-Routen
+    // Delete file
+    app.post('/api/delFile', authMiddleware.check('admin'), async (req, res) => {
+      logger.fatal('/api/delFile req.body', req.body);
+
+      // Neuen Benutzer anlegen
+      const result = await fileController.delFile(req.body.fileId);
+
+      if (result.success) {
+        // Erfolgsnachricht senden
+        res.json({ result });
+      } else {
+        res.status(401).json({ message: result.message });
+      }
+    });
+
+    // Update file
+    app.post('/api/updateFile', authMiddleware.check('admin'), async (req, res) => {
+      logger.fatal('/api/updateFile req.body', req.body);
+
+      // Neuen Benutzer anlegen
+      const result = fileController.updateFile(req.body);
+
+      if (result.success) {
+        // Erfolgsnachricht senden
+        res.json({ result });
+      } else {
+        res.status(401).json({ message: result.message });
+      }
+    });
+
+    app.get('/api/downloadFile/:fileId', authMiddleware.check('benutzer'), async (req, res) => {
+      const fileId = req.params.fileId;
+
+      // Hole die Datei basierend auf der ID
+      const file = await fileController.getFileById(fileId);
+
+      if (!file) {
+        return res.status(404).send('Datei nicht gefunden');
+      }
+
+      const filePath = file.path; // Pfad zur Datei
+      const fileName = file.name; // Originalname der Datei
+
+      const contentType = mime.lookup(fileName) || 'application/octet-stream'; // Ermittele den MIME-Typ basierend auf der Dateiendung
+
+      logger.info('Content-Type ', contentType);
+
+      res.setHeader('Content-Type', contentType); // Setze den ermittelten MIME-Typ
+      res.setHeader('Content-Disposition', `inline; filename="${fileName}"`); // "inline" zeigt die Datei im Browser an
+      res.sendFile(filePath);
+    });
+
+    // Login-Route (POST)
     app.post('/api/login', async (req, res) => {
       logger.fatal('/api/login req.body', req.body);
       const { username, password } = req.body;
@@ -97,7 +163,7 @@ const apiRoutes = {
     app.get('/api/getSession', (req, res) => {
       const token = req.cookies.session_token;
 
-      logger.info('/api/getSession', token);
+      // logger.info('/api/getSession', token);
 
       if (token) {
         const session = sessionController.getSessionByToken(token);
@@ -289,16 +355,16 @@ const apiRoutes = {
     });
 
     // new Sportfest
-    app.post('/api/newSportfest', authMiddleware.check('admin'), async (req, res) => {
-      logger.fatal('/api/newSportfest req.body', req.body);
+    app.post('/api/updateSportfest', authMiddleware.check('admin'), async (req, res) => {
+      logger.fatal('/api/updateSportfest req.body', req.body);
 
-      const io = sportfestController.newSportfest(req.body.sportfest);
+      const result = sportfestController.updateSportfest(req.body.sportfest);
 
-      if (io.success) {
+      if (result.success) {
         // Erfolgsnachricht senden
-        res.json({ sportfestId: io.sportfestId });
+        res.json({ success: result.success });
       } else {
-        res.status(401).json({ message: 'Fehler bei newSportfest' });
+        res.status(401).json({ message: result.message });
       }
     });
 
@@ -306,7 +372,7 @@ const apiRoutes = {
     app.post('/api/editSportfest', authMiddleware.check('benutzer'), async (req, res) => {
       logger.fatal('/api/editSportfest req.body', req.body);
 
-      const io = await sportfestController.editSportfest(req.body.sportfest);
+      const io = sportfestController.editSportfest(req.body.sportfest);
 
       if (io) {
         // Erfolgsnachricht senden

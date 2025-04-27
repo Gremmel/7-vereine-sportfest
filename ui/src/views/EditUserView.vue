@@ -205,6 +205,22 @@
         // benuterdaten aus stor löschen
         userStore.clearEditUser();
 
+        const verein_name = vereineList.find(verein => verein.id === form.value.vereinsId)?.name || '';
+        const verein_logo = vereineList.find(verein => verein.id === form.value.vereinsId)?.logo || '';
+
+        // neu benutzer daten in store speichern
+        userStore.setUser({
+          id: form.value.id,
+          username: form.value.username,
+          email: form.value.email,
+          telefon: form.value.telefon,
+          verein_id: form.value.vereinsId,
+          verein_name,
+          verein_logo,
+          roles: JSON.stringify(form.value.selectedRoles),
+          enabled: form.value.enabled
+        });
+
         // Weiterleitung nach erfolgreichem ändern
         router.push('/users');
       } else if (response.status === 401) {
