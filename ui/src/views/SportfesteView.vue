@@ -130,7 +130,9 @@
                 <tr>
                   <td :class="{ 'editMode': editMode }">{{ sportfest.name }}</td>
                   <td :class="{ 'editMode': editMode }">{{ sportfest.ort }}</td>
-                  <td :class="{ 'editMode': editMode }">{{ new Date(sportfest.startdate).toLocaleDateString() }}</td>
+                  <td :class="{ 'editMode': editMode }">
+                    {{ new Date(sportfest.startdate).toLocaleDateString() }} {{ sportfest.starttime }}
+                  </td>
                   <td :class="{ 'editMode': editMode }">{{ new Date(sportfest.meldeende).toLocaleDateString() }}</td>
                   <td>
                     <div class="d-flex">
@@ -149,7 +151,10 @@
                 <tr>
                   <td><input v-model="sportfest.name" type="text" class="form-control"></td>
                   <td><input v-model="sportfest.ort" type="text" class="form-control"></td>
-                  <td><input v-model="sportfest.startdate" type="date" class="form-control"></td>
+                  <td>
+                    <input v-model="sportfest.startdate" type="date" class="form-control">
+                    <input v-model="sportfest.starttime" type="time" class="form-control mt-2">
+                  </td>
                   <td><input v-model="sportfest.meldeende" type="date" class="form-control"></td>
                   <td>
                     <div class="button-group">
@@ -276,7 +281,11 @@ async function getSportfestList() {
 
       for (const sportfest of result.sportfestList) {
         sportfest.editMode = false;
-        sportfest.startdate = sportfest.startdate ? new Date(sportfest.startdate).toISOString().split('T')[0] : '';
+        if (sportfest.startdate) {
+          const date = new Date(sportfest.startdate);
+          sportfest.startdate = date.toISOString().split('T')[0]; // Nur das Datum
+          sportfest.starttime = date.toTimeString().split(':').slice(0, 2).join(':'); // Nur die Uhrzeit
+        }
         sportfest.meldeende = sportfest.meldeende ? new Date(sportfest.meldeende).toISOString().split('T')[0] : '';
         sportfestList.push(sportfest);
       }
@@ -339,12 +348,20 @@ const resDialogDelSportfest = async () => {
 
 const clickEditSportfestAendern = async (sportfest) => {
   try {
+    // Kombinieren von Datum und Uhrzeit
+    const combinedDateTime = `${sportfest.startdate}T${sportfest.starttime}:00`;
+
     const response = await fetch('/api/editSportfest', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({ sportfest }),
+      body: JSON.stringify({
+        sportfest: {
+          ...sportfest,
+          startdate: combinedDateTime // Kombiniertes Datum und Uhrzeit
+        }
+      }),
       credentials: 'include'  // Cookies mitsenden
     });
 
@@ -353,7 +370,7 @@ const clickEditSportfestAendern = async (sportfest) => {
         if (sportfestOrg.id === sportfest.id) {
           sportfestOrg.name = sportfest.name;
           sportfestOrg.ort = sportfest.ort;
-          sportfestOrg.startdate = sportfest.startdate;
+          sportfestOrg.startdate = combinedDateTime;
           sportfestOrg.meldeende = sportfest.meldeende;
           sportfestOrg.editMode = false;
           break;

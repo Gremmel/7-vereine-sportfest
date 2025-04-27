@@ -11,6 +11,7 @@ import AnmeldungDreiVierKampf from "@/views/AnmeldungDreiVierKampf.vue";
 import StaffelUebersicht from "@/views/StaffelUebersicht.vue";
 import EditStaffelView from "@/views/EditStaffelView.vue";
 import FilesView from "@/views/FilesView.vue";
+import ImpressumDSGVO from "@/views/ImpressumDSGVO.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -19,6 +20,11 @@ const router = createRouter({
       path: "/",
       name: "home",
       component: HomeView,
+    },
+    {
+      path: "/impressum",
+      name: "impressum",
+      component: ImpressumDSGVO,
     },
     {
       path: "/users",

@@ -50,8 +50,8 @@
                 <div v-if="sportfest.showDescriptionEdit" class="card-text text-dark p-2 mb-1" style="background-color: #f2f2f2;">
                   <textarea class="form-control" @blur="blurSprotfestDescription(sportfest)" v-model="sportfest.description"></textarea>
                 </div>
-                <p class="card-text"><small class="text-muted">Datum: {{ sportfest.startdate }}</small></p>
-                <p class="card-text"><small class="text-muted">Meldeende: {{ sportfest.meldeende }}</small></p>
+                <p class="card-text"><small class="text-muted">Datum: {{ sportfest.startDateDE }} Uhr</small></p>
+                <p class="card-text"><small class="text-muted">Meldeende: {{ sportfest.meldeendeDE }}</small></p>
                 <p class="card-text"><small class="text-muted">Ort: {{ sportfest.ort }}</small></p>
                 <p class="card-text"><small class="text-muted">Administrativer Verein: {{ sportfest.admin_verein_name }}</small></p>
                 <div>
@@ -84,8 +84,7 @@
   </main>
   <footer class="bg-dark text-white text-center py-3 mt-4">
     <div class="container">
-      <a href="/impressum" class="text-white me-3">Impressum</a>
-      <a href="/dsgvo" class="text-white">Datenschutz</a>
+      <a href="/impressum" class="text-white me-3">Impressum / Datenschutz</a>
     </div>
   </footer>
 </template>
@@ -117,6 +116,18 @@
       sportfest.vereineList = sportfest.vereine.split(',');
       sportfest.vereineList.sort((a, b) => a.localeCompare(b));
       sportfest.sportfestListString = sportfest.vereineList.join(', ');
+      sportfest.startDateDE = new Date(sportfest.startdate).toLocaleString('de-DE', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+      sportfest.meldeendeDE = new Date(sportfest.meldeende).toLocaleDateString('de-DE', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit'
+      });
 
       if (sportfest.admin_verein_id === userStore?.user?.verein_id) {
         sportfest.showDescriptionEdit = true;
