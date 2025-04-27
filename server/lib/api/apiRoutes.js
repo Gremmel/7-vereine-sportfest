@@ -355,6 +355,20 @@ const apiRoutes = {
     });
 
     // new Sportfest
+    app.post('/api/newSportfest', authMiddleware.check('admin'), async (req, res) => {
+      logger.fatal('/api/newSportfest req.body', req.body);
+
+      const io = sportfestController.newSportfest(req.body.sportfest);
+
+      if (io.success) {
+        // Erfolgsnachricht senden
+        res.json({ sportfestId: io.sportfestId });
+      } else {
+        res.status(401).json({ message: 'Fehler bei newSportfest' });
+      }
+    });
+
+    // update Sportfest
     app.post('/api/updateSportfest', authMiddleware.check('admin'), async (req, res) => {
       logger.fatal('/api/updateSportfest req.body', req.body);
 
@@ -444,6 +458,7 @@ const apiRoutes = {
     app.post('/api/getStaffelUebersicht', authMiddleware.check('benutzer'), async (req, res) => {
       try {
         const klassen = staffelController.getKlassen(req.body);
+        const sportleDreikampfOhneStaffel = meldungController.getSportleDreikampfOhneStaffel(req.body);
 
         res.json({
           klassen
@@ -507,6 +522,19 @@ const apiRoutes = {
         res.json({
           klassen
         });
+      } catch (error) {
+        res.status(401).json({ message: error.message });
+      }
+    });
+
+    // csv export
+    app.get('/api/exportDreikampf/:sportfestId', authMiddleware.check('admin'), async (req, res) => {
+      try {
+        const csv = meldungController.exportDreikampfCSV(req.params.sportfestId);
+
+        res.setHeader('Content-Type', 'text/csv');
+        res.setHeader('Content-Disposition', 'attachment; filename="MeldungenDreikampf.txt"');
+        res.send(csv);
       } catch (error) {
         res.status(401).json({ message: error.message });
       }

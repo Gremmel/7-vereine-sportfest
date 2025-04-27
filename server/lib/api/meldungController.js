@@ -1,6 +1,7 @@
 /* eslint-disable class-methods-use-this */
 import dbController from './dbController.js';
 import logger from '../logger.js';
+import { stringify } from 'csv-stringify/sync'; // CSV-Stringify-Bibliothek importieren
 
 class MeldungController {
   async newMeldung (meldung) {
@@ -74,6 +75,89 @@ class MeldungController {
       logger.error('Fehler beim löschen der Meldung:', error);
 
       throw new Error('Fehler beim löschen der Meldung.');
+    }
+  }
+
+  getSportleDreikampfOhneStaffel (sportfestId, vereinsId) {
+    try {
+      const stmt = dbController.prepare(`
+        SELECT
+            s.id AS sportlerId,
+            s.name AS name,
+            s.vname AS vname,
+            s.jahrgang AS jahrgang,
+            s.geschlecht AS geschlecht
+        FROM
+            sportler s
+        INNER JOIN
+            meldungen_sportler ms ON s.id = ms.sportler_id
+        LEFT JOIN
+            meldungen m ON ms.meldungen_id = m.id
+        LEFT JOIN
+            staffeln_meldungen sm ON m.id = sm.id
+        INNER JOIN
+            sportler_verein sv ON s.id = sv.sportler_id
+        WHERe sv.verein_id = ? AND sm.id IS NULL
+        ORDER BY
+            s.name, s.vname
+      `);
+
+      const rows = stmt.all(sportfestId, vereinsId);
+
+      logger.info('Sportler ohne Staffel:', rows);
+
+      return rows;
+    } catch (error) {
+      logger.error('Fehler beim Abrufen der Sportler ohne Staffel:', error);
+      throw new Error('Fehler beim Abrufen der Sportler ohne Staffel.');
+    }
+  }
+
+  exportDreikampfCSV (sportfestId) {
+    try {
+      const stmt = dbController.prepare(`
+        SELECT
+            v.name AS Verein,
+            s.name AS Name,
+            s.vname AS Vorname,
+            s.jahrgang AS JG,
+            s.geschlecht AS GS,
+            m.hoehe AS "AH Hochsprung"
+        FROM
+            meldungen m
+        INNER JOIN
+            meldungen_sportfest msf ON m.id = msf.meldungen_id
+        INNER JOIN
+            sportfest sf ON msf.sportfest_id = sf.id
+        INNER JOIN
+            meldungen_sportler ms ON m.id = ms.meldungen_id
+        INNER JOIN
+            sportler s ON ms.sportler_id = s.id
+        INNER JOIN
+            sportler_verein sv ON s.id = sv.sportler_id
+        INNER JOIN
+            verein v ON sv.verein_id = v.id
+        WHERE
+            sf.id = ?
+        ORDER BY
+            v.name, s.name, s.vname
+      `);
+
+      const rows = stmt.all(sportfestId);
+
+      logger.info('Exportierte Zeilen:', rows);
+
+      // CSV-Format erstellen
+      const csv = stringify(rows, {
+        header: true,
+        delimiter: ';',
+        columns: [ 'Verein', 'Name', 'Vorname', 'JG', 'GS', 'AH Hochsprung' ]
+      });
+
+      return csv;
+    } catch (error) {
+      logger.error('Fehler beim Exportieren der Meldung als CSV:', error);
+      throw new Error('Fehler beim Exportieren der Meldung als CSV.');
     }
   }
 }

@@ -1,6 +1,13 @@
 <template>
   <div class="container">
-    <h2>Staffel {{ selectedSportfest.name }}</h2>
+    <div class="row mt-2">
+      <div class="col">
+        <h2>Staffel {{ selectedSportfest.name }}</h2>
+      </div>
+      <div v-if="isAdmin" class="col-auto">
+        <a :href="`/api/exportStaffel/${selectedSportfest.id}`" class="btn btn-dark mb-3">Export Anmeldungen</a>
+      </div>
+    </div>
     <div v-if="isAdmin" class="d-flex align-items-center mb-3">
       <label for="vereineSelect" class="form-label me-2">Verein: </label>
       <select v-model="staffelVereinsId" class="form-select" aria-label="Default select example">
@@ -18,8 +25,8 @@
             <tr v-for="(staffel, index) of klasse.staffeln" :key="staffel.id">
               <td class="min-width fw-bold">Staffel&nbsp;{{ toRoman(index + 1) }}&nbsp;&nbsp;</td>
               <td class="text-left">
-                <span style="color: red; margin-right: 5px;" v-if="staffel.meldungenCount < 4">anzahl Läufer: {{ staffel.meldungenCount }}</span>
-                <span v-if="staffel.meldungenCount == 4">anzahl Läufer: {{ staffel.meldungenCount }}</span>
+                <span style="color: red; margin-right: 5px;" v-if="staffel.meldungenCount < 4">Anzahl Läufer: {{ staffel.meldungenCount }}</span>
+                <span v-if="staffel.meldungenCount == 4">Anzahl Läufer: {{ staffel.meldungenCount }}</span>
                 <span
                   :class="sportler.geschlecht === 'm' ? 'staffelSportlerMaenlich' : 'staffelSportlerWeiblich'"
                   v-for="sportler of staffel.staffelSportler"

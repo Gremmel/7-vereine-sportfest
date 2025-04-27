@@ -2,11 +2,18 @@
   <div class="container">
     <div class="card">
       <div class="card-body">
-        <h2 class="card-title">Anmeldung zum  {{ selectedSportfest.name }}</h2>
-        <h3 class="card-subtitle mb-2 text-muted">
-          <span v-if="selectedSportfest.disziplinActive.dreikampf">Dreikampf</span>
-          <span v-if="selectedSportfest.disziplinActive.hochsprung" class="ms-3">Hochsprung</span>
-        </h3>
+        <div class="row">
+          <div class="col">
+            <h2 class="card-title">Anmeldung zum  {{ selectedSportfest.name }}</h2>
+            <h3 class="card-subtitle mb-2 text-muted">
+              <span v-if="selectedSportfest.disziplinActive.dreikampf">Dreikampf</span>
+              <span v-if="selectedSportfest.disziplinActive.hochsprung" class="ms-3">Hochsprung</span>
+            </h3>
+          </div>
+          <div v-if="isAdmin" class="col-auto">
+            <a :href="`/api/exportDreikampf/${selectedSportfest.id}`" class="btn btn-dark mb-3">Export Anmeldungen</a>
+          </div>
+        </div>
         <div class="input-group mb-3">
           <input v-model="searchText" type="text" class="form-control" placeholder="finde...">
           <button @click="searchText = '';" class="btn btn-outline-secondary" type="button"

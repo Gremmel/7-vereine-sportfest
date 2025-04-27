@@ -3,8 +3,7 @@
     <div class="mt-4 container">
       <div>
         <p><b>Privat betriebene Internetseite des gemeinschaftlich durchgeführten 7-Vereine-Sportfest</b></p>
-        <p><b>Seitenbetreiber und verantwortlich für den Inhalt:</b><br>Christian Mayr<br>Gschwend 38<br>D 87484
-          Nesselwang<br><br></p>
+        <p><b>Seitenbetreiber und verantwortlich für den Inhalt:</b><br>Christian Mayr<br></p>
         <p>E-Mail: <a class="normal" href="mailto:admin@7-vereine-sportfest.de">admin@7-vereine-sportfest.de</a><br></p>
         <h5><br></h5>
         <h2>Disclaimer – rechtliche Hinweise</h2>§ 1 Warnhinweis zu Inhalten<br>Die kostenlosen und frei zugänglichen
@@ -89,8 +88,7 @@
           persönliche Vorlieben, Interessen, Zuverlä
         </p>
         <p><b>Privat betriebene Internetseite des gemeinschaftlich durchgeführten 7-Vereine-Sportfest</b></p>
-        <p><b>Seitenbetreiber und verantwortlich für den Inhalt:</b><br>Christian Mayr<br>Gschwend 38<br>D 87484
-          Nesselwang<br><br></p>
+        <p><b>Seitenbetreiber und verantwortlich für den Inhalt:</b><br>Christian Mayr<br></p>
         <p>E-Mail: <a class="normal"
             href="mailto:admin@7-vereine-sportfest.de">admin@7-vereine-sportfest.de</a><br></p>
         <h5><br></h5>

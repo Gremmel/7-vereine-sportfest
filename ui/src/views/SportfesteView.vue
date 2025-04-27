@@ -23,6 +23,10 @@
                   <input v-model="newSportfest.startdate" id="floatingInputStartdate" type="date" class="form-control">
                   <label for="floatingInputStartdate">Austragungs Datum</label>
                 </div>
+                <div class="form-floating mb-3">
+                  <input v-model="newSportfest.starttime" id="floatingInputStarttime" type="time" class="form-control mt-1">
+                  <label for="floatingInputStarttime">Start Uhrzeit</label>
+                </div>
               </div>
               <div class="col">
                 <div class="form-floating mb-3">
@@ -523,6 +527,11 @@ const sportfestListShow = computed(() => {
 const clickNewSportfest = async () => {
   console.log('clickNewSportfest', newSportfest.value);
   const kopieNewSporfest = { ...newSportfest.value };
+  const combinedDateTime = `${kopieNewSporfest.startdate}T${kopieNewSporfest.starttime}:00`;
+  const startdate = newSportfest.value.startdate;
+
+  kopieNewSporfest.startdate = combinedDateTime; // Kombiniertes Datum und Uhrzeit
+
   newSportfest.value.name = '';
   newSportfest.value.ort = '';
   newSportfest.value.startdate = '';
@@ -559,7 +568,8 @@ const clickNewSportfest = async () => {
         id: result.sportfestId,
         name: kopieNewSporfest.name,
         ort: kopieNewSporfest.ort,
-        startdate: kopieNewSporfest.startdate,
+        startdate: startdate,
+        starttime: newSportfest.value.starttime,
         meldeende: kopieNewSporfest.meldeende,
         disziplinen: kopieNewSporfest.disziplinen,
         vereine: kopieNewSporfest.vereine,
