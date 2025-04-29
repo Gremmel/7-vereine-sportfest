@@ -78,7 +78,7 @@ class MeldungController {
     }
   }
 
-  getSportleDreikampfOhneStaffel (sportfestId, vereinsId) {
+  getSportleDreikampfOhneStaffel (staffelData) {
     try {
       const stmt = dbController.prepare(`
         SELECT
@@ -91,18 +91,18 @@ class MeldungController {
             sportler s
         INNER JOIN
             meldungen_sportler ms ON s.id = ms.sportler_id
+        INNER JOIN
+            meldungen_sportfest msf ON ms.meldungen_id = msf.meldungen_id
         LEFT JOIN
-            meldungen m ON ms.meldungen_id = m.id
-        LEFT JOIN
-            staffeln_meldungen sm ON m.id = sm.id
+            staffeln_meldungen sm ON ms.sportler_id = sm.sportlerId
         INNER JOIN
             sportler_verein sv ON s.id = sv.sportler_id
-        WHERe sv.verein_id = ? AND sm.id IS NULL
+        WHERe  msf.sportfest_id = ? AND sv.verein_id = ? AND sm.staffelId IS NULL
         ORDER BY
-            s.name, s.vname
+            s.jahrgang DESC, s.name, s.vname
       `);
 
-      const rows = stmt.all(sportfestId, vereinsId);
+      const rows = stmt.all(staffelData.sportfestId, staffelData.vereinsId);
 
       logger.info('Sportler ohne Staffel:', rows);
 

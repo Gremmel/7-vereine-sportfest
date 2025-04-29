@@ -1,6 +1,7 @@
 /* eslint-disable class-methods-use-this */
 import dbController from './dbController.js';
 import logger from '../logger.js';
+import { stringify } from 'csv-stringify/sync'; // CSV-Stringify-Bibliothek importieren
 
 class StaffelController {
   // alleSportlrer die noch nicht für die Staffel gemeldet sind
@@ -155,6 +156,85 @@ class StaffelController {
       logger.error('Fehler beim Erstellen der Staffel:', error);
 
       throw new Error('Konnte die Staffel nicht erstellen.');
+    }
+  }
+
+  exportexportStaffelCSV (sportfestId) {
+    try {
+      const stmt = dbController.prepare(`
+        SELECT
+          v.name AS Verein,
+          k.name AS 'Klasse Staffel',
+          s.id AS staffelId
+        FROM
+          staffeln s
+        INNER JOIN
+        verein v ON s.vereinsId = v.id
+        INNER JOIN
+          klasse k ON s.klassenId = k.id
+        WHERE
+          s.sportfestId = ?
+        ORDER BY
+          v.name DESC, k.id ASC
+      `);
+
+      const rows = stmt.all(sportfestId);
+
+      // Verein;Klasse Staffel;Vorname1;Name1;G 1;JG 1;Vorname2;Name2;G 2;JG 2;Vorname3;Name3;G 3;JG 3;Vorname4;Name4;G 4;JG 4
+      // TV Nesselwang;m�nnliche Jugend U18/20;Sebastian;Wagner;m;2001;Lukas;French;m;2001;Tom;French;m;2002;Jacob;Erhart;m;2002
+      for (const row of rows) {
+        const stmt2 = dbController.prepare(`
+          SELECT
+            s.vname AS Vorname,
+            s.name AS Name,
+            s.geschlecht AS GS,
+            s.jahrgang AS JG
+          FROM
+            staffeln_meldungen sm
+          INNER JOIN
+            sportler s ON sm.sportlerId = s.id
+          WHERE
+            sm.staffelId = ?
+          ORDER BY
+            sm.laeuferNr
+        `);
+
+        const sportler = stmt2.all(row.staffelId);
+
+        row.Vorname1 = sportler[0]?.Vorname || '';
+        row.Name1 = sportler[0]?.Name || '';
+        row['G 1'] = sportler[0]?.GS || '';
+        row['JG 1'] = sportler[0]?.JG || '';
+        row.Vorname2 = sportler[1]?.Vorname;
+        row.Name2 = sportler[1]?.Name || '';
+        row['G 2'] = sportler[1]?.GS || '';
+        row['JG 2'] = sportler[1]?.JG || '';
+        row.Vorname3 = sportler[2]?.Vorname || '';
+        row.Name3 = sportler[2]?.Name || '';
+        row['G 3'] = sportler[2]?.GS || '';
+        row['JG 3'] = sportler[2]?.JG || '';
+        row.Vorname4 = sportler[3]?.Vorname || '';
+        row.Name4 = sportler[3]?.Name || '';
+        row['G 4'] = sportler[3]?.GS || '';
+        row['JG 4'] = sportler[3]?.JG || '';
+      }
+
+      logger.info('Exportierte Zeilen:', rows);
+
+      // CSV-Format erstellen
+      const csv = stringify(rows, {
+        header: true,
+        delimiter: ';',
+        columns: [ 'Verein', 'Klasse Staffel', 'Vorname1', 'Name1', 'G 1', 'JG 1',
+          'Vorname2', 'Name2', 'G 2', 'JG 2',
+          'Vorname3', 'Name3', 'G 3', 'JG 3',
+          'Vorname4', 'Name4', 'G 4', 'JG 4' ]
+      });
+
+      return csv;
+    } catch (error) {
+      logger.error('Fehler beim Exportieren der Meldung als CSV:', error);
+      throw new Error('Fehler beim Exportieren der Meldung als CSV.');
     }
   }
 }

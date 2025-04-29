@@ -458,10 +458,11 @@ const apiRoutes = {
     app.post('/api/getStaffelUebersicht', authMiddleware.check('benutzer'), async (req, res) => {
       try {
         const klassen = staffelController.getKlassen(req.body);
-        const sportleDreikampfOhneStaffel = meldungController.getSportleDreikampfOhneStaffel(req.body);
+        const sportlerDreikampfOhneStaffel = meldungController.getSportleDreikampfOhneStaffel(req.body);
 
         res.json({
-          klassen
+          klassen,
+          sportlerDreikampfOhneStaffel
         });
       } catch (error) {
         res.status(401).json({ message: error.message });
@@ -534,6 +535,18 @@ const apiRoutes = {
 
         res.setHeader('Content-Type', 'text/csv');
         res.setHeader('Content-Disposition', 'attachment; filename="MeldungenDreikampf.txt"');
+        res.send(csv);
+      } catch (error) {
+        res.status(401).json({ message: error.message });
+      }
+    });
+
+    app.get('/api/exportStaffel/:sportfestId', authMiddleware.check('admin'), async (req, res) => {
+      try {
+        const csv = staffelController.exportexportStaffelCSV(req.params.sportfestId);
+
+        res.setHeader('Content-Type', 'text/csv');
+        res.setHeader('Content-Disposition', 'attachment; filename="MeldungStaffel.txt"');
         res.send(csv);
       } catch (error) {
         res.status(401).json({ message: error.message });

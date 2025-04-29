@@ -2,7 +2,7 @@
   <div class="container">
     <div class="row mt-2">
       <div class="col">
-        <h2>Staffel {{ selectedSportfest.name }}</h2>
+        <h2>Staffeln {{ selectedSportfest.name }}</h2>
       </div>
       <div v-if="isAdmin" class="col-auto">
         <a :href="`/api/exportStaffel/${selectedSportfest.id}`" class="btn btn-dark mb-3">Export Anmeldungen</a>
@@ -20,6 +20,7 @@
         <button class="btn btn-success" @click="clickNeueStaffel(klasse)">Neue Staffel hinzufügen</button>
       </div>
       <div class="card-body">
+        <!-- Tabelle Staffeln -->
         <table class="table table-hover table-sm">
           <tbody>
             <tr v-for="(staffel, index) of klasse.staffeln" :key="staffel.id">
@@ -48,6 +49,30 @@
         </table>
       </div>
     </div>
+    <!-- Sportler Dreikampf ohne Staffel -->
+    <div v-if="sportlerDreikampfOhneStaffel.length > 0" class="mt-3">
+      <h5 class="mt-3">Sportler Dreikampf ohne Staffel</h5>
+      <div class="card mb-3">
+        <div class="card-body">
+          <table class="table table-hover table-sm">
+            <thead>
+              <tr>
+                <th scope="col">Name</th>
+                <th scope="col">Jahrgang</th>
+                <th scope="col">Geschlecht</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="sportler in sportlerDreikampfOhneStaffel" :key="sportler.id">
+                <td class="fw-bold">{{ sportler.vname }} {{ sportler.name }}</td>
+                <td>{{ sportler.jahrgang }}</td>
+                <td>{{ sportler.geschlecht }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
 
   </div>
 </template>
@@ -62,6 +87,7 @@ import { useDataStore } from '@/stores/dataStore';
 
 const vereineList = reactive([]);
 const klassenList = reactive([]);
+const sportlerDreikampfOhneStaffel = reactive([]);
 const userStore = useUserStore();
 const dialogStore = useDialogStore();
 const dataStore = useDataStore();
@@ -181,6 +207,12 @@ async function getStaffelUebersichtList() {
 
       for (const klasse of result.klassen) {
         klassenList.push(klasse);
+      }
+
+      console.log('result ', result);
+      sportlerDreikampfOhneStaffel.splice(0);
+      for (const sportler of result.sportlerDreikampfOhneStaffel) {
+        sportlerDreikampfOhneStaffel.push(sportler);
       }
 
     }else {
