@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <div class="card">
+    <div class="card mt-2">
       <div class="card-body">
         <h2 class="card-title">Sportfeste</h2>
         <div class="card mb-3">
@@ -132,8 +132,8 @@
               <!-- Anzeige Mode -->
               <template v-if="!sportfest.editMode">
                 <tr>
-                  <td :class="{ 'editMode': editMode }">{{ sportfest.name }}</td>
-                  <td :class="{ 'editMode': editMode }">{{ sportfest.ort }}</td>
+                  <td class="no-wrap" :class="{ 'editMode': editMode }">{{ sportfest.name }}</td>
+                  <td :class="{ 'editMode': editMode }" v-html="sportfest.ort"></td>
                   <td :class="{ 'editMode': editMode }">
                     {{ new Date(sportfest.startdate).toLocaleDateString() }} {{ sportfest.starttime }}
                   </td>
@@ -146,6 +146,9 @@
                       <button v-if="!editMode" @click="clickEditSportfest(sportfest)" class="btn btn-primary ms-1">
                         <i class="bi bi-pencil"></i>
                       </button>
+                      <button v-if="!editMode" @click="clickDuplicateSportfest(sportfest)" class="btn btn-secondary ms-1">
+                        <i class="bi bi-files"></i>
+                      </button>
                     </div>
                   </td>
                 </tr>
@@ -153,7 +156,7 @@
               <!-- Edit Mode -->
               <template v-else>
                 <tr>
-                  <td><input v-model="sportfest.name" type="text" class="form-control"></td>
+                  <td><input v-model="sportfest.name" type="text" class="form-control no-wrap"></td>
                   <td><input v-model="sportfest.ort" type="text" class="form-control"></td>
                   <td>
                     <input v-model="sportfest.startdate" type="date" class="form-control">
@@ -251,6 +254,8 @@ const dataStore = useDataStore();
 import { useDialogStore } from '@/stores/dialogStore';
 const dialogStore = useDialogStore();
 
+import DOMPurify from 'dompurify';
+
 const sportfestList = reactive([]);
 const disziplinenList = reactive([]);
 const selectedDisziplinen = ref([]);
@@ -331,6 +336,62 @@ function clickEditSportfest(sportfest) {
   editMode.value = true;
 }
 
+async function clickDuplicateSportfest (sportfest) {
+  const duplicatedSportfest = {
+    ...sportfest,
+    id: null, // Neue ID wird vom Backend generiert
+    name: `${sportfest.name} (Kopie)`
+  };
+
+  try {
+    const response = await fetch('/api/newSportfest', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ sportfest: duplicatedSportfest }),
+      credentials: 'include'  // Cookies mitsenden
+    });
+
+    const result = await response.json();
+
+    if (response.ok && result.sportfestId > 0) {
+      abgesendetOK.value = true;
+      showNewSportfestForm.value = false;
+
+      setTimeout(() => {
+        abgesendetOK.value = false;
+      }, 2000);
+
+      sportfestList.push({
+        id: result.sportfestId,
+        name: `${sportfest.name} (Kopie)`,
+        ort: sportfest.ort,
+        startdate: sportfest.startdate,
+        starttime: sportfest.starttime,
+        meldeende: sportfest.meldeende,
+        disziplinen: sportfest.disziplinen,
+        vereine: sportfest.vereine,
+        adminVerein: sportfest.adminVerein,
+        editMode: false
+      });
+
+      dataStore.sportfesteChanged = true;
+    } else {
+      setTimeout(() => {
+        dialogStore.setParameter('Fehlercode xxx', `${response.status} ${response.statusText}`, 'ok', null, '', null, null);
+      }, 1000);
+      console.log('fehler status beim anlegegen des Sportfestes', response.status);
+    }
+  } catch (error) {
+    console.error('Es gab ein Problem beim Anlegen des Sportfestes', error);
+    setTimeout(() => {
+      dialogStore.setParameter('Fehlercode xxx', `${error.message}`, 'ok', null, '', null, null);
+    }, 1000);
+
+  }
+}
+
 function clickDelSportfest(sportfest) {
   console.log('asdf  delSportfestId', delSportfestId);
   delSportfestId = sportfest.id;
@@ -354,6 +415,8 @@ const clickEditSportfestAendern = async (sportfest) => {
   try {
     // Kombinieren von Datum und Uhrzeit
     const combinedDateTime = `${sportfest.startdate}T${sportfest.starttime}:00`;
+
+    sportfest.ort = DOMPurify.sanitize(sportfest.ort);
 
     const response = await fetch('/api/editSportfest', {
       method: 'POST',
@@ -489,6 +552,8 @@ const newSportfestValid = computed(() => {
     newSportfest.value.startdate &&
     newSportfest.value.meldeende &&
     newSportfest.value.startdate > newSportfest.value.meldeende &&
+    newSportfest.value.starttime !== '' &&
+    newSportfest.value.starttime !== undefined &&
     selectedVereine.value.length > 0 &&
     selectedAdminVerein.value !== null &&
     selectedDisziplinen.value.length > 0;
@@ -501,6 +566,8 @@ const hinweisNewSportfest = computed(() => {
     return 'Bitte den Veranstaltungsort eintragen';
   } else if (!newSportfest.value.startdate) {
     return 'Bitte das Austragungs Datum eintragen';
+  } else if (!newSportfest.value.starttime) {
+    return 'Bitte Uhrzeit für Startzeit eintragen';
   } else if (!newSportfest.value.meldeende) {
     return 'Bitte das Meldeschlussdatum eintragen';
   } else if (newSportfest.value.startdate < newSportfest.value.meldeende) {
@@ -536,6 +603,7 @@ const clickNewSportfest = async () => {
   newSportfest.value.ort = '';
   newSportfest.value.startdate = '';
   newSportfest.value.meldeende = '';
+  kopieNewSporfest.ort = DOMPurify.sanitize(kopieNewSporfest.ort);
   kopieNewSporfest.disziplinen = selectedDisziplinen.value;
   kopieNewSporfest.vereine = selectedVereine.value;
   kopieNewSporfest.adminVerein = selectedAdminVerein.value;
@@ -583,14 +651,12 @@ const clickNewSportfest = async () => {
         dialogStore.setParameter('Fehlercode xxx', `${response.status} ${response.statusText}`, 'ok', null, '', null, null);
       }, 1000);
       console.log('fehler status beim anlegegen des Sportfestes', response.status);
-
     }
   } catch (error) {
     console.error('Es gab ein Problem beim Anlegen des Sportfestes', error);
     setTimeout(() => {
       dialogStore.setParameter('Fehlercode xxx', `${error.message}`, 'ok', null, '', null, null);
     }, 1000);
-
   }
 };
 
@@ -613,5 +679,9 @@ onMounted(() => {
   display: flex;
   flex-wrap: nowrap;
   gap: 2px; /* Abstand zwischen den Buttons */
+}
+
+.no-wrap {
+  white-space: nowrap;
 }
 </style>

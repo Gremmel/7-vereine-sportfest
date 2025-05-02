@@ -104,7 +104,7 @@ class MeldungController {
 
       const rows = stmt.all(staffelData.sportfestId, staffelData.vereinsId);
 
-      logger.info('Sportler ohne Staffel:', rows);
+      // logger.info('Sportler ohne Staffel:', rows);
 
       return rows;
     } catch (error) {
@@ -144,6 +144,54 @@ class MeldungController {
       `);
 
       const rows = stmt.all(sportfestId);
+
+      logger.info('Exportierte Zeilen:', rows);
+
+      // CSV-Format erstellen
+      const csv = stringify(rows, {
+        header: true,
+        delimiter: ';',
+        columns: [ 'Verein', 'Name', 'Vorname', 'JG', 'GS', 'AH Hochsprung' ]
+      });
+
+      return csv;
+    } catch (error) {
+      logger.error('Fehler beim Exportieren der Meldung als CSV:', error);
+      throw new Error('Fehler beim Exportieren der Meldung als CSV.');
+    }
+  }
+
+  exportDreikampfVereinCSV (sportfestId, vereinId) {
+    try {
+      const stmt = dbController.prepare(`
+        SELECT
+            v.name AS Verein,
+            s.name AS Name,
+            s.vname AS Vorname,
+            s.jahrgang AS JG,
+            s.geschlecht AS GS,
+            m.hoehe AS "AH Hochsprung"
+        FROM
+            meldungen m
+        INNER JOIN
+            meldungen_sportfest msf ON m.id = msf.meldungen_id
+        INNER JOIN
+            sportfest sf ON msf.sportfest_id = sf.id
+        INNER JOIN
+            meldungen_sportler ms ON m.id = ms.meldungen_id
+        INNER JOIN
+            sportler s ON ms.sportler_id = s.id
+        INNER JOIN
+            sportler_verein sv ON s.id = sv.sportler_id
+        INNER JOIN
+            verein v ON sv.verein_id = v.id
+        WHERE
+            sf.id = ? AND sv.verein_id = ?
+        ORDER BY
+            v.name, s.name, s.vname
+      `);
+
+      const rows = stmt.all(sportfestId, vereinId);
 
       logger.info('Exportierte Zeilen:', rows);
 

@@ -141,6 +141,39 @@ class UserController {
     }
   }
 
+  async changePassword (user) {
+    const { id, password } = user;
+
+    let passHash = null;
+
+    if (password) {
+      passHash = await this.hashPassword(password);
+      logger.info('updated hash', passHash);
+    }
+
+    const stmt = dbController.prepare(`
+      UPDATE fos_user
+      SET password = COALESCE(?, password)
+      WHERE id = ?
+    `);
+
+    try {
+      const result = stmt.run(passHash, id);
+
+      logger.info(`Password changed successfully.`, result);
+
+      if (result.changes === 1) {
+        return true;
+      }
+
+      return false;
+    } catch (error) {
+      logger.error(`Error changing password: ${error.message}`);
+
+      return false;
+    }
+  }
+
   async delUser (user) {
     const { id } = user;
 

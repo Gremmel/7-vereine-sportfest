@@ -9,6 +9,7 @@ export const useUserStore = defineStore('userStore', {
     getSessionDataFinished: false,
     sportfeste: null,
     selectedSportfest: null,
+    lastSelectedStaffelVereinsId: null,
   }),
 
   getters: {

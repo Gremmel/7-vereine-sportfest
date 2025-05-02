@@ -7,11 +7,15 @@
       <div v-if="isAdmin" class="col-auto">
         <a :href="`/api/exportStaffel/${selectedSportfest.id}`" class="btn btn-dark mb-3">Export Anmeldungen</a>
       </div>
+      <div v-else class="col-auto">
+        <a :href="`/api/exportStaffelVerein/${selectedSportfest.id}/${userStore.user.verein_id}`" class="btn btn-dark mb-3">Export Anmeldungen</a>
+      </div>
     </div>
     <div v-if="isAdmin" class="d-flex align-items-center mb-3">
+      <img :src="`/logos/${selectedVereinLogo}`" alt="" srcset="" class="me-1" style="height: 40px;">
       <label for="vereineSelect" class="form-label me-2">Verein: </label>
       <select v-model="staffelVereinsId" class="form-select" aria-label="Default select example">
-        <option v-for="verein of vereineList" :key="verein.id" :value="verein.id">{{ verein.name }}</option>
+        <option v-for="verein of sportfestVereineList" :key="verein.id" :value="verein.id">{{ verein.name }}</option>
       </select>
     </div>
     <div v-for="klasse of klassenList" :key="klasse.id" class="card mb-3">
@@ -58,14 +62,14 @@
             <thead>
               <tr>
                 <th scope="col">Name</th>
-                <th scope="col">Jahrgang</th>
+                <th scope="col">Jahrgang (Alter)</th>
                 <th scope="col">Geschlecht</th>
               </tr>
             </thead>
             <tbody>
               <tr v-for="sportler in sportlerDreikampfOhneStaffel" :key="sportler.id">
                 <td class="fw-bold">{{ sportler.vname }} {{ sportler.name }}</td>
-                <td>{{ sportler.jahrgang }}</td>
+                <td>{{ sportler.jahrgang }} ({{ new Date().getFullYear() - sportler.jahrgang }})</td>
                 <td>{{ sportler.geschlecht }}</td>
               </tr>
             </tbody>
@@ -93,6 +97,7 @@ const dialogStore = useDialogStore();
 const dataStore = useDataStore();
 const router = useRouter();
 const staffelVereinsId = ref(null);
+
 let delStaffelId;
 
 const route = useRoute();
@@ -101,11 +106,15 @@ const isAdmin = computed(() => {
   return userStore.hasRole('admin');
 });
 
-staffelVereinsId.value = userStore.user.verein_id;
+const selectedVereinLogo = computed(() => {
+  const verein = vereineList.find(verein => verein.id === staffelVereinsId.value);
+  return verein ? verein.logo : '';
+});
 
 watch(staffelVereinsId, async (newVal, oldVal) => {
   if (newVal !== oldVal) {
     console.log('staffelVereinsId changed:', newVal);
+    userStore.lastSelectedStaffelVereinsId = newVal;
     await getStaffelUebersichtList();
   }
 });
@@ -185,6 +194,29 @@ function toRoman(num) {
   return result;
 }
 
+function checkSelectedVerein() {
+  if (isAdmin.value) {
+    if (userStore.lastSelectedStaffelVereinsId) {
+      staffelVereinsId.value = userStore.lastSelectedStaffelVereinsId;
+    }
+
+    if (staffelVereinsId.value == null) {
+      staffelVereinsId.value = selectedSportfest.value.vereineList[0].vereinId;
+    } else {
+      for (const verein of selectedSportfest.value.vereineList) {
+        if (staffelVereinsId.value == verein.vereinId) {
+          staffelVereinsId.value = verein.vereinId;
+
+          return;
+        }
+      }
+      staffelVereinsId.value = selectedSportfest.value.vereineList[0].vereinId;
+    }
+  } else {
+    staffelVereinsId.value = userStore.user.verein_id;
+  }
+}
+
 async function getStaffelUebersichtList() {
   try {
     let response;
@@ -215,6 +247,7 @@ async function getStaffelUebersichtList() {
         sportlerDreikampfOhneStaffel.push(sportler);
       }
 
+      checkSelectedVerein();
     }else {
       setTimeout(() => {
         dialogStore.setParameter('Fehlercode xxx', `${response.status} ${response.statusText}`, 'ok', null, '', null, null);
@@ -264,12 +297,14 @@ const selectedSportfest = computed(() => {
   let found = false;
   let sportfestName = '';
   let disziplinActive = {};
+  let vereineList = [];
 
   for (const sportfest of userStore.sportfeste) {
     if (sportfest.id == route.params.sportfestId) {
       found = true;
       sportfestName = sportfest.name;
       disziplinActive = sportfest.disziplinActive;
+      vereineList = sportfest.vereineList;
     }
   }
 
@@ -281,8 +316,23 @@ const selectedSportfest = computed(() => {
   return {
     id: route.params.sportfestId,
     name: sportfestName,
-    disziplinActive: disziplinActive
+    disziplinActive: disziplinActive,
+    vereineList
   };
+});
+
+const sportfestVereineList = computed(() => {
+  const list = [];
+
+  for (const verein of vereineList) {
+    for (const sportfestVerein of selectedSportfest.value.vereineList) {
+      if (sportfestVerein.vereinId == verein.id) {
+        list.push(verein);
+      }
+    }
+  }
+
+  return list;
 });
 
 const newStaffel = async (staffelObj) => {

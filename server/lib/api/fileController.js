@@ -35,7 +35,7 @@ const fileController = {
     }
   },
 
-  async getFileById (fileId) {
+  async getFileById (fileId, req, authMiddleware) {
     try {
       if (!fileId) {
         throw new Error('Keine Dateien hochgeladen');
@@ -47,6 +47,20 @@ const fileController = {
       if (!file) {
         throw new Error('Datei nicht gefunden');
       }
+
+      logger.warn('asdf file.oeffentlich', file.oeffentlich);
+
+      // wenn nicht öffentlich muss der user admin sein
+      if (file.oeffentlich !== '1') {
+        const token = req.cookies.session_token;
+
+        const decoded = authMiddleware.verifyToken(token);
+
+        if (!decoded || !decoded.user.roles.includes('admin')) {
+          throw new Error('Keine Berechtigung zum Abrufen dieser Datei');
+        }
+      }
+
       logger.info('Datei erfolgreich abgerufen:', file);
 
       const filename = fileURLToPath(import.meta.url);
@@ -54,6 +68,7 @@ const fileController = {
       const filePath = path.join(dirname, '..', '..', '..', 'extern', 'uploads', file.file);
 
       return {
+        success: true,
         path: path.resolve(filePath), // Pfad zur Datei
         name: file.orgname // Originalname der Datei
       };

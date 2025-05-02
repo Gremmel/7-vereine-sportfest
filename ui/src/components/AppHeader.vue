@@ -4,6 +4,9 @@
     <div v-if="isLoggedIn">
       <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container-fluid">
+          <a href="/changepassword">
+            <img :src="`/logos/${userStore.user.verein_logo}`" style="height: 40px;" alt="Verein Logo">
+          </a>
           <!-- <a class="navbar-brand" href="#">{{ userStore.user.username }}</a> -->
           <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
             aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -26,7 +29,9 @@
               <li v-if="showSportlerLink" class="nav-item">
                 <RouterLink class="nav-link" to="/sportler">Sportler</RouterLink>
               </li>
-              <li v-if="showSportlerAnmeldungLink" class="nav-item dropdown ms-3">
+              <!-- Anmeldung Dreikampf -->
+              <!-- mehr als ein sportfest -->
+              <li v-if="showSportlerAnmeldungLink && userStore.sportfeste.length > 1 " class="nav-item dropdown ms-3">
                 <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                   Anmeldung 3/4 Kampf
                 </a>
@@ -36,7 +41,13 @@
                   </li>
                 </ul>
               </li>
-              <li v-if="showStaffelUebersichtLink" class="nav-item dropdown">
+              <!-- genau ein Sportfeset -->
+              <li v-if="showSportlerAnmeldungLink && userStore.sportfeste.length === 1" class="nav-item">
+                <RouterLink class="nav-link" :to="`/sportlerAnmeldung/${userStore.sportfeste[0].id}`">Anmeldung 3/4 Kampf</RouterLink>
+              </li>
+              <!-- Anmeldung Staffel -->
+              <!-- wenn mehr als ein Sportfest -->
+              <li v-if="showStaffelUebersichtLink && userStore.sportfeste.length > 1 " class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                   Staffel
                 </a>
@@ -47,6 +58,10 @@
                     </li>
                   </template>
                 </ul>
+              </li>
+              <!-- genau ein Sportfeset -->
+              <li v-if="showStaffelUebersichtLink && userStore.sportfeste.length === 1" class="nav-item">
+                <RouterLink class="nav-link" :to="`/staffelUebersicht/${userStore.sportfeste[0].id}`">Staffel</RouterLink>
               </li>
             </ul>
             <div class="d-flex">

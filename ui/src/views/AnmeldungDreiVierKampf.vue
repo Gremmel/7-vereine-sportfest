@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <div class="card">
+    <div class="card mt-2">
       <div class="card-body">
         <div class="row">
           <div class="col">
@@ -12,6 +12,9 @@
           </div>
           <div v-if="isAdmin" class="col-auto">
             <a :href="`/api/exportDreikampf/${selectedSportfest.id}`" class="btn btn-dark mb-3">Export Anmeldungen</a>
+          </div>
+          <div v-else class="col-auto">
+            <a :href="`/api/exportDreikampf/${selectedSportfest.id}/${userStore.user.verein_id}`" class="btn btn-dark mb-3">Export Anmeldungen</a>
           </div>
         </div>
         <div class="input-group mb-3">

@@ -87,7 +87,7 @@ class SportlerController {
 
     for (const sportler of sportlerList) {
       try {
-        logger.warn(' hochsprungMinHoehe', hochsprungMinHoehe);
+        // logger.warn(' hochsprungMinHoehe', hochsprungMinHoehe);
 
         const stmt = dbController.prepare(`
           SELECT *

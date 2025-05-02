@@ -13,6 +13,17 @@ class SportfestController {
         );
         const sportfeste = stmt.all();
 
+        // beteiligte vereine abfagen
+        for (const sportfest of sportfeste) {
+          const stmtVereine = dbController.prepare(
+            `SELECT verein_id as vereinId FROM sportfest_verein WHERE sportfest_id = ?`
+          );
+
+          const vereine = stmtVereine.all(sportfest.id);
+
+          sportfest.vereineList = vereine;
+        }
+
         return sportfeste;
       }
 
@@ -21,6 +32,18 @@ class SportfestController {
       );
 
       const sportfeste = stmt.all();
+
+      // beteiligte vereine abfagen
+      for (const sportfest of sportfeste) {
+        const stmtVereine = dbController.prepare(
+          `SELECT * FROM sportfest_verein WHERE sportfest_id = ?`
+        );
+
+        const vereine = stmtVereine.all(sportfest.id);
+        logger.fatal('asdf vereine', vereine);
+
+        sportfest.vereineList = vereine;
+      }
 
       return sportfeste;
     } catch (error) {
@@ -249,9 +272,30 @@ class SportfestController {
         `INSERT INTO sportfest_adminverein (sportfest_id, verein_id) VALUES (?, ?)`
       );
 
+      logger.warn('#asdf sportfest', sportfest);
+
       if (sportfest.adminVerein) {
         insertAdminStmt.run(sportfest.id, sportfest.adminVerein);
       }
+
+      return true;
+    } catch (error) {
+      logger.error('Fehler beim Bearbeiten des Sportfests:', error);
+
+      throw new Error('Fehler beim Bearbeiten des Sportfests:', error);
+    }
+  }
+
+  editDescriptionSportfest (sportfest) {
+    try {
+      const stmt = dbController.prepare(
+        `UPDATE sportfest SET description=? WHERE id=?`
+      );
+
+      stmt.run(
+        sportfest.description || '',
+        sportfest.id
+      );
 
       return true;
     } catch (error) {

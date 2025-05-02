@@ -38,12 +38,14 @@
                 </ul>
               </td>
               <td>
-                <button @click="delUser(user.id, user.username)" type="button" class="btn btn-danger">
-                  <i class="bi bi-trash"></i>
-                </button>
-                <button @click="editUser(user.id)" class="btn btn-primary ms-1">
-                  <i class="bi bi-pencil"></i>
-                </button>
+                <div v-if="user.username !== 'Admin' || userStore.user.username === 'Admin'">
+                  <button @click="delUser(user.id, user.username)" type="button" class="btn btn-danger">
+                    <i class="bi bi-trash"></i>
+                  </button>
+                  <button @click="editUser(user.id)" class="btn btn-primary ms-1">
+                    <i class="bi bi-pencil"></i>
+                  </button>
+                </div>
               </td>
             </tr>
           </tbody>

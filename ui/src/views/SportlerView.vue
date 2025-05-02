@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <div class="card">
+    <div class="card mt-2">
       <div class="card-body">
         <h2 class="card-title">Teilnehmer</h2>
         <div class="input-group mb-3">

@@ -1,30 +1,35 @@
 <template>
   <main>
-    <div class="container mt-3">
+    <div class="container mt-3" id="home">
       <!-- Bilder -->
       <div id="carouselHome" class="carousel slide carousel-fade" data-bs-ride="carousel">
-        <div class="carousel-indicators">
-          <button type="button" data-bs-target="#carouselHome" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
-          <button type="button" data-bs-target="#carouselHome" data-bs-slide-to="1" aria-label="Slide 2"></button>
-          <button type="button" data-bs-target="#carouselHome" data-bs-slide-to="2" aria-label="Slide 3"></button>
-          <button type="button" data-bs-target="#carouselHome" data-bs-slide-to="3" aria-label="Slide 4"></button>
-          <button type="button" data-bs-target="#carouselHome" data-bs-slide-to="4" aria-label="Slide 5"></button>
-        </div>
         <div class="carousel-inner">
           <div class="carousel-item active" data-bs-interval="5000">
             <img src="@/assets/7vereine_ca.png" class="d-block w-100" alt="7 Vereine">
           </div>
           <div class="carousel-item">
-            <img src="https://picsum.photos/2000/600" class="d-block w-100" alt="...">
+            <img src="@/assets/001-2000x600.jpg" class="d-block w-100" alt="..." loading="lazy">
           </div>
           <div class="carousel-item">
-            <img src="@/assets/001-2000x600.jpg" class="d-block w-100" alt="...">
+            <img src="@/assets/002-2000x600.jpg" class="d-block w-100" alt="..." loading="lazy">
           </div>
           <div class="carousel-item">
-            <img src="@/assets/002-2000x600.jpg" class="d-block w-100" alt="...">
+            <img src="@/assets/003-2000x600.jpg" class="d-block w-100" alt="..." loading="lazy">
           </div>
           <div class="carousel-item">
-            <img src="@/assets/003-2000x600.jpg" class="d-block w-100" alt="...">
+            <img src="@/assets/004-2000x600.jpg" class="d-block w-100" alt="..." loading="lazy">
+          </div>
+          <div class="carousel-item">
+            <img src="@/assets/005-2000x600.jpg" class="d-block w-100" alt="..." loading="lazy">
+          </div>
+          <div class="carousel-item">
+            <img src="@/assets/006-2000x600.jpg" class="d-block w-100" alt="..." loading="lazy">
+          </div>
+          <div class="carousel-item">
+            <img src="@/assets/007-2000x600.jpg" class="d-block w-100" alt="..." loading="lazy">
+          </div>
+          <div class="carousel-item">
+            <img src="@/assets/008-2000x600.jpg" class="d-block w-100" alt="..." loading="lazy">
           </div>
         </div>
         <button class="carousel-control-prev" type="button" data-bs-target="#carouselHome" data-bs-slide="prev">
@@ -44,18 +49,31 @@
             <div class="card">
               <div class="card-body">
                 <h5 class="card-title">{{ sportfest.name }}</h5>
-                <div v-if="sportfest.description && !sportfest.showDescriptionEdit" class="card-text text-dark p-2 mb-1" style="background-color: #f2f2f2;">
+                <div v-if="sportfest.description && !sportfest.showDescriptionEdit" class="card-text text-dark p-2 mb-1"
+                  style="background-color: #f2f2f2;">
                   <strong>{{ sportfest.description }}</strong>
                 </div>
-                <div v-if="sportfest.showDescriptionEdit" class="card-text text-dark p-2 mb-1" style="background-color: #f2f2f2;">
-                  <textarea class="form-control" @blur="blurSprotfestDescription(sportfest)" v-model="sportfest.description"></textarea>
+                <div v-if="sportfest.showDescriptionEdit" class="card-text text-dark p-2 mb-1"
+                  style="background-color: #f2f2f2;">
+                  <textarea class="form-control" @blur="blurSprotfestDescription(sportfest)"
+                    v-model="sportfest.description"></textarea>
                 </div>
-                <p class="card-text"><small class="text-muted">Datum: {{ sportfest.startDateDE }} Uhr</small></p>
-                <p class="card-text"><small class="text-muted">Meldeende: {{ sportfest.meldeendeDE }}</small></p>
-                <p class="card-text"><small class="text-muted">Ort: {{ sportfest.ort }}</small></p>
-                <p class="card-text"><small class="text-muted">Administrativer Verein: {{ sportfest.admin_verein_name }}</small></p>
+                <p class="card-text">
+                  <small class="text-muted">Datum: </small>
+                  <small>{{ sportfest.startDateDE }} Uhr</small>
+                </p>
+                <p class="card-text">
+                  <small class="text-muted">Meldeende: </small>
+                  <small>{{ sportfest.meldeendeDE }}</small>
+                </p>
+                <p class="card-text">
+                  <small class="text-muted">Ort: </small>
+                  <small v-html="sportfest.ort"></small>
+                </p>
+                <p class="card-text"><small class="text-muted">Administrativer Verein: </small><small>{{
+                  sportfest.admin_verein_name }}</small></p>
                 <div>
-                  Beiligte Vereine:
+                  Beteiligte Vereine:
                   <p class="card-text"><small class="text-muted">{{ sportfest.sportfestListString }}</small></p>
                 </div>
                 <div v-if="sportfest.fileList.length > 0">
@@ -76,7 +94,8 @@
         <h4 class="mt-3">Allgemeine Dateien</h4>
         <div class="card">
           <div class="list-group">
-            <a v-for="file in fileListOhneSportfestId" :key="file.id" class="list-group-item list-group-item-action" :href="`/api/downloadFile/${file.id}`" target="_blank">{{ file.name }}</a>
+            <a v-for="file in fileListOhneSportfestId" :key="file.id" class="list-group-item list-group-item-action"
+              :href="`/api/downloadFile/${file.id}`" target="_blank">{{ file.name }}</a>
           </div>
         </div>
       </div>
@@ -91,6 +110,7 @@
 
 <script setup>
   import { onMounted, reactive, computed } from 'vue';
+  import { Carousel } from 'bootstrap'; // Importiere nur die Carousel-Komponente von Bootstrap
 
   import { useUserStore } from '@/stores/userStore';
   const userStore = useUserStore();
@@ -155,7 +175,7 @@
     console.log('blurSportfestDescription sportfest', sportfest);
 
     try {
-      const response = await fetch('/api/editSportfest', {
+      const response = await fetch('/api/editDescriptionSportfest', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -223,6 +243,11 @@
     console.log('onMounted');
     // Dateien abfragen
     getData();
+
+    const carouselElement = document.getElementById('carouselHome');
+    if (carouselElement) {
+      new Carousel(carouselElement); // Initialisiere das Carousel
+    }
   });
 </script>
 
@@ -234,5 +259,26 @@
   max-width: 80%;
 }
 
+html, body {
+  height: 100%; /* Stellt sicher, dass der Body die volle Höhe des Fensters einnimmt */
+  margin: 0;
+}
 
+main {
+  flex: 1; /* Nimmt den verfügbaren Platz ein */
+}
+
+#home {
+  display: flex;
+  flex-direction: column;
+  min-height: 86vh; /* Stellt sicher, dass der Inhalt mindestens die Fensterhöhe einnimmt */
+}
+
+footer {
+  margin-top: auto; /* Schiebt den Footer an das Ende, wenn der Inhalt nicht die volle Höhe einnimmt */
+  background-color: #343a40; /* Optional: Hintergrundfarbe des Footers */
+  color: white; /* Optional: Textfarbe des Footers */
+  text-align: center;
+  padding: 1rem 0;
+}
 </style>

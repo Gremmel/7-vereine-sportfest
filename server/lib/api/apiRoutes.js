@@ -92,14 +92,14 @@ const apiRoutes = {
       }
     });
 
-    app.get('/api/downloadFile/:fileId', authMiddleware.check('benutzer'), async (req, res) => {
+    app.get('/api/downloadFile/:fileId', async (req, res) => {
       const fileId = req.params.fileId;
 
       // Hole die Datei basierend auf der ID
-      const file = await fileController.getFileById(fileId);
+      const file = await fileController.getFileById(fileId, req, authMiddleware);
 
-      if (!file) {
-        return res.status(404).send('Datei nicht gefunden');
+      if (!file.success) {
+        return res.status(404).send(file.message);
       }
 
       const filePath = file.path; // Pfad zur Datei
@@ -116,7 +116,7 @@ const apiRoutes = {
 
     // Login-Route (POST)
     app.post('/api/login', async (req, res) => {
-      logger.fatal('/api/login req.body', req.body);
+      // logger.fatal('/api/login req.body', req.body);
       const { username, password } = req.body;
 
       // Überprüfe Benutzername und Passwort
@@ -216,6 +216,21 @@ const apiRoutes = {
         res.json({ result });
       } else {
         res.status(401).json({ message: 'Fehler beim ändern des Users' });
+      }
+    });
+
+    // Benutzer ändern
+    app.post('/api/changePassword', authMiddleware.check('benutzer'), async (req, res) => {
+      logger.fatal('/api/changePassword req.body', req.body);
+
+      // Benutzer ändern
+      const result = await userController.changePassword(req.body);
+
+      if (result) {
+        // Erfolgsnachricht senden
+        res.json({ result });
+      } else {
+        res.status(401).json({ message: 'Fehler beim ändern des Passworts' });
       }
     });
 
@@ -396,6 +411,20 @@ const apiRoutes = {
       }
     });
 
+    // edit Sportfest
+    app.post('/api/editDescriptionSportfest', authMiddleware.check('benutzer'), async (req, res) => {
+      logger.fatal('/api/editSportfest req.body', req.body);
+
+      const io = sportfestController.editDescriptionSportfest(req.body.sportfest);
+
+      if (io) {
+        // Erfolgsnachricht senden
+        res.json({ io });
+      } else {
+        res.status(401).json({ message: 'Fehler bei editSportfest' });
+      }
+    });
+
     // del Sportfest
     app.post('/api/delSportfest', authMiddleware.check('admin'), async (req, res) => {
       logger.fatal('/api/delSportfest req.body', req.body);
@@ -541,12 +570,36 @@ const apiRoutes = {
       }
     });
 
+    app.get('/api/exportDreikampf/:sportfestId/:vereinId', authMiddleware.check('benutzer'), async (req, res) => {
+      try {
+        const csv = meldungController.exportDreikampfVereinCSV(req.params.sportfestId, req.params.vereinId);
+
+        res.setHeader('Content-Type', 'text/csv');
+        res.setHeader('Content-Disposition', 'attachment; filename="MeldungenDreikampfVerein.txt"');
+        res.send(csv);
+      } catch (error) {
+        res.status(401).json({ message: error.message });
+      }
+    });
+
     app.get('/api/exportStaffel/:sportfestId', authMiddleware.check('admin'), async (req, res) => {
       try {
         const csv = staffelController.exportexportStaffelCSV(req.params.sportfestId);
 
         res.setHeader('Content-Type', 'text/csv');
         res.setHeader('Content-Disposition', 'attachment; filename="MeldungStaffel.txt"');
+        res.send(csv);
+      } catch (error) {
+        res.status(401).json({ message: error.message });
+      }
+    });
+
+    app.get('/api/exportStaffelVerein/:sportfestId/:vereinId', authMiddleware.check('benutzer'), async (req, res) => {
+      try {
+        const csv = staffelController.exportexportStaffelVereinCSV(req.params.sportfestId, req.params.vereinId);
+
+        res.setHeader('Content-Type', 'text/csv');
+        res.setHeader('Content-Disposition', 'attachment; filename="MeldungStaffelVerein.txt"');
         res.send(csv);
       } catch (error) {
         res.status(401).json({ message: error.message });
