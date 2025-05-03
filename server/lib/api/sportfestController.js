@@ -9,7 +9,7 @@ class SportfestController {
 
       if (isAdmin) {
         const stmt = dbController.prepare(
-          ` SELECT sportfest.*, GROUP_CONCAT(sportfest_disziplin.disziplin_id) AS disziplinen FROM sportfest JOIN sportfest_disziplin ON sportfest.id=sportfest_disziplin.sportfest_id WHERE meldeende > DATE('now') GROUP BY sportfest.id ORDER BY meldeende DESC`
+          ` SELECT sportfest.*, GROUP_CONCAT(sportfest_disziplin.disziplin_id) AS disziplinen FROM sportfest JOIN sportfest_disziplin ON sportfest.id=sportfest_disziplin.sportfest_id WHERE meldeende >= DATE('now') GROUP BY sportfest.id ORDER BY meldeende DESC`
         );
         const sportfeste = stmt.all();
 
@@ -28,7 +28,7 @@ class SportfestController {
       }
 
       const stmt = dbController.prepare(
-        `SELECT sportfest.*, GROUP_CONCAT(sportfest_disziplin.disziplin_id) AS disziplinen FROM sportfest JOIN sportfest_verein ON sportfest.id=sportfest_verein.sportfest_id JOIN sportfest_disziplin ON sportfest.id=sportfest_disziplin.sportfest_id WHERE sportfest_verein.verein_id=${user.verein_id} AND meldeende > DATE('now') GROUP BY sportfest.id ORDER BY meldeende DESC`
+        `SELECT sportfest.*, GROUP_CONCAT(sportfest_disziplin.disziplin_id) AS disziplinen FROM sportfest JOIN sportfest_verein ON sportfest.id=sportfest_verein.sportfest_id JOIN sportfest_disziplin ON sportfest.id=sportfest_disziplin.sportfest_id WHERE sportfest_verein.verein_id=${user.verein_id} AND meldeende >= DATE('now') GROUP BY sportfest.id ORDER BY meldeende DESC`
       );
 
       const sportfeste = stmt.all();
