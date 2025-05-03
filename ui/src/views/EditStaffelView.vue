@@ -122,14 +122,14 @@ async function saveStaffelMeldungen () {
 
     if (!response.ok) {
       setTimeout(() => {
-        dialogStore.setParameter('Fehlercode xxx', `${response.status} ${response.statusText}`, 'ok', null, '', null, null);
+        dialogStore.setParameter('Fehlercode 110', `${response.status} ${response.statusText}`, 'ok', null, '', null, null);
       }, 1000);
       console.log(result.message || 'Fehler bei saveStaffelMeldungen');
     }
   } catch (error) {
     console.error('Fehler bei saveStaffelMeldungen:', error);
     setTimeout(() => {
-      dialogStore.setParameter('Fehlercode xxx', `${error.message}`, 'ok', null, '', null, null);
+      dialogStore.setParameter('Fehlercode 111', `${error.message}`, 'ok', null, '', null, null);
     }, 1000);
   }
 }
@@ -358,14 +358,14 @@ async function getKlasseSportler() {
 
     } else {
       setTimeout(() => {
-        dialogStore.setParameter('Fehlercode xxx', `${response.status} ${response.statusText}`, 'ok', null, '', null, null);
+        dialogStore.setParameter('Fehlercode 112', `${response.status} ${response.statusText}`, 'ok', null, '', null, null);
       }, 1000);
       console.log(result.message || 'keine Daten vorhanden');
     }
   } catch (error) {
     console.error('Es gab ein Problem mit dem Abrufen der getKLasseSportler:', error);
     setTimeout(() => {
-      dialogStore.setParameter('Fehlercode xxx', `${error.message}`, 'ok', null, '', null, null);
+      dialogStore.setParameter('Fehlercode 113', `${error.message}`, 'ok', null, '', null, null);
     }, 1000);
   }
 }

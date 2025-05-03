@@ -160,13 +160,13 @@ async function delStaffel() {
     } else {
       console.log('asdf test response', response);
       setTimeout(() => {
-        dialogStore.setParameter('Fehlercode xxx', `${response.status} ${response.statusText}`, 'ok', null, '', null, null);
+        dialogStore.setParameter('Fehlercode 152', `${response.status} ${response.statusText}`, 'ok', null, '', null, null);
       }, 1000);
     }
   } catch (error) {
     console.error('Es gab ein Problem mit Löschen des Sportlers:', error);
     setTimeout(() => {
-      dialogStore.setParameter('Fehlercode xxx', `${error.message}`, 'ok', null, '', null, null);
+      dialogStore.setParameter('Fehlercode 153', `${error.message}`, 'ok', null, '', null, null);
     }, 1000);
   }
 }
@@ -250,14 +250,14 @@ async function getStaffelUebersichtList() {
       checkSelectedVerein();
     }else {
       setTimeout(() => {
-        dialogStore.setParameter('Fehlercode xxx', `${response.status} ${response.statusText}`, 'ok', null, '', null, null);
+        dialogStore.setParameter('Fehlercode 154', `${response.status} ${response.statusText}`, 'ok', null, '', null, null);
       }, 1000);
       console.log(result.message || 'keine Daten vorhanden');
     }
   } catch (error) {
     console.error('Es gab ein Problem mit dem Abrufen der getStaffelUebersichtList:', error);
     setTimeout(() => {
-      dialogStore.setParameter('Fehlercode xxx', `${error.message}`, 'ok', null, '', null, null);
+      dialogStore.setParameter('Fehlercode 155', `${error.message}`, 'ok', null, '', null, null);
     }, 1000);
   }
 }
@@ -281,14 +281,14 @@ async function getVereineList() {
 
     } else {
       setTimeout(() => {
-        dialogStore.setParameter('Fehlercode xxx', `${response.status} ${response.statusText}`, 'ok', null, '', null, null);
+        dialogStore.setParameter('Fehlercode 156', `${response.status} ${response.statusText}`, 'ok', null, '', null, null);
       }, 1000);
       console.log(result.message || 'keine Daten vorhanden');
     }
   } catch (error) {
     console.error('Es gab ein Problem mit dem Abrufen der getVereineList:', error);
     setTimeout(() => {
-      dialogStore.setParameter('Fehlercode xxx', `${error.message}`, 'ok', null, '', null, null);
+      dialogStore.setParameter('Fehlercode 157', `${error.message}`, 'ok', null, '', null, null);
     }, 1000);
   }
 }

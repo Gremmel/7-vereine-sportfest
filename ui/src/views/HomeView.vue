@@ -186,13 +186,13 @@
 
       if (!response.ok) {
         setTimeout(() => {
-          dialogStore.setParameter('Fehlercode xxx', `${response.status} ${response.statusText}`, 'ok', null, '', null, null);
+          dialogStore.setParameter('Fehlercode 125', `${response.status} ${response.statusText}`, 'ok', null, '', null, null);
         }, 1000);
       }
     } catch (error) {
       console.error('Es gab ein Problem beim Aendern des Sportfestes', error);
       setTimeout(() => {
-        dialogStore.setParameter('Fehlercode xxx', `${error.message}`, 'ok', null, '', null, null);
+        dialogStore.setParameter('Fehlercode 126', `${error.message}`, 'ok', null, '', null, null);
       }, 1000);
     }
   };

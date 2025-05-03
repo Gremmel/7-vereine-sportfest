@@ -156,13 +156,13 @@
         }
       } else {
         setTimeout(() => {
-          dialogStore.setParameter('Fehlercode xxx', `${response.status} ${response.statusText}`, 'ok', null, '', null, null);
+          dialogStore.setParameter('Fehlercode 117', `${response.status} ${response.statusText}`, 'ok', null, '', null, null);
         }, 1000);
       }
     } catch (error) {
       console.error('Es gab ein Problem mit dem löschen der Datei:', error);
       setTimeout(() => {
-        dialogStore.setParameter('Fehlercode xxx', `${error.message}`, 'ok', null, '', null, null);
+        dialogStore.setParameter('Fehlercode 118', `${error.message}`, 'ok', null, '', null, null);
       }, 1000);
     }
   };
@@ -218,7 +218,7 @@
     } catch (error) {
       console.error(error);
       setTimeout(() => {
-        dialogStore.setParameter('Fehlercode xxx', `${error.message}`, 'ok', null, '', null, null);
+        dialogStore.setParameter('Fehlercode 119', `${error.message}`, 'ok', null, '', null, null);
       }, 1000);
     }
   };
@@ -253,14 +253,14 @@
         router.push('/login');
       } else {
         setTimeout(() => {
-          dialogStore.setParameter('Fehlercode xxx', `${response.status} ${response.statusText}`, 'ok', null, '', null, null);
+          dialogStore.setParameter('Fehlercode 120', `${response.status} ${response.statusText}`, 'ok', null, '', null, null);
         }, 1000);
         console.log(result.message || 'keine Daten vorhanden');
       }
     } catch (error) {
       console.error('Es gab ein Problem mit dem Abrufen der getSportfestList:', error);
       setTimeout(() => {
-        dialogStore.setParameter('Fehlercode xxx', `${error.message}`, 'ok', null, '', null, null);
+        dialogStore.setParameter('Fehlercode 121', `${error.message}`, 'ok', null, '', null, null);
       }, 1000);
     }
   }
@@ -296,7 +296,7 @@
     } catch (error) {
       console.error(error);
       setTimeout(() => {
-        dialogStore.setParameter('Fehlercode xxx', `${error.message}`, 'ok', null, '', null, null);
+        dialogStore.setParameter('Fehlercode 122', `${error.message}`, 'ok', null, '', null, null);
       }, 1000);
     }
   };
@@ -320,7 +320,7 @@
         }
         fileList.sort((a, b) => a.name.localeCompare(b.name));
       } else if (response.status === 401) {
-        dialogStore.setParameter('Fehlercode xxx', `${response.status} ${response.statusText}`, 'ok', null, '', null, null);
+        dialogStore.setParameter('Fehlercode 123', `${response.status} ${response.statusText}`, 'ok', null, '', null, null);
       } else {
         throw new Error('Fehler beim Abrufen der Dateien.');
       }
@@ -328,7 +328,7 @@
     } catch (error) {
       console.error(error);
       setTimeout(() => {
-        dialogStore.setParameter('Fehlercode xxx', `${error.message}`, 'ok', null, '', null, null);
+        dialogStore.setParameter('Fehlercode 124', `${error.message}`, 'ok', null, '', null, null);
       }, 1000);
     }
   };

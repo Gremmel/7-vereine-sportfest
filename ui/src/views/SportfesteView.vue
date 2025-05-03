@@ -313,14 +313,14 @@ async function getSportfestList() {
       router.push('/login');
     } else {
       setTimeout(() => {
-        dialogStore.setParameter('Fehlercode xxx', `${response.status} ${response.statusText}`, 'ok', null, '', null, null);
+        dialogStore.setParameter('Fehlercode 130', `${response.status} ${response.statusText}`, 'ok', null, '', null, null);
       }, 1000);
       console.log(result.message || 'keine Daten vorhanden');
     }
   } catch (error) {
     console.error('Es gab ein Problem mit dem Abrufen der getSportfestList:', error);
     setTimeout(() => {
-      dialogStore.setParameter('Fehlercode xxx', `${error.message}`, 'ok', null, '', null, null);
+      dialogStore.setParameter('Fehlercode 131', `${error.message}`, 'ok', null, '', null, null);
     }, 1000);
   }
 }
@@ -379,14 +379,14 @@ async function clickDuplicateSportfest (sportfest) {
       dataStore.sportfesteChanged = true;
     } else {
       setTimeout(() => {
-        dialogStore.setParameter('Fehlercode xxx', `${response.status} ${response.statusText}`, 'ok', null, '', null, null);
+        dialogStore.setParameter('Fehlercode 132', `${response.status} ${response.statusText}`, 'ok', null, '', null, null);
       }, 1000);
       console.log('fehler status beim anlegegen des Sportfestes', response.status);
     }
   } catch (error) {
     console.error('Es gab ein Problem beim Anlegen des Sportfestes', error);
     setTimeout(() => {
-      dialogStore.setParameter('Fehlercode xxx', `${error.message}`, 'ok', null, '', null, null);
+      dialogStore.setParameter('Fehlercode 133', `${error.message}`, 'ok', null, '', null, null);
     }, 1000);
 
   }
@@ -448,14 +448,14 @@ const clickEditSportfestAendern = async (sportfest) => {
       dataStore.sportfesteChanged = true;
     } else {
       setTimeout(() => {
-        dialogStore.setParameter('Fehlercode xxx', `${response.status} ${response.statusText}`, 'ok', null, '', null, null);
+        dialogStore.setParameter('Fehlercode 134', `${response.status} ${response.statusText}`, 'ok', null, '', null, null);
       }, 1000);
 
     }
   } catch (error) {
     console.error('Es gab ein Problem beim Aendern des Sportfestes', error);
     setTimeout(() => {
-      dialogStore.setParameter('Fehlercode xxx', `${error.message}`, 'ok', null, '', null, null);
+      dialogStore.setParameter('Fehlercode 135', `${error.message}`, 'ok', null, '', null, null);
     }, 1000);
   }
 }
@@ -499,14 +499,14 @@ async function getVereineList() {
       router.push('/login');
     } else {
       setTimeout(() => {
-        dialogStore.setParameter('Fehlercode xxx', `${response.status} ${response.statusText}`, 'ok', null, '', null, null);
+        dialogStore.setParameter('Fehlercode 136', `${response.status} ${response.statusText}`, 'ok', null, '', null, null);
       }, 1000);
       console.log(result.message || 'keine Daten vorhanden');
     }
   } catch (error) {
     console.error('Es gab ein Problem mit dem Abrufen der getVereineList:', error);
     setTimeout(() => {
-      dialogStore.setParameter('Fehlercode xxx', `${error.message}`, 'ok', null, '', null, null);
+      dialogStore.setParameter('Fehlercode 137', `${error.message}`, 'ok', null, '', null, null);
     }, 1000);
   }
 }
@@ -534,13 +534,13 @@ async function delSportfest() {
       dataStore.sportfesteChanged = true;
     } else {
       setTimeout(() => {
-        dialogStore.setParameter('Fehlercode xxx', `${response.status} ${response.statusText}`, 'ok', null, '', null, null);
+        dialogStore.setParameter('Fehlercode 138', `${response.status} ${response.statusText}`, 'ok', null, '', null, null);
       }, 1000);
     }
   } catch (error) {
     console.error('Es gab ein Problem mit Löschen des Sportfestes:', error);
     setTimeout(() => {
-      dialogStore.setParameter('Fehlercode xxx', `${error.message}`, 'ok', null, '', null, null);
+      dialogStore.setParameter('Fehlercode 139', `${error.message}`, 'ok', null, '', null, null);
     }, 1000);
   }
 }
@@ -648,14 +648,14 @@ const clickNewSportfest = async () => {
       dataStore.sportfesteChanged = true;
     } else {
       setTimeout(() => {
-        dialogStore.setParameter('Fehlercode xxx', `${response.status} ${response.statusText}`, 'ok', null, '', null, null);
+        dialogStore.setParameter('Fehlercode 140', `${response.status} ${response.statusText}`, 'ok', null, '', null, null);
       }, 1000);
       console.log('fehler status beim anlegegen des Sportfestes', response.status);
     }
   } catch (error) {
     console.error('Es gab ein Problem beim Anlegen des Sportfestes', error);
     setTimeout(() => {
-      dialogStore.setParameter('Fehlercode xxx', `${error.message}`, 'ok', null, '', null, null);
+      dialogStore.setParameter('Fehlercode 141', `${error.message}`, 'ok', null, '', null, null);
     }, 1000);
   }
 };

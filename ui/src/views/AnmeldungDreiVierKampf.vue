@@ -183,14 +183,14 @@ async function clickNewDreikampf (sportlerId) {
       }
     } else {
       setTimeout(() => {
-        dialogStore.setParameter('Fehlercode xxx', `${response.status} ${response.statusText}`, 'ok', null, '', null, null);
+        dialogStore.setParameter('Fehlercode 100', `${response.status} ${response.statusText}`, 'ok', null, '', null, null);
       }, 1000);
       console.log(result.message || 'keine Daten vorhanden');
     }
   } catch (error) {
     console.error('Es gab ein Problem mit dem Abrufen der getSportlerList:', error);
     setTimeout(() => {
-      dialogStore.setParameter('Fehlercode xxx', `${error.message}`, 'ok', null, '', null, null);
+      dialogStore.setParameter('Fehlercode 101', `${error.message}`, 'ok', null, '', null, null);
     }, 1000);
   }
 }
@@ -222,14 +222,14 @@ async function clickDelDreikampf (meldungId) {
       }
     } else {
       setTimeout(() => {
-        dialogStore.setParameter('Fehlercode xxx', `${response.status} ${response.statusText}`, 'ok', null, '', null, null);
+        dialogStore.setParameter('Fehlercode 102', `${response.status} ${response.statusText}`, 'ok', null, '', null, null);
       }, 1000);
       console.log(result.message || 'keine Daten vorhanden');
     }
   } catch (error) {
     console.error('Es gab ein Problem mit dem Abrufen der getSportlerList:', error);
     setTimeout(() => {
-      dialogStore.setParameter('Fehlercode xxx', `${error.message}`, 'ok', null, '', null, null);
+      dialogStore.setParameter('Fehlercode 103', `${error.message}`, 'ok', null, '', null, null);
     }, 1000);
   }
 }
@@ -259,14 +259,14 @@ async function changeStartHoehe (sportler) {
       }
     } else {
       setTimeout(() => {
-        dialogStore.setParameter('Fehlercode xxx', `${response.status} ${response.statusText}`, 'ok', null, '', null, null);
+        dialogStore.setParameter('Fehlercode 104', `${response.status} ${response.statusText}`, 'ok', null, '', null, null);
       }, 1000);
       console.log(result.message || 'keine Daten vorhanden');
     }
   } catch (error) {
     console.error('Es gab ein Problem mit dem Abrufen der getSportlerList:', error);
     setTimeout(() => {
-      dialogStore.setParameter('Fehlercode xxx', `${error.message}`, 'ok', null, '', null, null);
+      dialogStore.setParameter('Fehlercode 105', `${error.message}`, 'ok', null, '', null, null);
     }, 1000);
   }
 }
@@ -313,14 +313,14 @@ async function getSportlerList (isAdmin) {
       router.push('/login');
     } else {
       setTimeout(() => {
-        dialogStore.setParameter('Fehlercode xxx', `${response.status} ${response.statusText}`, 'ok', null, '', null, null);
+        dialogStore.setParameter('Fehlercode 106', `${response.status} ${response.statusText}`, 'ok', null, '', null, null);
       }, 1000);
       console.log(result.message || 'keine Daten vorhanden');
     }
   } catch (error) {
     console.error('Es gab ein Problem mit dem Abrufen der getSportlerList:', error);
     setTimeout(() => {
-      dialogStore.setParameter('Fehlercode xxx', `${error.message}`, 'ok', null, '', null, null);
+      dialogStore.setParameter('Fehlercode 107', `${error.message}`, 'ok', null, '', null, null);
     }, 1000);
   }
 }
@@ -354,14 +354,14 @@ async function getVereineList() {
       router.push('/login');
     } else {
       setTimeout(() => {
-        dialogStore.setParameter('Fehlercode xxx', `${response.status} ${response.statusText}`, 'ok', null, '', null, null);
+        dialogStore.setParameter('Fehlercode 108', `${response.status} ${response.statusText}`, 'ok', null, '', null, null);
       }, 1000);
       console.log(result.message || 'keine Daten vorhanden');
     }
   } catch (error) {
     console.error('Es gab ein Problem mit dem Abrufen der getVereineList:', error);
     setTimeout(() => {
-      dialogStore.setParameter('Fehlercode xxx', `${error.message}`, 'ok', null, '', null, null);
+      dialogStore.setParameter('Fehlercode 109', `${error.message}`, 'ok', null, '', null, null);
     }, 1000);
   }
 }
