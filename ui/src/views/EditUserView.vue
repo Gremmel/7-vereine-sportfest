@@ -202,24 +202,13 @@
 
       if (response.ok) {
         errorMessage.value = '';
+        // wenn der eigene Benutzer geändert wird, hinweis das die änderungen erst nach einem erneuten login wirksam werden
+        if (userStore.user.id === form.value.id) {
+          dialogStore.setParameter('Hinweis', 'Die Änderungen werden erst nach erneutem Anmelden wirksam', 'ok', null, '', null, null);
+        }
+
         // benuterdaten aus stor löschen
         userStore.clearEditUser();
-
-        const verein_name = vereineList.find(verein => verein.id === form.value.vereinsId)?.name || '';
-        const verein_logo = vereineList.find(verein => verein.id === form.value.vereinsId)?.logo || '';
-
-        // neu benutzer daten in store speichern
-        userStore.setUser({
-          id: form.value.id,
-          username: form.value.username,
-          email: form.value.email,
-          telefon: form.value.telefon,
-          verein_id: form.value.vereinsId,
-          verein_name,
-          verein_logo,
-          roles: JSON.stringify(form.value.selectedRoles),
-          enabled: form.value.enabled
-        });
 
         // Weiterleitung nach erfolgreichem ändern
         router.push('/users');

@@ -122,8 +122,6 @@ const apiRoutes = {
       // Überprüfe Benutzername und Passwort
       const user = await loginController.loginUser(username, password);
 
-      logger.fatal('api login user', user);
-
       if (user) {
         // session erzeugen
         const token = sessionController.addSession(user);
