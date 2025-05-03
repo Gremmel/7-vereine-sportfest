@@ -1,3 +1,4 @@
+/* eslint-disable no-underscore-dangle */
 import logger from '../logger.js';
 import authMiddleware from '../middleware/authMiddleware.js';
 import loginController from './loginController.js';
@@ -11,10 +12,15 @@ import staffelController from './staffelController.js';
 import fileController from './fileController.js';
 import multer from 'multer';
 import mime from 'mime-types';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // Speicherort und Dateinamen für hochgeladene Dateien konfigurieren
 const upload = multer({
-  dest: `${process.cwd()}/../extern/uploads/`, // Ordner, in dem die Dateien gespeichert werden
+  dest: path.join(__dirname, '..', '..', '..', 'extern', 'uploads'), // Ordner, in dem die Dateien gespeichert werden
   limits: { fileSize: 10 * 1024 * 1024 } // Maximalgröße der Datei (z. B. 10 MB)
 });
 
@@ -40,7 +46,7 @@ const apiRoutes = {
     app.post('/api/upload', authMiddleware.check('admin'), upload.array('files', 10), async (req, res) => {
       const result = await fileController.handleMultipleFileUpload(req.files);
 
-      logger.warn('pfad', `${process.cwd()}/../extern/uploads/`);
+      logger.warn('pfad', path.join(__dirname, '..', '..', '..', 'extern', 'uploads'));
 
       if (result.success) {
         res.json({
