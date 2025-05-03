@@ -252,30 +252,22 @@
 </script>
 
 <style scoped>
-.center-image {
-  display: block;
-  margin-left: auto;
-  margin-right: auto;
-  max-width: 80%;
-}
-
 html, body {
   height: 100%; /* Stellt sicher, dass der Body die volle Höhe des Fensters einnimmt */
   margin: 0;
+}
+
+#home {
+  display: flex;
+  flex-direction: column;
+  min-height: calc(100vh - 9.5rem); /* Stellt sicher, dass der Inhalt mindestens die Fensterhöhe einnimmt */
 }
 
 main {
   flex: 1; /* Nimmt den verfügbaren Platz ein */
 }
 
-#home {
-  display: flex;
-  flex-direction: column;
-  min-height: 86vh; /* Stellt sicher, dass der Inhalt mindestens die Fensterhöhe einnimmt */
-}
-
 footer {
-  margin-top: auto; /* Schiebt den Footer an das Ende, wenn der Inhalt nicht die volle Höhe einnimmt */
   background-color: #343a40; /* Optional: Hintergrundfarbe des Footers */
   color: white; /* Optional: Textfarbe des Footers */
   text-align: center;
