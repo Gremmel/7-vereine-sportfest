@@ -40,6 +40,8 @@ const apiRoutes = {
     app.post('/api/upload', authMiddleware.check('admin'), upload.array('files', 10), async (req, res) => {
       const result = await fileController.handleMultipleFileUpload(req.files);
 
+      logger.warn('pfad', `${process.cwd()}/../extern/uploads/`);
+
       if (result.success) {
         res.json({
           message: 'Dateien erfolgreich hochgeladen',
