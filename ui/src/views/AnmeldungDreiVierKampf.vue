@@ -301,6 +301,10 @@ async function getSportlerList (isAdmin) {
         }
       }
 
+      for (const sportler of sportlerList) {
+        sportler.vereinsname = vereineList.find(verein => verein.id === sportler.vereinsid).name;
+      }
+
       fuseSearch = new Fuse(sportlerList, fuseOptions);
 
     } else if (response.status === 401) {
@@ -450,15 +454,15 @@ const sportlerListShow = computed(() => {
     const searchResult = fuseSearch.search(searchText.value);
 
     for (const obj of searchResult) {
-      obj.item.vereinsname = vereineList.find(verein => verein.id === obj.item.vereinsid).name;
+      // obj.item.vereinsname = vereineList.find(verein => verein.id === obj.item.vereinsid).name;
       sortedList.push({ ...obj.item });
     }
   } else {
     // Sortierung
     sortedList = sportlerList.map(sportler => ({ ...sportler })); // Erstelle eine tiefe Kopie des Arrays
-    for (const sportler of sortedList) {
-      sportler.vereinsname = vereineList.find(verein => verein.id === sportler.vereinsid).name;
-    }
+    // for (const sportler of sortedList) {
+    //   sportler.vereinsname = vereineList.find(verein => verein.id === sportler.vereinsid).name;
+    // }
 
     if (sortOrder.value === 'Name_ASC') {
       sortedList.sort((a, b) => a.name.localeCompare(b.name, "de", { sensitivity: 'base' }));
