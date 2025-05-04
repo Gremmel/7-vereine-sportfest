@@ -437,7 +437,8 @@ const clickEditSportfestAendern = async (sportfest) => {
         if (sportfestOrg.id === sportfest.id) {
           sportfestOrg.name = sportfest.name;
           sportfestOrg.ort = sportfest.ort;
-          sportfestOrg.startdate = combinedDateTime;
+          sportfestOrg.startdate = sportfest.startdate;
+          sportfestOrg.starttime = sportfest.starttime;
           sportfestOrg.meldeende = sportfest.meldeende;
           sportfestOrg.editMode = false;
           break;
