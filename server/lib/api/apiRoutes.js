@@ -14,26 +14,16 @@ import multer from 'multer';
 import mime from 'mime-types';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import iconv from 'iconv-lite'; // Importiere iconv-lite
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // Speicherort und Dateinamen für hochgeladene Dateien konfigurieren
 const upload = multer({
-  storage: multer.diskStorage({
-    destination (req, file, cb) {
-      cb(null, path.join(__dirname, '..', '..', '..', 'extern', 'uploads')); // Zielordner
-    },
-    filename (req, file, cb) {
-      // Kodierung des Dateinamens in UTF-8
-      const originalName = Buffer.from(file.originalname, 'latin1').toString('utf8');
-
-      cb(null, originalName);
-    }
-  }),
+  dest: path.join(__dirname, '..', '..', '..', 'extern', 'uploads'), // Ordner, in dem die Dateien gespeichert werden
   limits: { fileSize: 10 * 1024 * 1024 } // Maximalgröße der Datei (z. B. 10 MB)
 });
-
 const apiRoutes = {
   init (app, config) {
     sessionController.init(config);
@@ -578,9 +568,12 @@ const apiRoutes = {
       try {
         const csv = meldungController.exportDreikampfCSV(req.params.sportfestId);
 
+        // Konvertiere den CSV-Inhalt in ANSI (Windows-1252)
+        const csvAnsi = iconv.encode(csv, 'windows-1252');
+
         res.setHeader('Content-Type', 'text/csv');
-        res.setHeader('Content-Disposition', 'attachment; filename="MeldungenDreikampf.txt"');
-        res.send(csv);
+        res.setHeader('Content-Disposition', 'attachment; filename="MeldungenDreikampf.csv"');
+        res.send(csvAnsi);
       } catch (error) {
         res.status(401).json({ message: error.message });
       }
@@ -590,9 +583,12 @@ const apiRoutes = {
       try {
         const csv = meldungController.exportDreikampfVereinCSV(req.params.sportfestId, req.params.vereinId);
 
+        // Konvertiere den CSV-Inhalt in ANSI (Windows-1252)
+        const csvAnsi = iconv.encode(csv, 'windows-1252');
+
         res.setHeader('Content-Type', 'text/csv');
-        res.setHeader('Content-Disposition', 'attachment; filename="MeldungenDreikampfVerein.txt"');
-        res.send(csv);
+        res.setHeader('Content-Disposition', 'attachment; filename="MeldungenDreikampfVerein.csv"');
+        res.send(csvAnsi);
       } catch (error) {
         res.status(401).json({ message: error.message });
       }
@@ -602,9 +598,12 @@ const apiRoutes = {
       try {
         const csv = staffelController.exportexportStaffelCSV(req.params.sportfestId);
 
+        // Konvertiere den CSV-Inhalt in ANSI (Windows-1252)
+        const csvAnsi = iconv.encode(csv, 'windows-1252');
+
         res.setHeader('Content-Type', 'text/csv');
-        res.setHeader('Content-Disposition', 'attachment; filename="MeldungStaffel.txt"');
-        res.send(csv);
+        res.setHeader('Content-Disposition', 'attachment; filename="MeldungStaffel.csv"');
+        res.send(csvAnsi);
       } catch (error) {
         res.status(401).json({ message: error.message });
       }
@@ -614,9 +613,12 @@ const apiRoutes = {
       try {
         const csv = staffelController.exportexportStaffelVereinCSV(req.params.sportfestId, req.params.vereinId);
 
+        // Konvertiere den CSV-Inhalt in ANSI (Windows-1252)
+        const csvAnsi = iconv.encode(csv, 'windows-1252');
+
         res.setHeader('Content-Type', 'text/csv');
-        res.setHeader('Content-Disposition', 'attachment; filename="MeldungStaffelVerein.txt"');
-        res.send(csv);
+        res.setHeader('Content-Disposition', 'attachment; filename="MeldungStaffelVerein.csv"');
+        res.send(csvAnsi);
       } catch (error) {
         res.status(401).json({ message: error.message });
       }

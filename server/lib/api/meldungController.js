@@ -1,3 +1,4 @@
+/* eslint-disable camelcase */
 /* eslint-disable class-methods-use-this */
 import dbController from './dbController.js';
 import logger from '../logger.js';
@@ -145,12 +146,21 @@ class MeldungController {
 
       const rows = stmt.all(sportfestId);
 
+      // Convert m.hoehe from cm to meters with a comma as the decimal separator
+      rows.forEach((row) => {
+        if (row['AH Hochsprung'] !== null) {
+          // eslint-disable-next-line no-param-reassign
+          row['AH Hochsprung'] = (row['AH Hochsprung'] / 100).toFixed(2).replace('.', ',');
+        }
+      });
+
       logger.info('Exportierte Zeilen:', rows);
 
       // CSV-Format erstellen
       const csv = stringify(rows, {
         header: true,
         delimiter: ';',
+        record_delimiter: '\r\n', // Windows-Zeilenumbruch
         columns: [ 'Verein', 'Name', 'Vorname', 'JG', 'GS', 'AH Hochsprung' ]
       });
 
@@ -193,12 +203,19 @@ class MeldungController {
 
       const rows = stmt.all(sportfestId, vereinId);
 
-      logger.info('Exportierte Zeilen:', rows);
+      // Convert m.hoehe from cm to meters with a comma as the decimal separator
+      rows.forEach((row) => {
+        if (row['AH Hochsprung'] !== null) {
+          // eslint-disable-next-line no-param-reassign
+          row['AH Hochsprung'] = (row['AH Hochsprung'] / 100).toFixed(2).replace('.', ',');
+        }
+      });
 
       // CSV-Format erstellen
       const csv = stringify(rows, {
         header: true,
         delimiter: ';',
+        record_delimiter: '\r\n', // Windows-Zeilenumbruch
         columns: [ 'Verein', 'Name', 'Vorname', 'JG', 'GS', 'AH Hochsprung' ]
       });
 

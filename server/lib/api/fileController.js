@@ -19,7 +19,9 @@ const fileController = {
       const insertFiles = files.map((file) => {
         const { originalname, filename } = file;
 
-        return insertStmt.run(originalname, originalname, filename);
+        const originalnameLatin = Buffer.from(originalname, 'latin1').toString('utf8');
+
+        return insertStmt.run(originalnameLatin, originalnameLatin, filename);
       });
 
       logger.info('Dateien erfolgreich in die Datenbank eingefügt:', insertFiles);

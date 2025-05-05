@@ -1,3 +1,4 @@
+/* eslint-disable camelcase */
 /* eslint-disable class-methods-use-this */
 import dbController from './dbController.js';
 import logger from '../logger.js';
@@ -159,6 +160,32 @@ class StaffelController {
     }
   }
 
+  toRoman (num) {
+    const romanNumerals = [
+      { value: 100, numeral: 'C' },
+      { value: 90, numeral: 'XC' },
+      { value: 50, numeral: 'L' },
+      { value: 40, numeral: 'XL' },
+      { value: 10, numeral: 'X' },
+      { value: 9, numeral: 'IX' },
+      { value: 5, numeral: 'V' },
+      { value: 4, numeral: 'IV' },
+      { value: 1, numeral: 'I' }
+    ];
+
+    let result = '';
+
+    for (const { value, numeral } of romanNumerals) {
+      while (num >= value) {
+        result += numeral;
+        // eslint-disable-next-line no-param-reassign
+        num -= value;
+      }
+    }
+
+    return result;
+  }
+
   exportexportStaffelCSV (sportfestId) {
     try {
       const stmt = dbController.prepare(`
@@ -181,7 +208,7 @@ class StaffelController {
       const rows = stmt.all(sportfestId);
 
       // Verein;Klasse Staffel;Vorname1;Name1;G 1;JG 1;Vorname2;Name2;G 2;JG 2;Vorname3;Name3;G 3;JG 3;Vorname4;Name4;G 4;JG 4
-      // TV Nesselwang;m�nnliche Jugend U18/20;Sebastian;Wagner;m;2001;Lukas;French;m;2001;Tom;French;m;2002;Jacob;Erhart;m;2002
+      // TV Nesselwang;männliche Jugend U18/20;Sebastian;Wagner;m;2001;Lukas;French;m;2001;Tom;French;m;2002;Jacob;Erhart;m;2002
       for (const row of rows) {
         const stmt2 = dbController.prepare(`
           SELECT
@@ -221,10 +248,25 @@ class StaffelController {
 
       logger.info('Exportierte Zeilen:', rows);
 
+      const vereinCount = {};
+
+      for (const row of rows) {
+        const key = `${row.Verein}-${row['Klasse Staffel']}`;
+
+        if (!vereinCount[key]) {
+          vereinCount[key] = 1;
+          row.Verein += ` ${this.toRoman(vereinCount[key])}`;
+        } else {
+          vereinCount[key] += 1;
+          row.Verein += ` ${this.toRoman(vereinCount[key])}`;
+        }
+      }
+
       // CSV-Format erstellen
       const csv = stringify(rows, {
         header: true,
         delimiter: ';',
+        record_delimiter: '\r\n', // Windows-Zeilenumbruch
         columns: [ 'Verein', 'Klasse Staffel', 'Vorname1', 'Name1', 'G 1', 'JG 1',
           'Vorname2', 'Name2', 'G 2', 'JG 2',
           'Vorname3', 'Name3', 'G 3', 'JG 3',
@@ -304,6 +346,7 @@ class StaffelController {
       const csv = stringify(rows, {
         header: true,
         delimiter: ';',
+        record_delimiter: '\r\n', // Windows-Zeilenumbruch
         columns: [ 'Verein', 'Klasse Staffel', 'Vorname1', 'Name1', 'G 1', 'JG 1',
           'Vorname2', 'Name2', 'G 2', 'JG 2',
           'Vorname3', 'Name3', 'G 3', 'JG 3',
