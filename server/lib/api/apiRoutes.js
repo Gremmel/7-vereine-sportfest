@@ -20,7 +20,17 @@ const __dirname = path.dirname(__filename);
 
 // Speicherort und Dateinamen für hochgeladene Dateien konfigurieren
 const upload = multer({
-  dest: path.join(__dirname, '..', '..', '..', 'extern', 'uploads'), // Ordner, in dem die Dateien gespeichert werden
+  storage: multer.diskStorage({
+    destination (req, file, cb) {
+      cb(null, path.join(__dirname, '..', '..', '..', 'extern', 'uploads')); // Zielordner
+    },
+    filename (req, file, cb) {
+      // Kodierung des Dateinamens in UTF-8
+      const originalName = Buffer.from(file.originalname, 'latin1').toString('utf8');
+
+      cb(null, originalName);
+    }
+  }),
   limits: { fileSize: 10 * 1024 * 1024 } // Maximalgröße der Datei (z. B. 10 MB)
 });
 
