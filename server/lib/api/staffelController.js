@@ -249,21 +249,26 @@ class StaffelController {
       logger.info('Exportierte Zeilen:', rows);
 
       const vereinCount = {};
+      const list = [];
 
       for (const row of rows) {
-        const key = `${row.Verein}-${row['Klasse Staffel']}`;
+        if (row.Name1 !== '' && row.Name2 !== '' && row.Name3 !== '' && row.Name4 !== '') {
+          const key = `${row.Verein}-${row['Klasse Staffel']}`;
 
-        if (!vereinCount[key]) {
-          vereinCount[key] = 1;
-          row.Verein += ` ${this.toRoman(vereinCount[key])}`;
-        } else {
-          vereinCount[key] += 1;
-          row.Verein += ` ${this.toRoman(vereinCount[key])}`;
+          if (!vereinCount[key]) {
+            vereinCount[key] = 1;
+            row.Verein += ` ${this.toRoman(vereinCount[key])}`;
+          } else {
+            vereinCount[key] += 1;
+            row.Verein += ` ${this.toRoman(vereinCount[key])}`;
+          }
+
+          list.push(row);
         }
       }
 
       // CSV-Format erstellen
-      const csv = stringify(rows, {
+      const csv = stringify(list, {
         header: true,
         delimiter: ';',
         record_delimiter: '\r\n', // Windows-Zeilenumbruch
@@ -342,8 +347,27 @@ class StaffelController {
 
       logger.info('Exportierte Zeilen:', rows);
 
+      const list = [];
+      const vereinCount = {};
+
+      for (const row of rows) {
+        if (row.Name1 !== '' && row.Name2 !== '' && row.Name3 !== '' && row.Name4 !== '') {
+          const key = `${row.Verein}-${row['Klasse Staffel']}`;
+
+          if (!vereinCount[key]) {
+            vereinCount[key] = 1;
+            row.Verein += ` ${this.toRoman(vereinCount[key])}`;
+          } else {
+            vereinCount[key] += 1;
+            row.Verein += ` ${this.toRoman(vereinCount[key])}`;
+          }
+
+          list.push(row);
+        }
+      }
+
       // CSV-Format erstellen
-      const csv = stringify(rows, {
+      const csv = stringify(list, {
         header: true,
         delimiter: ';',
         record_delimiter: '\r\n', // Windows-Zeilenumbruch
