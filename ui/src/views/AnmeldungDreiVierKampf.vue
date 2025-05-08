@@ -66,22 +66,29 @@
               <td v-if="isAdmin">{{ sportler.vereinsname }}</td>
               <td v-if="selectedSportfest.disziplinActive.dreikampf">
                 <i
-                  v-if="!sportler.dreikampf"
+                  v-if="!sportler.dreikampf && !isMeldeende"
                   @click="clickNewDreikampf(sportler.id)"
                   class="bi bi-x-circle"
                   style="cursor: pointer; font-size: 1.5em;">
                 </i>
                 <i
-                v-if="sportler.dreikampf"
+                v-if="sportler.dreikampf && !isMeldeende"
                   @click="clickDelDreikampf(sportler.meldungId)"
                     class="bi bi-check-circle-fill text-success"
                   style="cursor: pointer; font-size: 1.5em;">
                 </i>
+                <!-- Nach Meldeende -->
+                <i
+                v-if="sportler.dreikampf && isMeldeende"
+                  class="bi bi-check-circle-fill text-success"
+                  style="font-size: 1.5em;">
+                </i>
               </td>
               <td v-if="selectedSportfest.disziplinActive.hochsprung">
                 <template v-if ="sportler.dreikampf">
-                  <span v-if="sportler.minHoehe === null">min. Alter 10</span>
-                  <select v-else v-model="sportler.hoehe" @change="changeStartHoehe(sportler)" class="form-select">
+                  <span v-if="sportler.minHoehe === null && !isMeldeende">min. Alter 10</span>
+                  <span v-if="isMeldeende && sportler.hoehe">{{ sportler.hoehe }} cm</span>
+                  <select v-if="sportler.minHoehe !== null && !isMeldeende" v-model="sportler.hoehe" @change="changeStartHoehe(sportler)" class="form-select">
                     <option key="0" value="null">keine Hochsprung Anmeldung</option>
                     <option
                       v-for="item in createHoeheList(sportler.minHoehe)"
@@ -119,6 +126,25 @@ let fuseSearch;
 let searchText = ref('');
 
 const route = useRoute();
+
+const isMeldeende = computed(() => {
+  let result = true;
+
+  if (userStore.sportfeste.length > 0) {
+    for (const sportfest of userStore.sportfeste) {
+      if (sportfest.id == route.params.sportfestId) {
+        if (new Date(sportfest.meldeende).setHours(0, 0, 0, 0) >= new Date().setHours(0, 0, 0, 0)) {
+          result = false;
+        } else {
+          result = true;
+        }
+        console.log('asdf', result);
+      }
+    }
+  }
+
+  return result;
+});
 
 const fuseOptions = {
   // isCaseSensitive: false,

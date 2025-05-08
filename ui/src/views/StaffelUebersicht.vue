@@ -21,7 +21,7 @@
     <div v-for="klasse of klassenList" :key="klasse.id" class="card mb-3">
       <div class="card-header d-flex justify-content-between align-items-center" style="background-color: #e3e3e3;">
         <h5 class="card-title">{{ klasse.name }}</h5>
-        <button class="btn btn-success" @click="clickNeueStaffel(klasse)">Neue Staffel hinzufügen</button>
+        <button v-if="!isMeldeende" class="btn btn-success" @click="clickNeueStaffel(klasse)">Neue Staffel hinzufügen</button>
       </div>
       <div class="card-body">
         <!-- Tabelle Staffeln -->
@@ -41,12 +41,14 @@
                 </span>
               </td>
               <td class="text-end">
-                <button @click="clickDelStaffel(staffel)" type="button" class="btn btn-danger">
-                  <i class="bi bi-trash"></i>
-                </button>
-                <button @click="clickEditStaffel(staffel, klasse)" class="btn btn-primary ms-1">
-                  <i class="bi bi-pencil"></i>
-                </button>
+                <div v-if="!isMeldeende">
+                  <button @click="clickDelStaffel(staffel)" type="button" class="btn btn-danger">
+                    <i class="bi bi-trash"></i>
+                  </button>
+                  <button @click="clickEditStaffel(staffel, klasse)" class="btn btn-primary ms-1">
+                    <i class="bi bi-pencil"></i>
+                  </button>
+                </div>
               </td>
             </tr>
           </tbody>
@@ -97,6 +99,25 @@ const dialogStore = useDialogStore();
 const dataStore = useDataStore();
 const router = useRouter();
 const staffelVereinsId = ref(null);
+
+const isMeldeende = computed(() => {
+  let result = true;
+
+  if (userStore.sportfeste.length > 0) {
+    for (const sportfest of userStore.sportfeste) {
+      if (sportfest.id == route.params.sportfestId) {
+        if (new Date(sportfest.meldeende).setHours(0, 0, 0, 0) >= new Date().setHours(0, 0, 0, 0)) {
+          result = false;
+        } else {
+          result = true;
+        }
+        console.log('asdf', result);
+      }
+    }
+  }
+
+  return result;
+});
 
 let delStaffelId;
 
