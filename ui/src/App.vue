@@ -28,8 +28,16 @@ async function getSessionData() {
   userStore.getSessionDataFinished = true;
 }
 
+function checkIfMobile() {
+  const isMobile = window.innerWidth <= 768; // Schwellenwert für Smartphones
+  console.log('checkIfMobile isMobile', isMobile);
+  userStore.setIsMobile(isMobile);
+}
+
 onMounted(() => {
   getSessionData();
+  checkIfMobile(); // Initialer Check
+  window.addEventListener('resize', checkIfMobile); // Aktualisieren bei Größenänderung
 });
 
 </script>

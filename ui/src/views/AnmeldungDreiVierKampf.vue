@@ -22,7 +22,9 @@
           <button @click="searchText = '';" class="btn btn-outline-secondary" type="button"
             id="button-addon2">X</button>
         </div>
-        <table class="table table-striped">
+
+        <!-- Tabellen ansicht für PC -->
+        <table v-if="!userStore.isMobileDevice" class="table table-striped">
           <thead>
             <tr>
               <th scope="col">
@@ -72,14 +74,14 @@
                   style="cursor: pointer; font-size: 1.5em;">
                 </i>
                 <i
-                v-if="sportler.dreikampf && !isMeldeende"
+                  v-if="sportler.dreikampf && !isMeldeende"
                   @click="clickDelDreikampf(sportler.meldungId)"
                     class="bi bi-check-circle-fill text-success"
                   style="cursor: pointer; font-size: 1.5em;">
                 </i>
                 <!-- Nach Meldeende -->
                 <i
-                v-if="sportler.dreikampf && isMeldeende"
+                  v-if="sportler.dreikampf && isMeldeende"
                   class="bi bi-check-circle-fill text-success"
                   style="font-size: 1.5em;">
                 </i>
@@ -103,6 +105,56 @@
             </tr>
           </tbody>
         </table>
+
+        <!-- Handy ansicht -->
+        <div v-if="userStore.isMobileDevice" class="card-deck">
+          <div v-for="sportler in sportlerListShow" :key="sportler.id" class="card mb-3">
+            <div class="card-body" style="padding: 9px;">
+              <h5 class="card-title">{{ sportler.name }} {{ sportler.vname }}</h5>
+              <p class="card-text mb-1">
+                <strong>Jahrgang:</strong> {{ sportler.jahrgang }} ({{ sportler.alter }})<br>
+                <strong>Geschlecht:</strong> {{ sportler.geschlecht === 'm' ? 'männlich' : 'weiblich' }}<br>
+                <strong v-if="isAdmin">Verein:</strong> <span v-if="isAdmin">{{ sportler.vereinsname }}</span>
+              </p>
+              <p class="mb-1 d-flex align-items-center">
+                <i
+                  v-if="!sportler.dreikampf && !isMeldeende"
+                  @click="clickNewDreikampf(sportler.id)"
+                  class="bi bi-x-circle me-2"
+                  style="cursor: pointer; font-size: 1.5em;">
+                </i>
+                <i
+                  v-if="sportler.dreikampf && !isMeldeende"
+                  @click="clickDelDreikampf(sportler.meldungId)"
+                    class="bi bi-check-circle-fill text-success me-2"
+                  style="cursor: pointer; font-size: 1.5em;">
+                </i>
+                <!-- Nach Meldeende -->
+                <i
+                  v-if="sportler.dreikampf && isMeldeende"
+                  class="bi bi-check-circle-fill text-success me-2"
+                  style="font-size: 1.5em;">
+                </i>
+                <span v-if="selectedSportfest.disziplinActive.hochsprung" class="mb-0">
+                  <template v-if ="sportler.dreikampf">
+                    <span v-if="sportler.minHoehe === null && !isMeldeende">kein Hochsprung: min. Alter 10</span>
+                    <span v-if="isMeldeende && sportler.hoehe">{{ sportler.hoehe }} cm</span>
+                    <select v-if="sportler.minHoehe !== null && !isMeldeende" v-model="sportler.hoehe" @change="changeStartHoehe(sportler)" class="form-select">
+                      <option key="0" value="null">keine Hochsprung Anmeldung</option>
+                      <option
+                        v-for="item in createHoeheList(sportler.minHoehe)"
+                        :key="item.value"
+                        :value="item.value"
+                      >
+                        {{ item.text }}
+                      </option>
+                    </select>
+                  </template>
+                </span>
+              </p>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -138,7 +190,6 @@ const isMeldeende = computed(() => {
         } else {
           result = true;
         }
-        console.log('asdf', result);
       }
     }
   }

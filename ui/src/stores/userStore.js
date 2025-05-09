@@ -10,10 +10,12 @@ export const useUserStore = defineStore('userStore', {
     sportfeste: null,
     selectedSportfest: null,
     lastSelectedStaffelVereinsId: null,
+    isMobile: false,
   }),
 
   getters: {
     isLoggedIn: (state) => !!state.user,
+    isMobileDevice: (state) => state.isMobile,
   },
 
   actions: {
@@ -24,6 +26,10 @@ export const useUserStore = defineStore('userStore', {
     setUser (userData) {
       this.user = userData;
       this.getSessionDataFinished = true;
+    },
+
+    setIsMobile(isMobile) {
+      this.isMobile = isMobile; // Methode zum Setzen von isMobile
     },
 
     setEditUser (user) {
