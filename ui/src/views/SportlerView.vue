@@ -1,159 +1,176 @@
 <template>
   <div class="container">
-    <div class="card mt-2">
-      <div class="card-body">
-        <h2 class="card-title">Teilnehmer</h2>
-        <div class="input-group mb-3">
-          <input v-model="searchText" type="text" class="form-control" placeholder="finde...">
-          <button @click="clickClearTextSearch()" class="btn btn-outline-secondary" type="button"
-            id="button-addon2">X</button>
-        </div>
 
-        <!-- Ansicht PC -->
-        <table v-if="!userStore.isMobileDevice" class="table table-striped">
-          <thead>
-            <tr>
-              <th scope="col">
-                <span class="sortCollums" @click="clickSortName()">Name</span>
-                <i v-if="searchText === '' && sortOrder === 'Name_ASC'" @click="clickSortName()" class="bi bi-arrow-down"></i>
-                <i v-if="searchText === '' && sortOrder === 'Name_DSC'" @click="clickSortName()" class="bi bi-arrow-up"></i>
-              </th>
-              <th scope="col">
-                <span class="sortCollums" @click="clickSortVorname()">Vorname</span>
-                <i v-if="searchText === '' && sortOrder === 'Vorname_ASC'" @click="clickSortVorname()" class="bi bi-arrow-down"></i>
-                <i v-if="searchText === '' && sortOrder === 'Vorname_DSC'" @click="clickSortVorname()" class="bi bi-arrow-up"></i>
-              </th>
-              <th scope="col">
-                <span class="sortCollums" @click="clickSortJahrgang()">Jahrgang</span>
-                <i v-if="searchText === '' && sortOrder === 'Jahrgang_ASC'" @click="clickSortJahrgang()" class="bi bi-arrow-down"></i>
-                <i v-if="searchText === '' && sortOrder === 'Jahrgang_DSC'" @click="clickSortJahrgang()" class="bi bi-arrow-up"></i>
-              </th>
-              <th scope="col">
-                <span class="sortCollums" @click="clickSortGeschlecht()">Geschlecht</span>
-                <i v-if="searchText === '' && sortOrder === 'Geschlecht_ASC'" @click="clickSortGeschlecht()" class="bi bi-arrow-down"></i>
-                <i v-if="searchText === '' && sortOrder === 'Geschlecht_DSC'" @click="clickSortGeschlecht()" class="bi bi-arrow-up"></i>
-              </th>
-              <th v-if="isAdmin" scope="col">
-                <span class="sortCollums" @click="clickSortVerein()">Verein</span>
-                <i v-if="searchText === '' && sortOrder === 'Vereinsname_ASC'" @click="clickSortVerein()" class="bi bi-arrow-down"></i>
-                <i v-if="searchText === '' && sortOrder === 'Vereinsname_DSC'" @click="clickSortVerein()" class="bi bi-arrow-up"></i>
-              </th>
-              <th scope="col"></th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td><input v-model="newSportler.name" type="text" class="form-control"></td>
-              <td><input v-model="newSportler.vname" type="text" class="form-control"></td>
-              <td><input v-model.number="newSportler.jahrgang" type="number" class="form-control" min="1900"></td>
-              <td>
-                <select v-model="newSportler.geschlecht" class="form-select">
-                  <option value="m">männlich</option>
-                  <option value="w">weiblich</option>
-                </select>
-              </td>
-              <td v-if="isAdmin">
-                <select v-model="newSportler.vereinsid" class="form-select">
-                  <option v-for="verein in vereineList" :key="verein.id" :value="verein.id">
-                    {{ verein.name }}
-                  </option>
-                </select>
-              </td>
-              <td>
-                <button v-if="!abgesendetOK" :disabled="!newSportlerValid" type="button" @click="clickNewSportler"
-                  class="btn btn-success">
-                  Neuer Sportler
-                </button>
-                <div v-else>
-                  <i class="bi bi-check-circle-fill" style="color: green; font-size: 2rem;"></i>
-                </div>
-              </td>
-            </tr>
-            <tr v-for="sportler in sportlerListShow" :key="sportler.id">
-              <template v-if="!sportler.editMode">
-                <td :class="{ 'editMode': editMode }">{{ sportler.name }}</td>
-                <td :class="{ 'editMode': editMode }">{{ sportler.vname }}</td>
-                <td :class="{ 'editMode': editMode }">{{ sportler.jahrgang }}</td>
-                <td :class="{ 'editMode': editMode }">{{ sportler.geschlecht === 'm' ? 'männlich' : 'weiblich' }}</td>
-                <td :class="{ 'editMode': editMode }" v-if="isAdmin">{{ sportler.vereinsname }}</td>
+    <!-- Ansicht PC -->
+    <div v-if="!userStore.isMobileDevice">
+      <div class="card mt-2">
+        <div class="card-body">
+          <h2 class="card-title">Teilnehmer</h2>
+          <div class="input-group mb-3">
+            <input v-model="searchText" type="text" class="form-control" placeholder="finde...">
+            <button @click="clickClearTextSearch()" class="btn btn-outline-secondary" type="button"
+              id="button-addon2">X</button>
+          </div>
+          <table class="table table-striped">
+            <thead>
+              <tr>
+                <th scope="col">
+                  <span class="sortCollums" @click="clickSortName()">Name</span>
+                  <i v-if="searchText === '' && sortOrder === 'Name_ASC'" @click="clickSortName()" class="bi bi-arrow-down"></i>
+                  <i v-if="searchText === '' && sortOrder === 'Name_DSC'" @click="clickSortName()" class="bi bi-arrow-up"></i>
+                </th>
+                <th scope="col">
+                  <span class="sortCollums" @click="clickSortVorname()">Vorname</span>
+                  <i v-if="searchText === '' && sortOrder === 'Vorname_ASC'" @click="clickSortVorname()" class="bi bi-arrow-down"></i>
+                  <i v-if="searchText === '' && sortOrder === 'Vorname_DSC'" @click="clickSortVorname()" class="bi bi-arrow-up"></i>
+                </th>
+                <th scope="col">
+                  <span class="sortCollums" @click="clickSortJahrgang()">Jahrgang</span>
+                  <i v-if="searchText === '' && sortOrder === 'Jahrgang_ASC'" @click="clickSortJahrgang()" class="bi bi-arrow-down"></i>
+                  <i v-if="searchText === '' && sortOrder === 'Jahrgang_DSC'" @click="clickSortJahrgang()" class="bi bi-arrow-up"></i>
+                </th>
+                <th scope="col">
+                  <span class="sortCollums" @click="clickSortGeschlecht()">Geschlecht</span>
+                  <i v-if="searchText === '' && sortOrder === 'Geschlecht_ASC'" @click="clickSortGeschlecht()" class="bi bi-arrow-down"></i>
+                  <i v-if="searchText === '' && sortOrder === 'Geschlecht_DSC'" @click="clickSortGeschlecht()" class="bi bi-arrow-up"></i>
+                </th>
+                <th v-if="isAdmin" scope="col">
+                  <span class="sortCollums" @click="clickSortVerein()">Verein</span>
+                  <i v-if="searchText === '' && sortOrder === 'Vereinsname_ASC'" @click="clickSortVerein()" class="bi bi-arrow-down"></i>
+                  <i v-if="searchText === '' && sortOrder === 'Vereinsname_DSC'" @click="clickSortVerein()" class="bi bi-arrow-up"></i>
+                </th>
+                <th scope="col"></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><input v-model="newSportler.name" type="text" class="form-control"></td>
+                <td><input v-model="newSportler.vname" type="text" class="form-control"></td>
+                <td><input v-model.number="newSportler.jahrgang" type="number" class="form-control" min="1900"></td>
                 <td>
-                  <div class="d-flex">
-                    <button v-if="!editMode" @click="clickDelSportler(sportler)" type="button" class="btn btn-danger">
-                      <i class="bi bi-trash"></i>
-                    </button>
-                    <button v-if="!editMode" @click="clickEditSportler(sportler)" class="btn btn-primary ms-1">
-                      <i class="bi bi-pencil"></i>
-                    </button>
-                  </div>
-                </td>
-              </template>
-              <template v-else>
-                <td><input v-model="sportler.name" type="text" class="form-control"></td>
-                <td><input v-model="sportler.vname" type="text" class="form-control"></td>
-                <td><input v-model.number="sportler.jahrgang" type="number" class="form-control" min="1900"></td>
-                <td>
-                  <select v-model="sportler.geschlecht" class="form-select">
+                  <select v-model="newSportler.geschlecht" class="form-select">
                     <option value="m">männlich</option>
                     <option value="w">weiblich</option>
                   </select>
                 </td>
                 <td v-if="isAdmin">
-                  <select v-model="sportler.vereinsid" class="form-select">
-                    <option v-for="verein in vereineList" :key="verein.id" :value="verein.id">{{ verein.name }}</option>
+                  <select v-model="newSportler.vereinsid" class="form-select">
+                    <option v-for="verein in vereineList" :key="verein.id" :value="verein.id">
+                      {{ verein.name }}
+                    </option>
                   </select>
                 </td>
                 <td>
-                  <button @click="clickEditSportlerAbbrechen(sportler)" type="button" class="btn btn-secondary">
-                    <i class="bi bi-x"></i>
+                  <button v-if="!abgesendetOK" :disabled="!newSportlerValid" type="button" @click="clickNewSportler"
+                    class="btn btn-success">
+                    Neuer Sportler
                   </button>
-                  <button @click="clickEditSportlerAendern(sportler)" class="btn btn-success ms-1">
-                    <i class="bi bi-check"></i>
-                  </button>
+                  <div v-else>
+                    <i class="bi bi-check-circle-fill" style="color: green; font-size: 2rem;"></i>
+                  </div>
                 </td>
-              </template>
-            </tr>
-          </tbody>
-        </table>
+              </tr>
+              <tr v-for="sportler in sportlerListShow" :key="sportler.id">
+                <template v-if="!sportler.editMode">
+                  <td :class="{ 'editMode': editMode }">{{ sportler.name }}</td>
+                  <td :class="{ 'editMode': editMode }">{{ sportler.vname }}</td>
+                  <td :class="{ 'editMode': editMode }">{{ sportler.jahrgang }}</td>
+                  <td :class="{ 'editMode': editMode }">{{ sportler.geschlecht === 'm' ? 'männlich' : 'weiblich' }}</td>
+                  <td :class="{ 'editMode': editMode }" v-if="isAdmin">{{ sportler.vereinsname }}</td>
+                  <td>
+                    <div class="d-flex">
+                      <button v-if="!editMode" @click="clickDelSportler(sportler)" type="button" class="btn btn-danger">
+                        <i class="bi bi-trash"></i>
+                      </button>
+                      <button v-if="!editMode" @click="clickEditSportler(sportler)" class="btn btn-primary ms-1">
+                        <i class="bi bi-pencil"></i>
+                      </button>
+                    </div>
+                  </td>
+                </template>
+                <template v-else>
+                  <td><input v-model="sportler.name" type="text" class="form-control"></td>
+                  <td><input v-model="sportler.vname" type="text" class="form-control"></td>
+                  <td><input v-model.number="sportler.jahrgang" type="number" class="form-control" min="1900"></td>
+                  <td>
+                    <select v-model="sportler.geschlecht" class="form-select">
+                      <option value="m">männlich</option>
+                      <option value="w">weiblich</option>
+                    </select>
+                  </td>
+                  <td v-if="isAdmin">
+                    <select v-model="sportler.vereinsid" class="form-select">
+                      <option v-for="verein in vereineList" :key="verein.id" :value="verein.id">{{ verein.name }}</option>
+                    </select>
+                  </td>
+                  <td>
+                    <button @click="clickEditSportlerAbbrechen(sportler)" type="button" class="btn btn-secondary">
+                      <i class="bi bi-x"></i>
+                    </button>
+                    <button @click="clickEditSportlerAendern(sportler)" class="btn btn-success ms-1">
+                      <i class="bi bi-check"></i>
+                    </button>
+                  </td>
+                </template>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
 
-        <!-- Mobile Ansicht -->
-        <div v-if="userStore.isMobileDevice" class="list-group">
-          <!-- Neuer Sportler -->
-          <div class="card-body">
-            <h6 class="card-title">Neuer Sportler</h6>
-            <div class="mb-1">
-                <label for="name" class="form-label" style="font-size: 0.9rem;">Name</label>
-              <input id="name" v-model="newSportler.name" type="text" class="form-control form-control-sm" placeholder="Name">
+    <!-- Mobile Ansicht -->
+    <div v-if="userStore.isMobileDevice" class="list-group">
+      <div class="card mt-2">
+        <!-- Neuer Sportler -->
+        <div class="card-body">
+          <h5 class="card-title">Neuer Sportler</h5>
+          <div class="mb-1">
+              <label for="name" class="form-label" style="font-size: 0.9rem;">Name</label>
+            <input id="name" v-model="newSportler.name" type="text" class="form-control form-control-sm" placeholder="Name">
+          </div>
+          <div class="mb-1">
+            <label for="vname" class="form-label" style="font-size: 0.9rem;">Vorname</label>
+            <input id="vname" v-model="newSportler.vname" type="text" class="form-control form-control-sm" placeholder="Vorname">
+          </div>
+          <div class="mb-1">
+            <label for="jahrgang" class="form-label" style="font-size: 0.9rem;">Jahrgang</label>
+            <input id="jahrgang" v-model.number="newSportler.jahrgang" type="number" class="form-control form-control-sm" min="1900" placeholder="Jahrgang">
+          </div>
+          <div class="mb-1">
+            <label for="geschlecht" class="form-label" style="font-size: 0.9rem;">Geschlecht</label>
+            <select id="geschlecht" v-model="newSportler.geschlecht" class="form-select form-select-sm">
+              <option value="m">männlich</option>
+              <option value="w">weiblich</option>
+            </select>
+          </div>
+          <div v-if="isAdmin" class="mb-1">
+            <label for="verein" class="form-label" style="font-size: 0.9rem;">Verein</label>
+            <select id="verein" v-model="newSportler.vereinsid" class="form-select form-select-sm">
+              <option v-for="verein in vereineList" :key="verein.id" :value="verein.id">
+                {{ verein.name }}
+              </option>
+            </select>
+          </div>
+          <div class="d-flex justify-content-between align-items-center">
+            <button v-if="!abgesendetOK" :disabled="!newSportlerValid" type="button" @click="clickNewSportler" class="btn btn-sm btn-success w-100">
+              Neuer Sportler
+            </button>
+            <div v-else>
+              <i class="bi bi-check-circle-fill" style="color: green; font-size: 2rem;"></i>
             </div>
-            <div class="mb-1">
-              <label for="vname" class="form-label" style="font-size: 0.9rem;">Vorname</label>
-              <input id="vname" v-model="newSportler.vname" type="text" class="form-control form-control-sm" placeholder="Vorname">
-            </div>
-            <div class="mb-1">
-              <label for="jahrgang" class="form-label" style="font-size: 0.9rem;">Jahrgang</label>
-              <input id="jahrgang" v-model.number="newSportler.jahrgang" type="number" class="form-control form-control-sm" min="1900" placeholder="Jahrgang">
-            </div>
-            <div class="mb-1">
-              <label for="geschlecht" class="form-label" style="font-size: 0.9rem;">Geschlecht</label>
-              <select id="geschlecht" v-model="newSportler.geschlecht" class="form-select form-select-sm">
-                <option value="m">männlich</option>
-                <option value="w">weiblich</option>
-              </select>
-            </div>
-            <div v-if="isAdmin" class="mb-1">
-              <label for="verein" class="form-label" style="font-size: 0.9rem;">Verein</label>
-              <select id="verein" v-model="newSportler.vereinsid" class="form-select form-select-sm">
-                <option v-for="verein in vereineList" :key="verein.id" :value="verein.id">
-                  {{ verein.name }}
-                </option>
-              </select>
-            </div>
-            <div class="d-flex justify-content-between align-items-center">
-              <button v-if="!abgesendetOK" :disabled="!newSportlerValid" type="button" @click="clickNewSportler" class="btn btn-sm btn-success w-100">
-                Neuer Sportler
-              </button>
-              <div v-else>
-                <i class="bi bi-check-circle-fill" style="color: green; font-size: 2rem;"></i>
-              </div>
+          </div>
+        </div>
+      </div>
+      <div class="card mt-2">
+        <div class="card-body">
+          <!-- globale suche -->
+          <div>
+            <h2 class="card-title">Teilnehmer</h2>
+            <div class="input-group mb-3">
+              <input v-model="searchText" type="text" class="form-control" placeholder="finde...">
+              <button @click="clickClearTextSearch()" class="btn btn-outline-secondary" type="button"
+              id="button-addon2">X</button>
             </div>
           </div>
           <!-- Auflistung der Sportler -->
