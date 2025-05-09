@@ -5,7 +5,7 @@
     <div v-if="!userStore.isMobileDevice">
       <div class="card mt-2">
         <div class="card-body">
-          <h2 class="card-title">Teilnehmer</h2>
+          <h2 class="card-title">Sportler</h2>
           <div class="input-group mb-3">
             <input v-model="searchText" type="text" class="form-control" placeholder="finde...">
             <button @click="clickClearTextSearch()" class="btn btn-outline-secondary" type="button"
@@ -166,7 +166,7 @@
         <div class="card-body">
           <!-- globale suche -->
           <div>
-            <h2 class="card-title">Teilnehmer</h2>
+            <h2 class="card-title">Sportler</h2>
             <div class="input-group mb-3">
               <input v-model="searchText" type="text" class="form-control" placeholder="finde...">
               <button @click="clickClearTextSearch()" class="btn btn-outline-secondary" type="button"
