@@ -8,7 +8,9 @@
         <label class="form-check-label" for="flexSwitchCheckMixed">gemixte Staffel</label>
       </div>
     </div>
-    <div class="card mb-3">
+
+    <!-- PC Ansicht -->
+    <div v-if="!userStore.isMobileDevice" class="card mb-3">
       <table class="table table-striped table-hover">
         <thead>
           <tr>
@@ -70,6 +72,61 @@
       </table>
     </div>
 
+    <!-- Mobile Ansict -->
+    <div v-if="userStore.isMobileDevice" class="row">
+      <div v-for="sportler in klasseSportlerListShow" :key="sportler.id" class="col-12 col-md-6 col-lg-4 mb-3">
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title">{{ sportler.name }} {{ sportler.vname }}</h5>
+            <p class="card-text">
+              <strong>Jahrgang:</strong> {{ sportler.jahrgang }} ({{ sportler.sportleralter }})<br>
+              <strong>Geschlecht:</strong> {{ sportler.geschlecht === 'm' ? 'männlich' : 'weiblich' }}
+            </p>
+            <div class="d-flex justify-content-between align-items-center">
+              <div>
+                <template v-if="sportler.laeuferNr || (!staffelVoll && sportler.geschlecht === 'm') || (!staffelVoll && sportler.geschlecht === 'w' && countWeiblich < 3)">
+                  <i
+                    v-if="!sportler.laeuferNr"
+                    @click="clickNewStaffelLaeufer(sportler)"
+                    class="bi bi-check-circle text-success"
+                    style="cursor: pointer; font-size: 1.5rem;">
+                  </i>
+                  <i
+                    v-if="sportler.laeuferNr"
+                    @click="clickDelStaffelLaeufer(sportler.id)"
+                    class="bi bi-x-circle text-danger"
+                    style="cursor: pointer; font-size: 1.5rem;">
+                  </i>
+                </template>
+                <template v-else>
+                  <i
+                    class="bi bi-check-circle"
+                    style="cursor: pointer; font-size: 1.5rem; color:lightgrey;">
+                  </i>
+                </template>
+              </div>
+              <div>
+                <template v-if="sportler.laeuferNr">
+                  <div class="btn-group" role="group" aria-label="Läufernummer">
+                    <button
+                      v-for="num in [1, 2, 3, 4]"
+                      :key="num"
+                      type="button"
+                      class="btn btn-sm"
+                      :class="{ 'btn-outline-dark': sportler.laeuferNr !== num, active: sportler.laeuferNr === num, 'btn-outline-success': sportler.laeuferNr === num }"
+                      @click="clickSportlerNr(sportler.id, num)"
+                    >
+                      {{ num }}
+                    </button>
+                  </div>
+                </template>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
   </div>
 </template>
 
@@ -78,9 +135,11 @@ import { onMounted, onBeforeMount, reactive, ref, computed, watch } from 'vue';
 import { nextTick } from 'vue';
 import { useDialogStore } from '@/stores/dialogStore';
 import { useDataStore } from '@/stores/dataStore';
+import { useUserStore } from '@/stores/userStore';
 
 const dialogStore = useDialogStore();
 const dataStore = useDataStore();
+const userStore = useUserStore();
 const klasseSportlerList = reactive([]);
 const mixedStaffel = ref(false);
 let merkerWeitereStaffel = false
