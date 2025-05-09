@@ -15,19 +15,19 @@
           <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav me-auto">
               <li class="nav-item">
-                <RouterLink class="nav-link" to="/">Home</RouterLink>
+                <RouterLink class="nav-link" to="/" @click="collapseNavbar">Home</RouterLink>
               </li>
               <li v-if="showUserLink" class="nav-item">
-                <RouterLink class="nav-link" to="/users">Benutzer</RouterLink>
+                <RouterLink class="nav-link" to="/users" @click="collapseNavbar">Benutzer</RouterLink>
               </li>
               <li v-if="showSportfesteLink" class="nav-item">
-                <RouterLink class="nav-link" to="/sportfeste">Sportfeste</RouterLink>
+                <RouterLink class="nav-link" to="/sportfeste" @click="collapseNavbar">Sportfeste</RouterLink>
               </li>
               <li v-if="showFilesLink" class="nav-item">
-                <RouterLink class="nav-link" to="/files">Dateien</RouterLink>
+                <RouterLink class="nav-link" to="/files" @click="collapseNavbar">Dateien</RouterLink>
               </li>
               <li v-if="showSportlerLink" class="nav-item">
-                <RouterLink class="nav-link" to="/sportler">Sportler</RouterLink>
+                <RouterLink class="nav-link" to="/sportler" @click="collapseNavbar">Sportler</RouterLink>
               </li>
               <!-- Anmeldung Dreikampf -->
               <!-- mehr als ein sportfest -->
@@ -37,13 +37,13 @@
                 </a>
                 <ul class="dropdown-menu">
                   <li v-for="sportfest of userStore.sportfeste" :key="sportfest.id">
-                    <RouterLink class="dropdown-item" :to="`/sportlerAnmeldung/${sportfest.id}`">{{sportfest.name}}</RouterLink>
+                    <RouterLink class="dropdown-item" :to="`/sportlerAnmeldung/${sportfest.id}`" @click="collapseNavbar">{{sportfest.name}}</RouterLink>
                   </li>
                 </ul>
               </li>
               <!-- genau ein Sportfeset -->
               <li v-if="showSportlerAnmeldungLink && userStore.sportfeste.length === 1" class="nav-item">
-                <RouterLink class="nav-link" :to="`/sportlerAnmeldung/${userStore.sportfeste[0].id}`">Anmeldung 3/4 Kampf</RouterLink>
+                <RouterLink class="nav-link" :to="`/sportlerAnmeldung/${userStore.sportfeste[0].id}`" @click="collapseNavbar">Anmeldung 3/4 Kampf</RouterLink>
               </li>
               <!-- Anmeldung Staffel -->
               <!-- wenn mehr als ein Sportfest -->
@@ -54,14 +54,14 @@
                 <ul class="dropdown-menu">
                   <template v-for="sportfest of userStore.sportfeste" :key="sportfest.id">
                     <li v-if="sportfest.disziplinActive.staffel">
-                      <RouterLink class="dropdown-item" :to="`/staffelUebersicht/${sportfest.id}`">{{sportfest.name}}</RouterLink>
+                      <RouterLink class="dropdown-item" :to="`/staffelUebersicht/${sportfest.id}`" @click="collapseNavbar">{{sportfest.name}}</RouterLink>
                     </li>
                   </template>
                 </ul>
               </li>
               <!-- genau ein Sportfeset -->
               <li v-if="showStaffelUebersichtLink && userStore.sportfeste.length === 1" class="nav-item">
-                <RouterLink class="nav-link" :to="`/staffelUebersicht/${userStore.sportfeste[0].id}`">Staffel</RouterLink>
+                <RouterLink class="nav-link" :to="`/staffelUebersicht/${userStore.sportfeste[0].id}`" @click="collapseNavbar">Staffel</RouterLink>
               </li>
             </ul>
             <div class="d-flex">
@@ -91,11 +91,13 @@ import { useDataStore } from '@/stores/dataStore';
 import { useRouter } from 'vue-router';
 import { onMounted } from 'vue';
 import { watch } from 'vue';
+import * as bootstrap from 'bootstrap';
 
 const userStore = useUserStore();
 const dataStore = useDataStore();
 const isLoggedIn = computed(() => userStore.isLoggedIn);
 const router = useRouter();
+let navbarCollapse;
 
 watch(() => userStore.isLoggedIn, (newValue) => {
   if (newValue) {
@@ -199,9 +201,33 @@ const getAktiveSportfeste = async () => {
   }
 }
 
-onMounted(async () => {
+onMounted(() => {
+  const navbarElement = document.getElementById('navbarNav');
+  if (navbarElement) {
+    // Initialisiere die Bootstrap Collapse-Instanz
+    navbarCollapse = new bootstrap.Collapse(navbarElement, {
+      toggle: false
+    });
+  }
 });
 
+const collapseNavbar = () => {
+  if (navbarCollapse) {
+    // Verstecke die Navbar
+    navbarCollapse.hide();
+  } else {
+    const navbarElement = document.getElementById('navbarNav');
+
+    if (navbarElement) {
+      // Initialisiere die Bootstrap Collapse-Instanz
+      navbarCollapse = new bootstrap.Collapse(navbarElement, {
+        toggle: false
+      });
+
+      navbarCollapse.hide();
+    }
+  }
+};
 
 </script>
 
