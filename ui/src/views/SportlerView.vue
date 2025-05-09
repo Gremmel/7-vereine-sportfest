@@ -8,7 +8,9 @@
           <button @click="clickClearTextSearch()" class="btn btn-outline-secondary" type="button"
             id="button-addon2">X</button>
         </div>
-        <table class="table table-striped">
+
+        <!-- Ansicht PC -->
+        <table v-if="!userStore.isMobileDevice" class="table table-striped">
           <thead>
             <tr>
               <th scope="col">
@@ -112,6 +114,115 @@
             </tr>
           </tbody>
         </table>
+
+        <!-- Mobile Ansicht -->
+        <div v-if="userStore.isMobileDevice" class="list-group">
+          <!-- Neuer Sportler -->
+          <div class="card-body">
+            <h6 class="card-title">Neuer Sportler</h6>
+            <div class="mb-1">
+                <label for="name" class="form-label" style="font-size: 0.9rem;">Name</label>
+              <input id="name" v-model="newSportler.name" type="text" class="form-control form-control-sm" placeholder="Name">
+            </div>
+            <div class="mb-1">
+              <label for="vname" class="form-label" style="font-size: 0.9rem;">Vorname</label>
+              <input id="vname" v-model="newSportler.vname" type="text" class="form-control form-control-sm" placeholder="Vorname">
+            </div>
+            <div class="mb-1">
+              <label for="jahrgang" class="form-label" style="font-size: 0.9rem;">Jahrgang</label>
+              <input id="jahrgang" v-model.number="newSportler.jahrgang" type="number" class="form-control form-control-sm" min="1900" placeholder="Jahrgang">
+            </div>
+            <div class="mb-1">
+              <label for="geschlecht" class="form-label" style="font-size: 0.9rem;">Geschlecht</label>
+              <select id="geschlecht" v-model="newSportler.geschlecht" class="form-select form-select-sm">
+                <option value="m">männlich</option>
+                <option value="w">weiblich</option>
+              </select>
+            </div>
+            <div v-if="isAdmin" class="mb-1">
+              <label for="verein" class="form-label" style="font-size: 0.9rem;">Verein</label>
+              <select id="verein" v-model="newSportler.vereinsid" class="form-select form-select-sm">
+                <option v-for="verein in vereineList" :key="verein.id" :value="verein.id">
+                  {{ verein.name }}
+                </option>
+              </select>
+            </div>
+            <div class="d-flex justify-content-between align-items-center">
+              <button v-if="!abgesendetOK" :disabled="!newSportlerValid" type="button" @click="clickNewSportler" class="btn btn-sm btn-success w-100">
+                Neuer Sportler
+              </button>
+              <div v-else>
+                <i class="bi bi-check-circle-fill" style="color: green; font-size: 2rem;"></i>
+              </div>
+            </div>
+          </div>
+          <!-- Auflistung der Sportler -->
+          <div v-for="sportler in sportlerListShow" :key="sportler.id" class="list-group-item">
+            <template v-if="!sportler.editMode">
+              <div :class="{ 'editMode': editMode }">
+                <div class="d-flex justify-content-between">
+                  <div>
+                    <strong>{{ sportler.name }}</strong> {{ sportler.vname }}
+                  </div>
+                  <div v-if="!editMode">
+                    <button @click="clickDelSportler(sportler)" class="btn btn-danger btn-sm">
+                      <i class="bi bi-trash"></i>
+                    </button>
+                    <button @click="clickEditSportler(sportler)" class="btn btn-primary btn-sm ms-1">
+                      <i class="bi bi-pencil"></i>
+                    </button>
+                  </div>
+                </div>
+                <div>
+                  <small>Jahrgang: {{ sportler.jahrgang }}</small>
+                </div>
+                <div>
+                  <small>Geschlecht: {{ sportler.geschlecht === 'm' ? 'männlich' : 'weiblich' }}</small>
+                </div>
+                <div v-if="isAdmin">
+                  <small>Verein: {{ sportler.vereinsname }}</small>
+                </div>
+              </div>
+            </template>
+            <template v-else>
+              <div class="mb-1">
+                <label for="name" class="form-label" style="font-size: 0.9rem;">Name</label>
+                <input id="name" v-model="sportler.name" type="text" class="form-control form-control-sm">
+              </div>
+              <div class="mb-1">
+                <label for="vname" class="form-label" style="font-size: 0.9rem;">Vorname</label>
+                <input id="vname" v-model="sportler.vname" type="text" class="form-control form-control-sm">
+              </div>
+              <div class="mb-1">
+                <label for="jahrgang" class="form-label" style="font-size: 0.9rem;">Jahrgang</label>
+                <input id="jahrgang" v-model.number="sportler.jahrgang" type="number" class="form-control form-control-sm" min="1900">
+              </div>
+              <div class="mb-1">
+                <label for="geschlecht" class="form-label" style="font-size: 0.9rem;">Geschlecht</label>
+                <select id="geschlecht" v-model="sportler.geschlecht" class="form-select form-select-sm">
+                  <option value="m">männlich</option>
+                  <option value="w">weiblich</option>
+                </select>
+              </div>
+              <div v-if="isAdmin" class="mb-1">
+                <label for="verein" class="form-label" style="font-size: 0.9rem;">Verein</label>
+                <select id="verein" v-model="sportler.vereinsid" class="form-select form-select-sm">
+                  <option v-for="verein in vereineList" :key="verein.id" :value="verein.id">
+                    {{ verein.name }}
+                  </option>
+                </select>
+              </div>
+              <div class="d-flex justify-content-between">
+                <button @click="clickEditSportlerAbbrechen(sportler)" class="btn btn-secondary btn-sm">
+                  <i class="bi bi-x"></i> Abbrechen
+                </button>
+                <button @click="clickEditSportlerAendern(sportler)" class="btn btn-success btn-sm ms-1">
+                  <i class="bi bi-check"></i> Speichern
+                </button>
+              </div>
+            </template>
+          </div>
+        </div>
       </div>
     </div>
   </div>
