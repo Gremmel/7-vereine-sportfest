@@ -50,6 +50,13 @@ class MeldungController {
         WHERE id = ?
       `);
 
+      logger.info(`hoeheMeldung: ${hoeheMeldung.hoehe}, meldungId: ${hoeheMeldung.meldungId}`);
+
+      if (hoeheMeldung.hoehe === 'null') {
+        // eslint-disable-next-line no-param-reassign
+        hoeheMeldung.hoehe = null;
+      }
+
       stmt.bind(hoeheMeldung.hoehe, hoeheMeldung.meldungId);
 
       const info = stmt.run();
@@ -147,14 +154,15 @@ class MeldungController {
       const rows = stmt.all(sportfestId);
 
       // Convert m.hoehe from cm to meters with a comma as the decimal separator
-      rows.forEach((row) => {
+      for (const row of rows) {
+        if (row['AH Hochsprung'] === 'null') {
+          row['AH Hochsprung'] = null;
+        }
+
         if (row['AH Hochsprung'] !== null) {
-          // eslint-disable-next-line no-param-reassign
           row['AH Hochsprung'] = (row['AH Hochsprung'] / 100).toFixed(2).replace('.', ',');
         }
-      });
-
-      logger.info('Exportierte Zeilen:', rows);
+      }
 
       // CSV-Format erstellen
       const csv = stringify(rows, {
@@ -206,6 +214,7 @@ class MeldungController {
       // Convert m.hoehe from cm to meters with a comma as the decimal separator
       rows.forEach((row) => {
         if (row['AH Hochsprung'] !== null) {
+          logger.info('Exportierte Zeilen:', row);
           // eslint-disable-next-line no-param-reassign
           row['AH Hochsprung'] = (row['AH Hochsprung'] / 100).toFixed(2).replace('.', ',');
         }
