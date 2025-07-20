@@ -4,6 +4,8 @@ import logger from '../logger.js';
 
 class SportfestController {
   getAktiveSportfeste (user) {
+    // Diese Methode gibt nun alle Sportfeste zurück, das sonst keine Meldungen mehr angezeigt werden können
+    // wenn das Sportfest bereits abgelaufen ist
     try {
       const isAdmin = user.roles.includes('admin');
 
@@ -13,7 +15,7 @@ class SportfestController {
             GROUP_CONCAT(sportfest_disziplin.disziplin_id) AS disziplinen
            FROM sportfest
            JOIN sportfest_disziplin ON sportfest.id = sportfest_disziplin.sportfest_id
-           WHERE startdate >= DATE('now')
+           WHERE true
            GROUP BY sportfest.id
            ORDER BY meldeende DESC`
         );
@@ -40,7 +42,6 @@ class SportfestController {
          JOIN sportfest_verein ON sportfest.id = sportfest_verein.sportfest_id
          JOIN sportfest_disziplin ON sportfest.id = sportfest_disziplin.sportfest_id
          WHERE sportfest_verein.verein_id = ${user.verein_id}
-           AND startdate >= DATE('now')
          GROUP BY sportfest.id
          ORDER BY meldeende DESC`
       );
@@ -54,7 +55,6 @@ class SportfestController {
         );
 
         const vereine = stmtVereine.all(sportfest.id);
-        logger.fatal('asdf vereine', vereine);
 
         sportfest.vereineList = vereine;
       }
