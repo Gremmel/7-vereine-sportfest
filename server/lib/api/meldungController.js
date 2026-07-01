@@ -7,6 +7,23 @@ import { stringify } from 'csv-stringify/sync'; // CSV-Stringify-Bibliothek impo
 class MeldungController {
   async newMeldung (meldung) {
     try {
+      const stmtCheckExisting = dbController.prepare(`
+        SELECT m.id
+        FROM meldungen m
+        INNER JOIN meldungen_sportler ms ON m.id = ms.meldungen_id
+        INNER JOIN meldungen_sportfest msf ON m.id = msf.meldungen_id
+        WHERE ms.sportler_id = ? AND msf.sportfest_id = ?
+        LIMIT 1
+      `);
+
+      const existingMeldung = stmtCheckExisting.get(meldung.sportlerId, meldung.sportfestId);
+
+      if (existingMeldung) {
+        logger.info(`Meldung bereits vorhanden (meldungId=${existingMeldung.id}, sportlerId=${meldung.sportlerId}, sportfestId=${meldung.sportfestId}). Kein neuer Eintrag angelegt.`);
+
+        return existingMeldung.id; // Return the existing meldung ID instead of false
+      }
+
       const stmt = dbController.prepare(`
         INSERT INTO meldungen (dreikampf)
         VALUES (1)
